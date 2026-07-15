@@ -29,8 +29,9 @@ placa 2x4 en 0,0,15 color verde
 baldosa 1x2 en 1,1,16 color blanco
 ```
 
-El visor necesita conexión a internet para cargar la librería 3D. El motor y
-el servidor no tienen ninguna dependencia externa.
+Funciona sin conexión: Three.js va incluido en `blockcad_web/vendor/` bajo
+licencia MIT, compatible con la GPL de este proyecto. Ni el motor, ni el
+servidor, ni el visor descargan nada de internet.
 
 ## El lenguaje
 
@@ -137,8 +138,9 @@ sigue funcionando.
 ## Arquitectura
 
 ```
-blockcad_engine/   motor puro: geometría, catálogo, modelo, comandos, lenguaje
-blockcad_web/      editor y visor 3D; depende del motor, el motor no de él
+blockcad_engine/     motor puro: geometría, catálogo, modelo, comandos, lenguaje
+blockcad_web/        editor y visor 3D; depende del motor, el motor no de él
+blockcad_web/vendor/ Three.js incluido (MIT), para funcionar sin conexión
 ```
 
 ## Ejecutar

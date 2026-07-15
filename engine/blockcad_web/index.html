@@ -127,18 +127,18 @@
 
 <footer id="estado">Cargando…</footer>
 
+<!-- Three.js va incluido en vendor/ (licencia MIT): el visor funciona sin conexión. -->
 <script type="importmap">
 {
   "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    "three": "/vendor/three.module.js"
   }
 }
 </script>
 
 <script type="module">
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from '/vendor/OrbitControls.js';
 
 // Proporciones reales de LEGO: un stud mide 8 mm de lado y una placa 3,2 mm
 // de alto. Con el stud como unidad, la altura de una placa es 0,4.

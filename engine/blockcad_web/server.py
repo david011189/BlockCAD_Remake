@@ -9,6 +9,7 @@ from blockcad_engine import BlockCADError, BlockModel, DslError, parse_model
 from blockcad_engine.parts import PartCatalog
 
 _HTML = Path(__file__).with_name("index.html")
+_VENDOR = Path(__file__).with_name("vendor")
 
 EJEMPLO = '''modelo "Casa sencilla"
 
@@ -102,6 +103,22 @@ class _Handler(BaseHTTPRequestHandler):
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self._send(200, body, "application/json; charset=utf-8")
 
+    def _send_vendor(self, nombre: str) -> None:
+        # El servidor solo escucha en 127.0.0.1, pero un nombre como
+        # '../../secreto' no debe salir nunca de la carpeta vendor.
+        raiz = _VENDOR.resolve()
+        destino = (raiz / nombre).resolve()
+        if raiz not in destino.parents or not destino.is_file():
+            self._send(404, b"No encontrado", "text/plain; charset=utf-8")
+            return
+
+        tipo = (
+            "text/javascript; charset=utf-8"
+            if destino.suffix == ".js"
+            else "text/plain; charset=utf-8"
+        )
+        self._send(200, destino.read_bytes(), tipo)
+
     def do_GET(self) -> None:
         if self.path in ("/", "/index.html"):
             self._send(
@@ -109,6 +126,8 @@ class _Handler(BaseHTTPRequestHandler):
                 _HTML.read_bytes(),
                 "text/html; charset=utf-8",
             )
+        elif self.path.startswith("/vendor/"):
+            self._send_vendor(self.path[len("/vendor/"):])
         elif self.path == "/api/ejemplo":
             self._send_json({"codigo": EJEMPLO})
         elif self.path == "/api/catalogo":

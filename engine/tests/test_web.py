@@ -1,7 +1,12 @@
+import re
 import unittest
+from pathlib import Path
 
+import blockcad_web
 from blockcad_engine import parse_model
 from blockcad_web.server import EJEMPLO, compile_source, model_to_scene
+
+_WEB = Path(blockcad_web.__file__).parent
 
 
 class SceneTests(unittest.TestCase):
@@ -62,6 +67,30 @@ class CompileTests(unittest.TestCase):
         resultado = compile_source(EJEMPLO)
         self.assertTrue(resultado["ok"], resultado.get("mensaje"))
         self.assertEqual(len(resultado["piezas"]), 21)
+
+
+class OfflineTests(unittest.TestCase):
+    """El visor debe funcionar sin conexión: nada puede venir de internet."""
+
+    def test_the_page_has_no_external_references(self) -> None:
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        externas = re.findall(r"https?://[^\"'\s>]+", html)
+        self.assertEqual(externas, [], f"El visor apunta fuera: {externas}")
+
+    def test_the_3d_library_is_bundled(self) -> None:
+        for nombre in ("three.module.js", "OrbitControls.js"):
+            with self.subTest(nombre=nombre):
+                self.assertTrue((_WEB / "vendor" / nombre).is_file())
+
+    def test_orbitcontrols_only_needs_three(self) -> None:
+        # Si importara de 'three/addons/...' el importmap local no bastaría.
+        codigo = (_WEB / "vendor" / "OrbitControls.js").read_text(encoding="utf-8")
+        origenes = set(re.findall(r"from\s+['\"]([^'\"]+)['\"]", codigo))
+        self.assertEqual(origenes, {"three"})
+
+    def test_the_bundled_library_license_is_included(self) -> None:
+        licencia = (_WEB / "vendor" / "LICENSE-three.txt").read_text(encoding="utf-8")
+        self.assertIn("MIT", licencia)
 
 
 if __name__ == "__main__":
