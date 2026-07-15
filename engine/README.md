@@ -83,6 +83,32 @@ sobreviven a cualquier orden.
 Una instrucción por línea. Los errores indican siempre la línea y, cuando dos
 piezas chocan, también la línea de la otra pieza.
 
+### Elegir el catálogo
+
+Sin decir nada se construye con siete piezas idealizadas: ladrillos, placas y
+baldosas. Para usar las de verdad, las que trae una caja concreta:
+
+```
+catalogo "wedo"
+modelo "Mi robot"
+
+viga 7 en 0,0,0 color rojo
+eje 6 en 0,8,0
+19071 en 0,14,0          // el hub, 6x8 studs
+21980 en 8,14,0          // el motor mediano
+```
+
+Va en la primera línea, antes de `modelo`. Son las **277 piezas del set
+45300**, con sus medidas reales sacadas de LDraw y lo que trae la caja de
+cada una.
+
+Ojo: es un set de robótica. **No trae ladrillos 1×1 ni placas 2×4**, así que
+un modelo de ladrillos no compila con él. Los dos catálogos conviven.
+
+Una pieza se escribe por su **número de molde** —`19071`, `3001`—, que es el
+que sale en cualquier inventario. Las familias regulares tienen además nombre
+corto: `ladrillo 2x4`, `placa 1x2`, `baldosa 1x2`, `viga 7`, `eje 6`.
+
 ### Colocar una pieza
 
 ```

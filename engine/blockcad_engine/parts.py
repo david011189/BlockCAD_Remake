@@ -38,6 +38,10 @@ class PartDefinition:
     default_color: str = "#D62828"
     has_top_studs: bool = True
     metadata: dict[str, str] = field(default_factory=dict)
+    #: Otros nombres por los que responde. Una pieza real se llama por su
+    #: número de molde —3001—, pero nadie quiere escribir eso: el alias
+    #: `brick_2x4` deja que el lenguaje siga diciendo "ladrillo 2x4".
+    aliases: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.part_id.strip():
@@ -52,6 +56,7 @@ class PartCatalog:
 
     def __init__(self) -> None:
         self._parts: dict[str, PartDefinition] = {}
+        self._aliases: dict[str, str] = {}
 
     def register(self, definition: PartDefinition, *, replace: bool = False) -> None:
         if definition.part_id in self._parts and not replace:
@@ -60,16 +65,25 @@ class PartCatalog:
             )
         self._parts[definition.part_id] = definition
 
+        for alias in definition.aliases:
+            anterior = self._aliases.get(alias)
+            if anterior is not None and anterior != definition.part_id and not replace:
+                raise DuplicatePartError(
+                    f"El alias {alias!r} ya lo usa la pieza {anterior!r}."
+                )
+            self._aliases[alias] = definition.part_id
+
     def get(self, part_id: str) -> PartDefinition:
+        real = self._aliases.get(part_id, part_id)
         try:
-            return self._parts[part_id]
+            return self._parts[real]
         except KeyError as exc:
             raise PartNotFoundError(
                 f"No existe la definición de pieza {part_id!r}."
             ) from exc
 
     def contains(self, part_id: str) -> bool:
-        return part_id in self._parts
+        return part_id in self._parts or part_id in self._aliases
 
     def all(self) -> tuple[PartDefinition, ...]:
         return tuple(self._parts.values())

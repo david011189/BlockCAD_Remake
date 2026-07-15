@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import re
 import json
 import sys
 from collections import defaultdict
@@ -92,6 +93,57 @@ def cargar_inventario(ruta: Path) -> dict[str, dict]:
     return piezas
 
 
+#: Lo que un stud sobresale del techo de la pieza.
+ALTO_STUD = 4
+
+_MOVIDA_RE = re.compile(r"^~Moved to (\S+)")
+
+
+def resolver(biblioteca: Biblioteca, numero: str, saltos: int = 0) -> str:
+    """Sigue las redirecciones de LDraw hasta la pieza de verdad.
+
+    Cuando un molde se recataloga, LDraw deja un archivo con el número viejo
+    cuyo título es "~Moved to 3023b". La geometría se resuelve igual porque
+    apunta al destino, pero el nombre que quedaría en el catálogo sería
+    "~Moved to 3023b" en vez de "Plate 1 x 2".
+    """
+    titulo, _, _ = biblioteca.cabecera(f"{numero}.dat")
+    movida = _MOVIDA_RE.match(titulo or "")
+    if movida and saltos < 5:
+        return resolver(biblioteca, movida.group(1), saltos + 1)
+    return numero
+
+
+def caja_de_colision(pieza) -> tuple[float, float, float]:
+    """El bulto real de la pieza, en ejes del motor y sin los studs.
+
+    La caja de la malla no sirve para colisionar: los studs sobresalen 4 LDU
+    del techo y se meten dentro de la pieza de arriba. Contarlos haría
+    imposible apilar dos ladrillos, que es lo primero que hace cualquiera.
+
+    En LDraw la vertical es Y y apunta hacia ABAJO, así que el techo de una
+    pieza es su `min_y`. El motor usa Z hacia arriba, y aquí se traduce:
+    ancho = ancho en X, fondo = ancho en Z, alto = ancho en Y.
+    """
+    minimo, maximo = pieza.caja()
+    techo = minimo.y
+
+    # Un stud del techo se apoya justo 4 LDU por debajo del punto más alto.
+    hay_studs_arriba = any(
+        conexion.tipo == "stud"
+        and abs(conexion.punto.y - (techo + ALTO_STUD)) < 0.01
+        for conexion in pieza.conexiones
+    )
+    if hay_studs_arriba:
+        techo += ALTO_STUD
+
+    return (
+        round(maximo.x - minimo.x, 2),
+        round(maximo.z - minimo.z, 2),
+        round(maximo.y - techo, 2),
+    )
+
+
 def describir(biblioteca: Biblioteca, numero: str) -> dict | None:
     pieza = biblioteca.analizar(f"{numero}.dat")
     if not pieza.vertices:
@@ -110,8 +162,11 @@ def describir(biblioteca: Biblioteca, numero: str) -> dict | None:
 
     return {
         "ldraw": numero,
-        "nombre_ldraw": pieza.nombre,
+        # El '=' delante marca un alias en LDraw; no forma parte del nombre.
+        "nombre_ldraw": pieza.nombre.lstrip("=").strip(),
         "licencia": pieza.licencia,
+        # Lo que el motor necesita: el bulto sin studs, en sus ejes.
+        "caja_motor_ldu": list(caja_de_colision(pieza)),
         # Ojo: en LDraw la vertical es Y y apunta hacia abajo. La caja incluye
         # los studs, que sobresalen 4 LDU, así que NO es la caja de colisión.
         "caja_ldu": {
@@ -140,6 +195,8 @@ def generar(inventario: Path, biblioteca_zip: Path, salida: Path) -> dict:
         if not biblioteca.existe(f"{numero}.dat"):
             no_encontradas.append(datos)
             continue
+
+        numero = resolver(biblioteca, numero)
 
         descripcion = describir(biblioteca, numero)
         if descripcion is None:

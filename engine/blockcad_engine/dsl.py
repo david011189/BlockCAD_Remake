@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import re
 
+from .catalogos import cargar as cargar_catalogo
 from .errors import BlockCADError, DslError
 from .geometry import PLACA, STUD, GridPosition, Orientation
 from .model import DEFAULT_MODEL_NAME, BlockModel, PlacedPart
@@ -29,6 +30,8 @@ PART_PREFIXES = {
     "ladrillo": "brick",
     "placa": "plate",
     "baldosa": "tile",
+    "viga": "beam",
+    "eje": "axle",
 }
 
 #: Colores con nombre, para no escribir hexadecimal.
@@ -55,6 +58,8 @@ _PART_ID_RE = re.compile(r"^(?P<prefijo>[a-z]+)_(?P<medida>\d+x\d+)$")
 
 _NAME_RE = re.compile(r'^modelo\s+"(?P<nombre>[^"]*)"\s*$')
 
+_CATALOGO_RE = re.compile(r'^catalogo\s+"(?P<nombre>[^"]*)"\s*$')
+
 _REPEAT_RE = re.compile(
     r"^repetir\s+(?P<veces>\d+)(?:\s+veces)?"
     # Sin desplazamiento el bloque se repite en el sitio, que es lo que hace
@@ -65,8 +70,11 @@ _REPEAT_RE = re.compile(
 )
 
 _PIECE_RE = re.compile(
-    r"^(?P<tipo>[A-Za-z_][A-Za-z0-9_]*)"
-    r"(?:\s+(?P<medida>\d+x\d+))?"
+    # El identificador puede empezar por dígito: los moldes de LEGO se llaman
+    # 3001 o 32316, y es como vienen en las instrucciones.
+    r"^(?P<tipo>[A-Za-z0-9_][A-Za-z0-9_]*)"
+    # Un ladrillo se mide con dos números ("2x4") y una viga con uno ("7").
+    r"(?:\s+(?P<medida>\d+(?:x\d+)?))?"
     r"\s+(?P<lugar>(?:encima|en)\b.*)$"
 )
 
@@ -273,7 +281,10 @@ class _Builder:
 
         nombre = options.pop("nombre", None)
         candidate = PlacedPart.create(
-            part_id=part_id,
+            # Se guarda la pieza canónica, no el alias con que se escribió:
+            # "brick_2x4" significa cosas distintas en cada catálogo, y en un
+            # archivo guardado eso sería una trampa. El molde 3001 es 3001.
+            part_id=definition.part_id,
             position=position,
             color=options.pop("color", None) or definition.default_color,
             **options,
@@ -553,6 +564,23 @@ def parse_model(source: str, *, catalog: PartCatalog | None = None) -> BlockMode
         )
 
     lines = _read_lines(source)
+
+    # `catalogo "wedo"` elige con qué piezas se construye. Sin él se usan las
+    # básicas, que es lo que espera el código escrito hasta ahora.
+    #
+    # Si el código lo declara, manda el código: se describe a sí mismo, y el
+    # `catalog=` de Python es el valor por defecto para cuando no dice nada.
+    # Ignorar la línea en silencio sería peor: alguien pediría "wedo" y
+    # construiría con otra cosa.
+    if lines:
+        eleccion = _CATALOGO_RE.match(lines[0].text)
+        if eleccion:
+            try:
+                catalog = cargar_catalogo(eleccion.group("nombre"))
+            except BlockCADError as exc:
+                raise DslError(lines[0].number, str(exc)) from exc
+            lines = lines[1:]
+
     model = BlockModel(catalog=catalog)
 
     if lines:
@@ -566,6 +594,11 @@ def parse_model(source: str, *, catalog: PartCatalog | None = None) -> BlockMode
             raise DslError(
                 line.number,
                 "'modelo' debe ser la primera instrucción del código.",
+            )
+        if _CATALOGO_RE.match(line.text):
+            raise DslError(
+                line.number,
+                "'catalogo' debe ir en la primera línea, antes que 'modelo'.",
             )
 
     if lines and lines[0].indent != 0:
