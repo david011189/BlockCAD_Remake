@@ -340,14 +340,36 @@ El editor de ladrillos, completo y coherente, quedó etiquetado en
 | Hecho | Lenguaje textual y editor web con vista 3D. |
 | Hecho | Lector de LDraw y catálogo del set 45300: 277 de 280 piezas. |
 | Hecho | El motor mide en LDU, que es lo que hace colocable una viga. |
-| **Siguiente** | Rotaciones en tres ejes: una viga apunta a donde haga falta. |
-| | Conexiones: pines, ejes y agujeros, en rejilla de medio módulo. |
-| | Cargar el catálogo de WeDo en el motor. |
-| | Visor con la geometría real de LDraw. |
+| Hecho | Rotaciones en tres ejes: una pieza apunta a donde haga falta. |
+| Hecho | El catálogo del set, cargado en el motor. |
+| Hecho | Conexiones y aviso de piezas en el aire. |
+| **Siguiente** | Visor con la geometría real de LDraw. |
+| | Selección y edición con el ratón. |
 
-Dos preguntas abiertas:
+**El giro a Technic está terminado.** El motor mide en LDU, gira en tres ejes,
+conoce las piezas de la caja y sabe qué se sostiene.
 
-- La **licencia del BlockCAD original** nunca se verificó. Importaba para leer
-  su formato; con el giro a Technic puede haber dejado de importar.
-- **¿El editor web ya es la interfaz?** Si lo es, no hace falta rehacer un
-  visor 3D en PySide6 para llegar al mismo sitio.
+### El editor web es la interfaz
+
+Decidido en julio de 2026. **No habrá aplicación de escritorio**: los pasos 6
+y 7 del plan original —renderizado propio y PySide6— quedan descartados.
+Rehacer en PySide6 un visor 3D que ya funciona solo llevaría al mismo sitio
+por más camino.
+
+Eso sube el listón de `blockcad_web/`. Deja de ser una forma de mirar el
+modelo para ser **el producto**, así que lo que hoy se le perdona —dibujar
+cajas en vez de la geometría de LDraw, no girar los studs de una pieza
+tumbada— pasa a ser deuda.
+
+Lo que no cambia es el principio de siempre: **el motor no sabe que existen
+los gráficos**. `blockcad_web` depende de él, nunca al revés. Esa frontera es
+lo que permitió cambiar las unidades, los giros y el catálogo enteros sin
+tocar el editor.
+
+### La licencia del BlockCAD original
+
+Cerrada como irrelevante. Importaba para leer su formato, y ese paso murió con
+el giro a Technic: la geometría viene de LDraw y el inventario de Brickset.
+Este proyecto usa GPL-2.0-or-later por sus propios méritos, no «por coherencia
+con el autor anterior» como se dijo al principio — el original es freeware, o
+sea propietario, así que no había ninguna coherencia que preservar.
