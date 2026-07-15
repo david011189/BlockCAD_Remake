@@ -41,7 +41,6 @@ from .geometry import (
     Dimensions,
     GridPosition,
     Orientation,
-    Rotation,
 )
 from .history import CommandHistory
 from .model import BlockModel, PlacedPart
@@ -72,7 +71,6 @@ __all__ = [
     "Bounds3D",
     "Dimensions",
     "GridPosition",
-    "Rotation",
     "Orientation",
     "BlockModel",
     "PlacedPart",

@@ -17,9 +17,32 @@ from blockcad_engine import (
     InvalidPartError,
     PartCatalog,
     PartDefinition,
-    Rotation,
+    Orientation,
     load_model,
 )
+
+
+class PublicApiTests(unittest.TestCase):
+    """Lo que se exporta tiene que existir y usarse.
+
+    `Rotation` sobrevivió al cambio a orientaciones: nada del motor lo usaba,
+    pero seguía en la API pública y solo lo tocaban dos pruebas, que probaban
+    código muerto.
+    """
+
+    def test_everything_exported_exists(self) -> None:
+        import blockcad_engine
+
+        for nombre in blockcad_engine.__all__:
+            with self.subTest(nombre=nombre):
+                self.assertTrue(hasattr(blockcad_engine, nombre))
+
+    def test_nothing_is_exported_twice(self) -> None:
+        import blockcad_engine
+
+        self.assertEqual(
+            len(blockcad_engine.__all__), len(set(blockcad_engine.__all__))
+        )
 
 
 class HierarchyTests(unittest.TestCase):
@@ -43,7 +66,7 @@ class HierarchyTests(unittest.TestCase):
 
     def test_invalid_rotation_is_a_domain_error(self) -> None:
         with self.assertRaises(BlockCADError):
-            Rotation.normalize(45)
+            Orientation.around("z", 45)
 
     def test_zero_dimension_is_a_domain_error(self) -> None:
         with self.assertRaises(BlockCADError):
@@ -77,7 +100,7 @@ class BackwardsCompatibilityTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             GridPosition(0, 0, -1)
         with self.assertRaises(ValueError):
-            Rotation.normalize(45)
+            Orientation.around("z", 45)
         with self.assertRaises(ValueError):
             Dimensions(1, 0, 1)
 

@@ -7,7 +7,6 @@ from pathlib import Path
 
 from blockcad_engine import BlockCADError, BlockModel, DslError, parse_model
 from blockcad_engine.dsl import model_to_source
-from blockcad_engine.parts import PartCatalog
 from blockcad_engine.serialization import model_from_dict, model_to_dict
 
 _HTML = Path(__file__).with_name("index.html")
@@ -121,20 +120,6 @@ def import_json(texto: str) -> dict:
     return {"ok": True, "codigo": model_to_source(model)}
 
 
-def catalog_summary() -> list[dict]:
-    catalogo = PartCatalog.with_basic_parts()
-    return [
-        {
-            "id": definition.part_id,
-            "nombre": definition.name,
-            "ancho": definition.dimensions.width,
-            "fondo": definition.dimensions.depth,
-            "alto": definition.dimensions.height,
-        }
-        for definition in catalogo.all()
-    ]
-
-
 class _Handler(BaseHTTPRequestHandler):
     def log_message(self, *args) -> None:  # noqa: D102 - silencia el ruido
         pass
@@ -177,8 +162,6 @@ class _Handler(BaseHTTPRequestHandler):
             self._send_vendor(self.path[len("/vendor/"):])
         elif self.path == "/api/ejemplo":
             self._send_json({"codigo": EJEMPLO})
-        elif self.path == "/api/catalogo":
-            self._send_json(catalog_summary())
         else:
             self._send(404, b"No encontrado", "text/plain; charset=utf-8")
 

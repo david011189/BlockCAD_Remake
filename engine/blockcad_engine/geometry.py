@@ -27,7 +27,6 @@ studs y placas; el lenguaje traduce.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import IntEnum
 
 from .errors import InvalidGeometryError
 
@@ -50,28 +49,6 @@ def _is_integer(value: object) -> bool:
     # bool es subclase de int, pero True como coordenada acabaría escrito como
     # `true` en el JSON y no como un número.
     return isinstance(value, int) and not isinstance(value, bool)
-
-
-class Rotation(IntEnum):
-    """Rotación alrededor del eje Z."""
-
-    DEG_0 = 0
-    DEG_90 = 90
-    DEG_180 = 180
-    DEG_270 = 270
-
-    @classmethod
-    def normalize(cls, value: int) -> "Rotation":
-        normalized = value % 360
-        try:
-            return cls(normalized)
-        except ValueError as exc:
-            raise InvalidGeometryError(
-                "La rotación debe ser múltiplo de 90 grados."
-            ) from exc
-
-    def clockwise(self) -> "Rotation":
-        return Rotation.normalize(int(self) + 90)
 
 
 #: Las tres matrices de giro de 90° a derechas, con Z hacia arriba.
@@ -130,10 +107,10 @@ class Orientation:
             raise InvalidGeometryError(
                 f"El eje debe ser x, y o z, no {eje!r}."
             )
-        vueltas = (grados // 90) % 4
         if grados % 90:
             raise InvalidGeometryError("El giro debe ser múltiplo de 90 grados.")
 
+        vueltas = (grados // 90) % 4
         resultado = cls()
         paso = cls(_GIROS_90[clave])
         for _ in range(vueltas):
