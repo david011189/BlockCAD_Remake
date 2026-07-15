@@ -261,8 +261,8 @@ const sol = new THREE.DirectionalLight(0xffffff, 1.6);
 sol.position.set(8, 16, 10);
 escena.add(sol);
 
-// Ojo: un color son seis dígitos. El 0x39405060 que había aquí antes tenía
-// ocho y se salía del rango, así que la rejilla salía de un tono cualquiera.
+// Ojo: un color son seis dígitos. El valor que había aquí antes tenía ocho,
+// se salía del rango y la rejilla acababa de un tono cualquiera.
 const rejilla = new THREE.GridHelper(80, 80, 0x525b6b, 0x464e5c);
 rejilla.material.transparent = true;
 rejilla.material.opacity = 0.6;
