@@ -64,3 +64,12 @@ class DuplicatePartError(BlockCADError, ValueError):
 
 class InvalidFormatError(BlockCADError, ValueError):
     """El archivo no es un modelo BlockCAD válido."""
+
+
+class DslError(BlockCADError, ValueError):
+    """El código BlockCAD tiene un fallo, indicando la línea."""
+
+    def __init__(self, line: int, message: str) -> None:
+        self.line = line
+        self.message = message
+        super().__init__(f"Línea {line}: {message}")

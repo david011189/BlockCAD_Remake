@@ -1,107 +1,170 @@
-# BlockCAD Engine — Paso 2
+# BlockCAD Engine
 
-Núcleo del remake de BlockCAD con sistema de comandos, deshacer y rehacer.
+Núcleo del remake de BlockCAD, más un lenguaje textual para describir
+construcciones y un editor web con vista 3D en vivo.
 
-## Qué incluye
+## El editor: escribe código, mira el modelo
 
-Todo lo del Paso 1:
+```cmd
+python -m blockcad_web
+```
+
+Abre el navegador con el editor a la izquierda y el modelo 3D a la derecha,
+que se actualiza mientras escribes. Se gira arrastrando y se acerca con la
+rueda.
+
+```
+modelo "Casa sencilla"
+
+// La base
+ladrillo 2x4 en 0,0,0 color rojo
+ladrillo 2x4 en 2,0,0 color amarillo
+
+// Cuatro alturas de pared
+repetir 4 veces desplazando 0,0,3:
+    ladrillo 1x2 en 0,0,3 color celeste
+    ladrillo 1x2 en 3,0,3 color celeste
+
+placa 2x4 en 0,0,15 color verde
+baldosa 1x2 en 1,1,16 color blanco
+```
+
+El visor necesita conexión a internet para cargar la librería 3D. El motor y
+el servidor no tienen ninguna dependencia externa.
+
+## El lenguaje
+
+Una instrucción por línea. Los errores indican siempre la línea y, cuando dos
+piezas chocan, también la línea de la otra pieza.
+
+### Colocar una pieza
+
+```
+<tipo> <medida> en <x>,<y>,<z> [opciones]
+```
+
+- **tipo**: `ladrillo`, `placa`, `baldosa`, o un identificador del catálogo
+  como `brick_2x4`.
+- **medida**: `1x1`, `1x2`, `2x2`, `2x4`… según lo que exista en el catálogo.
+- **en**: posición de la esquina mínima.
+
+Opciones, todas opcionales y en cualquier orden:
+
+| Opción | Ejemplo | Significado |
+|---|---|---|
+| `color` | `color rojo` o `color #00AAFF` | Color de la pieza. |
+| `rot` / `rotado` | `rot 90` | Giro sobre el eje Z: 0, 90, 180 o 270. |
+| `grupo` | `grupo 2` | Número de grupo. |
+| `paso` | `paso 5` | Número de paso de montaje. |
+| `transparente` | `transparente` | Dibuja la pieza translúcida. |
+
+Colores con nombre: `rojo`, `azul`, `celeste`, `amarillo`, `verde`,
+`naranja`, `blanco`, `negro`, `gris`, `marron`, `rosa`, `morado`.
+
+### Nombrar el modelo
+
+```
+modelo "Mi construcción"
+```
+
+Debe ser la primera instrucción.
+
+### Repetir
+
+```
+repetir 4 veces desplazando 0,0,3:
+    ladrillo 2x2 en 1,1,0
+```
+
+Coloca el bloque indentado 4 veces, sumando el desplazamiento en cada vuelta.
+`veces` es opcional. Se pueden anidar para construir rejillas.
+
+### Comentarios
+
+`#` al principio de una línea, o `//` en cualquier posición. `#` solo comenta
+al principio de la línea porque en cualquier otro sitio empieza un color.
+
+## El motor
 
 - Modelo de coordenadas enteras en una cuadrícula.
-- Catálogo básico de piezas.
-- Piezas colocadas con identificadores únicos.
-- Rotación en pasos de 90 grados.
-- Movimiento y eliminación.
+- Catálogo de piezas y piezas colocadas con identificador único.
+- Rotación en pasos de 90 grados, movimiento y eliminación.
 - Detección de colisiones por volumen.
-- Guardado y carga en JSON.
-- Pruebas automatizadas.
-- Demostración desde consola.
+- Guardado y carga en JSON versionado.
+- Patrón Command con deshacer, rehacer y transacciones.
 - Sin PySide6 y sin dependencias externas.
 
-Y lo añadido en el Paso 2:
-
-- Patrón Command: cada operación es un objeto reversible.
-- Historial con deshacer y rehacer, con límite opcional.
-- Transacciones que agrupan varias operaciones en una sola entrada.
-- Reversión automática cuando una transacción falla a medias.
-- Fachada `BlockEditor` como punto de entrada para la interfaz futura.
-- Etiquetas legibles de cada operación para mostrar en un menú.
-
-## Convención de coordenadas
+### Convención de coordenadas
 
 - `x`: izquierda/derecha, medido en studs.
 - `y`: adelante/atrás, medido en studs.
 - `z`: altura, medida en unidades de placa.
-- Una placa tiene altura `1`.
-- Un ladrillo normal tiene altura `3`.
+- Una placa tiene altura `1`; un ladrillo normal, `3`.
 - La rotación es `0`, `90`, `180` o `270` grados.
 
-## Uso básico
+El visor respeta la proporción real: un stud mide 8 mm y una placa 3,2 mm de
+alto, así que la altura se dibuja a escala 0,4.
+
+### Uso desde Python
 
 ```python
-from blockcad_engine import BlockEditor, GridPosition
+from blockcad_engine import BlockEditor, GridPosition, parse_model
 
 editor = BlockEditor(name="Mi construcción")
-
 base = editor.add("brick_2x4", GridPosition(0, 0, 0), color="#D62828")
 editor.rotate_clockwise(base.instance_id)
+editor.undo()
 
-editor.undo()   # deshace la rotación
-editor.redo()   # la vuelve a aplicar
-
-editor.save("mi_modelo.blockcad.json")
+modelo = parse_model('ladrillo 2x4 en 0,0,0 color rojo')
 ```
 
-## Transacciones
-
-Un bloque `transaction` se deshace como una sola operación. Si algo falla
-dentro del bloque, lo ya ejecutado se revierte y el historial queda intacto.
+Un bloque `transaction` se deshace como una sola operación, y si algo falla
+dentro se revierte lo ya ejecutado:
 
 ```python
 with editor.transaction("Construir muro"):
     editor.add("brick_2x4", GridPosition(0, 0, 0))
     editor.add("brick_2x4", GridPosition(2, 0, 0))
-    editor.add("brick_2x4", GridPosition(4, 0, 0))
-
-editor.undo()   # retira las tres piezas de una vez
 ```
 
-## Modelo y editor
+### Errores
 
-`BlockModel` conserva su API directa y sigue siendo válida para scripts o
-pruebas que no necesiten historial. `BlockEditor` la envuelve y registra cada
-cambio. Los cambios hechos directamente sobre el modelo no se registran, así
-que la interfaz debe trabajar siempre a través del editor.
+Todo fallo del motor deriva de `BlockCADError`, así que una interfaz puede
+capturarlo con un solo `except`. Los que históricamente eran `ValueError` o
+`KeyError` heredan también de esas clases, de modo que el código antiguo
+sigue funcionando.
 
-## Ejecutar la demostración
+## Arquitectura
 
-Desde la carpeta del proyecto:
-
-```cmd
-python -m blockcad_engine.cli
+```
+blockcad_engine/   motor puro: geometría, catálogo, modelo, comandos, lenguaje
+blockcad_web/      editor y visor 3D; depende del motor, el motor no de él
 ```
 
-Esto genera `modelo_demo.blockcad.json` y muestra el historial en consola.
-
-## Ejecutar las pruebas
+## Ejecutar
 
 ```cmd
+python -m blockcad_web              # editor con vista 3D
+python -m blockcad_engine.cli       # demostración por consola
 python -m unittest discover -s tests -v
 ```
 
 ## Instalar en modo editable
 
-No es obligatorio, pero facilita trabajar desde cualquier carpeta:
-
 ```cmd
 python -m pip install -e .
-blockcad-demo
+blockcad-web
 ```
 
-## Próximo paso
+## Hoja de ruta
 
-El Paso 3 añadirá las conexiones entre piezas:
-
-- studs y tubos;
-- puntos de anclaje;
-- validación de soporte;
-- encaje automático a la cuadrícula.
+| Paso | Estado | Contenido |
+|---|---|---|
+| 1 | Hecho | Núcleo: piezas, coordenadas, colisiones, JSON. |
+| 2 | Hecho | Comandos: deshacer, rehacer, transacciones. |
+| — | Hecho | Lenguaje textual y editor web con vista 3D. |
+| 3 | Siguiente | Conexiones: studs, tubos, anclajes y soporte. |
+| 4 | | Catálogo ampliado y piezas paramétricas. |
+| 5 | | Importar el formato original y LDraw. |
+| 6 | | Renderizado propio y selección. |
+| 7 | | Interfaz de escritorio con PySide6. |

@@ -12,10 +12,12 @@ from .commands import (
     TranslatePartCommand,
 )
 from .editor import BlockEditor
+from .dsl import parse_model
 from .errors import (
     BlockCADError,
     CollisionError,
     CommandError,
+    DslError,
     DuplicateInstanceError,
     DuplicatePartError,
     InstanceNotFoundError,
@@ -37,6 +39,7 @@ __all__ = [
     "BlockCADError",
     "CollisionError",
     "CommandError",
+    "DslError",
     "DuplicateInstanceError",
     "DuplicatePartError",
     "InstanceNotFoundError",
@@ -57,6 +60,7 @@ __all__ = [
     "PartDefinition",
     "load_model",
     "save_model",
+    "parse_model",
     "Command",
     "AddPartCommand",
     "RemovePartCommand",

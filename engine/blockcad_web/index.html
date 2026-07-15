@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BlockCAD — editor</title>
+<style>
+  :root {
+    --fondo: #0f1116;
+    --panel: #171a21;
+    --borde: #272c37;
+    --texto: #dfe4ec;
+    --suave: #8b93a7;
+    --acento: #6aa9ff;
+    --error: #ff6b6b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--fondo);
+    color: var(--texto);
+    font: 14px/1.5 system-ui, "Segoe UI", sans-serif;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--borde);
+    background: var(--panel);
+  }
+  header h1 { font-size: 15px; font-weight: 600; letter-spacing: .02em; }
+  header h1 span { color: var(--suave); font-weight: 400; }
+  .acciones { margin-left: auto; display: flex; gap: 8px; }
+  button {
+    background: #222735;
+    color: var(--texto);
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    padding: 5px 11px;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--acento); color: var(--acento); }
+
+  main { flex: 1; display: flex; min-height: 0; }
+
+  .editor {
+    width: 42%;
+    min-width: 280px;
+    display: flex;
+    background: var(--panel);
+    border-right: 1px solid var(--borde);
+    overflow: hidden;
+  }
+  .gutter {
+    padding: 12px 8px 12px 12px;
+    text-align: right;
+    color: #4d5566;
+    font: 13px/1.6 ui-monospace, Consolas, monospace;
+    user-select: none;
+    overflow: hidden;
+    background: #13161d;
+  }
+  .gutter div.fallo {
+    color: var(--error);
+    font-weight: 700;
+  }
+  textarea {
+    flex: 1;
+    padding: 12px;
+    background: transparent;
+    color: var(--texto);
+    border: 0;
+    resize: none;
+    outline: none;
+    font: 13px/1.6 ui-monospace, Consolas, monospace;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .visor { flex: 1; position: relative; min-width: 0; }
+  canvas { display: block; width: 100%; height: 100%; }
+  .pista {
+    position: absolute;
+    left: 12px;
+    bottom: 10px;
+    color: var(--suave);
+    font-size: 12px;
+    pointer-events: none;
+  }
+
+  footer {
+    border-top: 1px solid var(--borde);
+    background: var(--panel);
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--suave);
+    min-height: 35px;
+  }
+  footer.fallo { color: var(--error); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>BlockCAD <span>— escribe código, mira el modelo</span></h1>
+  <div class="acciones">
+    <button id="centrar">Centrar</button>
+    <button id="ejemplo">Cargar ejemplo</button>
+  </div>
+</header>
+
+<main>
+  <section class="editor">
+    <div class="gutter" id="gutter"></div>
+    <textarea id="codigo" spellcheck="false" autocomplete="off"></textarea>
+  </section>
+  <section class="visor">
+    <canvas id="lienzo"></canvas>
+    <div class="pista">Arrastra para girar · rueda para acercar · clic derecho para desplazar</div>
+  </section>
+</main>
+
+<footer id="estado">Cargando…</footer>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// Proporciones reales de LEGO: un stud mide 8 mm de lado y una placa 3,2 mm
+// de alto. Con el stud como unidad, la altura de una placa es 0,4.
+const PLACA = 0.4;
+const RADIO_STUD = 0.3;    // 4,8 mm de diámetro
+const ALTO_STUD = 0.225;   // 1,8 mm
+
+const lienzo = document.getElementById('lienzo');
+const areaCodigo = document.getElementById('codigo');
+const gutter = document.getElementById('gutter');
+const estado = document.getElementById('estado');
+
+const renderer = new THREE.WebGLRenderer({ canvas: lienzo, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
+const escena = new THREE.Scene();
+escena.background = new THREE.Color(0x0f1116);
+
+const camara = new THREE.PerspectiveCamera(45, 1, 0.1, 500);
+camara.position.set(14, 12, 16);
+
+const controles = new OrbitControls(camara, lienzo);
+controles.enableDamping = true;
+controles.target.set(2, 2, 2);
+
+escena.add(new THREE.HemisphereLight(0xffffff, 0x333944, 2.2));
+const sol = new THREE.DirectionalLight(0xffffff, 1.6);
+sol.position.set(8, 16, 10);
+escena.add(sol);
+
+const rejilla = new THREE.GridHelper(80, 80, 0x39405060, 0x272c37);
+rejilla.material.transparent = true;
+rejilla.material.opacity = 0.5;
+escena.add(rejilla);
+
+const modelo = new THREE.Group();
+escena.add(modelo);
+
+function limpiar(grupo) {
+  while (grupo.children.length) {
+    const hijo = grupo.children.pop();
+    if (hijo.geometry) hijo.geometry.dispose();
+    if (hijo.material) hijo.material.dispose();
+  }
+}
+
+function construir(piezas) {
+  limpiar(modelo);
+
+  for (const p of piezas) {
+    const alto = p.alto * PLACA;
+    const material = new THREE.MeshLambertMaterial({
+      color: p.color,
+      transparent: p.transparente,
+      opacity: p.transparente ? 0.45 : 1,
+    });
+
+    const caja = new THREE.BoxGeometry(p.ancho, alto, p.fondo);
+    const cuerpo = new THREE.Mesh(caja, material);
+    // El motor usa z como altura; Three.js usa y. Además la caja se dibuja
+    // desde su centro, mientras que el motor guarda la esquina mínima.
+    cuerpo.position.set(
+      p.x + p.ancho / 2,
+      p.z * PLACA + alto / 2,
+      p.y + p.fondo / 2,
+    );
+    modelo.add(cuerpo);
+
+    const aristas = new THREE.LineSegments(
+      new THREE.EdgesGeometry(caja),
+      new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3 }),
+    );
+    aristas.position.copy(cuerpo.position);
+    modelo.add(aristas);
+
+    if (!p.studs) continue;
+    for (let i = 0; i < p.ancho; i++) {
+      for (let j = 0; j < p.fondo; j++) {
+        const stud = new THREE.Mesh(
+          new THREE.CylinderGeometry(RADIO_STUD, RADIO_STUD, ALTO_STUD, 16),
+          material,
+        );
+        stud.position.set(
+          p.x + i + 0.5,
+          p.z * PLACA + alto + ALTO_STUD / 2,
+          p.y + j + 0.5,
+        );
+        modelo.add(stud);
+      }
+    }
+  }
+}
+
+function centrar() {
+  if (!modelo.children.length) return;
+  const caja = new THREE.Box3().setFromObject(modelo);
+  const centro = caja.getCenter(new THREE.Vector3());
+  const tamano = caja.getSize(new THREE.Vector3());
+  const radio = Math.max(tamano.x, tamano.y, tamano.z) || 4;
+
+  controles.target.copy(centro);
+  camara.position.set(
+    centro.x + radio * 1.6,
+    centro.y + radio * 1.3,
+    centro.z + radio * 1.9,
+  );
+  controles.update();
+}
+
+function pintarGutter(fallo) {
+  const total = areaCodigo.value.split('\n').length;
+  let html = '';
+  for (let i = 1; i <= total; i++) {
+    html += `<div class="${i === fallo ? 'fallo' : ''}">${i}</div>`;
+  }
+  gutter.innerHTML = html;
+  gutter.scrollTop = areaCodigo.scrollTop;
+}
+
+let primeraVez = true;
+
+async function compilar() {
+  let datos;
+  try {
+    const respuesta = await fetch('/api/modelo', {
+      method: 'POST',
+      body: areaCodigo.value,
+    });
+    datos = await respuesta.json();
+  } catch (error) {
+    estado.className = 'fallo';
+    estado.textContent = 'No se pudo hablar con el servidor: ' + error.message;
+    return;
+  }
+
+  if (!datos.ok) {
+    estado.className = 'fallo';
+    estado.textContent = datos.linea
+      ? `Línea ${datos.linea}: ${datos.mensaje}`
+      : datos.mensaje;
+    pintarGutter(datos.linea);
+    return;
+  }
+
+  construir(datos.piezas);
+  pintarGutter(null);
+  estado.className = '';
+  const n = datos.piezas.length;
+  estado.textContent = `${datos.nombre} — ${n} ${n === 1 ? 'pieza' : 'piezas'}`;
+
+  if (primeraVez && n) {
+    centrar();
+    primeraVez = false;
+  }
+}
+
+let temporizador;
+function alEscribir() {
+  pintarGutter(null);
+  clearTimeout(temporizador);
+  temporizador = setTimeout(compilar, 400);
+}
+
+areaCodigo.addEventListener('input', alEscribir);
+areaCodigo.addEventListener('scroll', () => { gutter.scrollTop = areaCodigo.scrollTop; });
+document.getElementById('centrar').addEventListener('click', centrar);
+document.getElementById('ejemplo').addEventListener('click', async () => {
+  const r = await fetch('/api/ejemplo');
+  areaCodigo.value = (await r.json()).codigo;
+  primeraVez = true;
+  compilar();
+});
+
+// El tabulador debe indentar, no saltar de campo: el lenguaje usa bloques.
+areaCodigo.addEventListener('keydown', (evento) => {
+  if (evento.key !== 'Tab') return;
+  evento.preventDefault();
+  const inicio = areaCodigo.selectionStart;
+  const fin = areaCodigo.selectionEnd;
+  areaCodigo.value = areaCodigo.value.slice(0, inicio) + '    ' + areaCodigo.value.slice(fin);
+  areaCodigo.selectionStart = areaCodigo.selectionEnd = inicio + 4;
+  alEscribir();
+});
+
+function ajustar() {
+  const ancho = lienzo.clientWidth;
+  const alto = lienzo.clientHeight;
+  if (!ancho || !alto) return;
+  renderer.setSize(ancho, alto, false);
+  camara.aspect = ancho / alto;
+  camara.updateProjectionMatrix();
+}
+addEventListener('resize', ajustar);
+
+function bucle() {
+  requestAnimationFrame(bucle);
+  ajustar();
+  controles.update();
+  renderer.render(escena, camara);
+}
+bucle();
+
+fetch('/api/ejemplo')
+  .then((r) => r.json())
+  .then((d) => { areaCodigo.value = d.codigo; compilar(); });
+</script>
+</body>
+</html>
