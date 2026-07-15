@@ -35,9 +35,30 @@ from ldraw import Biblioteca  # noqa: E402
 #: Adivinar aquí sería meter geometría falsa sin que salte ningún error, así
 #: que lo que no esté verificado se queda fuera y sale en el informe.
 EQUIVALENCIAS = {
-    "42127": "32013",   # ANGLE ELEMENT, 0 DEGREES [1]      -> Angle Connector #1
-    "42128": "32016",   # ANGLE ELEMENT, 157,5 DEGR. [3]    -> Angle Connector #3 (157.5)
-    "42156": "32192",   # ANGLE ELEMENT 135 DEG. [4]        -> Angle Connector #4 (135)
+    # Casan por el número entre corchetes y además por los grados.
+    "42127": "32013",   # ANGLE ELEMENT, 0 DEGREES [1]   -> Angle Connector #1
+    "42128": "32016",   # ANGLE ELEMENT, 157,5 DEGR. [3] -> Angle Connector #3 (157.5)
+    "42156": "32192",   # ANGLE ELEMENT 135 DEG. [4]     -> Angle Connector #4 (135)
+
+    # Identificadas por quien tiene el set delante y comprobadas contra la
+    # geometría de LDraw antes de entrar aquí.
+    "42136": "32123a",  # 1/2 BUSH -> Bush 1/2 Smooth, Axle Hole Reduced.
+                        # Mide 10 LDU de grueso: medio módulo, como su nombre.
+    "42798": "3713",    # BUSH FOR CROSS AXLE -> Technic Bush with Two Flanges.
+                        # 20 LDU de grueso: un módulo entero.
+    "65668": "4185a",   # WEDGE-BELT WHEEL Ø24 -> Wedge Belt Wheel Not Reinforced.
+                        # Mide 60 LDU = 24 mm exactos, el Ø24 del nombre de LEGO.
+    "28698": "6588",    # WORM GEAR BLOCK, TRANSP. -> Technic Gearbox 2x4x3&1/3.
+                        # El "block" es la carcasa transparente, no el tornillo.
+    "21712": "44728",   # ANGLE PLATE 1X2/2X2 -> Bracket 1x2 - 2x2 Down.
+    "39223": "6143",    # BRICK Ø16 W. CROSS -> Brick 2x2 Round Reinforced.
+                        # El "CROSS" es la cruz de refuerzo interna, no un
+                        # agujero de eje: es lo único que lo separa del 3941
+                        # ("without Reinforcement"). Ø16 mm = 40 LDU = 2 studs.
+    "13360": "10238",   # FLAT TILE 1X1 ROUND 'NO. 8' -> alias de 98138p07,
+                        # que LDraw llama "Eye Pattern". El nombre del dibujo
+                        # difiere, pero una impresión no cambia la forma: la
+                        # geometría es la misma baldosa redonda 1x1.
 }
 
 #: Piezas que el motor no podrá representar nunca, por mucho catálogo que

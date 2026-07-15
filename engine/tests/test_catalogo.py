@@ -20,6 +20,8 @@ STUD = 20
 PLACA = 8
 LADRILLO = 24
 ALTO_STUD = 4
+MODULO_TECHNIC = 20
+MEDIO_MODULO = 10
 
 
 class CatalogTests(unittest.TestCase):
@@ -53,15 +55,21 @@ class CatalogTests(unittest.TestCase):
             with self.subTest(diseno=diseno):
                 self.assertIn(esperado, self.piezas[diseno]["nombre_ldraw"])
 
-    def test_technic_holes_are_a_module_apart(self) -> None:
-        """Los agujeros de una pieza guardan siempre múltiplos de 20 LDU.
+    def test_technic_holes_sit_on_a_half_module_grid(self) -> None:
+        """Los agujeros de una pieza se separan por múltiplos de MEDIO módulo.
 
-        Lo que está en rejilla es la separación, no la posición: el origen de
-        una pieza no tiene por qué caer en un agujero. La baldosa 32530 los
-        tiene en y=-22 y y=-2, que están a 20 pero no son múltiplos de 20.
+        Dos matices que costó aprender y que el motor tendrá que respetar:
 
-        Este es el invariante que hace posible colocar Technic en una rejilla
-        entera, y por tanto lo que el motor podrá dar por supuesto.
+        1. Lo que está en rejilla es la SEPARACIÓN, no la posición. El origen
+           de una pieza no tiene por qué caer en un agujero: la baldosa 32530
+           los tiene en y=-22 y y=-2, separados por 20 pero sin ser múltiplos.
+
+        2. La rejilla es de medio módulo, no de módulo entero. La caja de
+           engranajes 6588 tiene agujeros en x=±30, a media distancia, porque
+           es por donde entra el tornillo sinfín. Con 20 LDU esta prueba
+           fallaba solo para ella; con 10, ninguna de las 97 la rompe.
+
+        Es decir: la rejilla Technic del motor tiene que ser de 10 LDU.
         """
         for pieza in self.doc["piezas"]:
             pines = [
@@ -74,7 +82,7 @@ class CatalogTests(unittest.TestCase):
                 base = valores[0]
                 with self.subTest(diseno=pieza["diseno"], eje="xyz"[eje]):
                     for valor in valores:
-                        self.assertAlmostEqual((valor - base) % 20, 0, places=1)
+                        self.assertAlmostEqual((valor - base) % MEDIO_MODULO, 0, places=1)
 
     def test_every_part_carries_its_ldraw_licence(self) -> None:
         # Hay que atribuir a LDraw: la licencia debe viajar con cada pieza.
