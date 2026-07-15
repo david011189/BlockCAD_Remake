@@ -3,6 +3,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import IntEnum
 
+from .errors import InvalidGeometryError
+
+
+def _is_integer(value: object) -> bool:
+    # bool es subclase de int, pero True como coordenada acabaría escrito como
+    # `true` en el JSON y no como un número.
+    return isinstance(value, int) and not isinstance(value, bool)
+
 
 class Rotation(IntEnum):
     """Rotación alrededor del eje Z."""
@@ -18,7 +26,7 @@ class Rotation(IntEnum):
         try:
             return cls(normalized)
         except ValueError as exc:
-            raise ValueError(
+            raise InvalidGeometryError(
                 "La rotación debe ser múltiplo de 90 grados."
             ) from exc
 
@@ -35,10 +43,10 @@ class GridPosition:
     z: int
 
     def __post_init__(self) -> None:
-        if not all(isinstance(value, int) for value in (self.x, self.y, self.z)):
+        if not all(_is_integer(value) for value in (self.x, self.y, self.z)):
             raise TypeError("Las coordenadas deben ser números enteros.")
         if self.z < 0:
-            raise ValueError("La coordenada z no puede ser negativa.")
+            raise InvalidGeometryError("La coordenada z no puede ser negativa.")
 
     def translated(self, dx: int = 0, dy: int = 0, dz: int = 0) -> "GridPosition":
         return GridPosition(self.x + dx, self.y + dy, self.z + dz)
@@ -54,12 +62,14 @@ class Dimensions:
 
     def __post_init__(self) -> None:
         if not all(
-            isinstance(value, int)
+            _is_integer(value)
             for value in (self.width, self.depth, self.height)
         ):
             raise TypeError("Las dimensiones deben ser números enteros.")
         if self.width <= 0 or self.depth <= 0 or self.height <= 0:
-            raise ValueError("Todas las dimensiones deben ser mayores que cero.")
+            raise InvalidGeometryError(
+                "Todas las dimensiones deben ser mayores que cero."
+            )
 
     def rotated(self, rotation: Rotation) -> "Dimensions":
         if rotation in (Rotation.DEG_90, Rotation.DEG_270):

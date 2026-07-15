@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from .errors import InvalidFormatError
 from .geometry import GridPosition, Rotation
 from .model import BlockModel
 from .parts import PartCatalog
@@ -44,9 +45,9 @@ def model_from_dict(
     catalog: PartCatalog | None = None,
 ) -> BlockModel:
     if payload.get("format") != FORMAT_NAME:
-        raise ValueError("El archivo no utiliza el formato BlockCAD Remake.")
+        raise InvalidFormatError("El archivo no utiliza el formato BlockCAD Remake.")
     if payload.get("version") != FORMAT_VERSION:
-        raise ValueError(
+        raise InvalidFormatError(
             f"Versión de archivo no soportada: {payload.get('version')!r}."
         )
 
@@ -56,22 +57,31 @@ def model_from_dict(
     )
 
     for data in payload.get("parts", []):
-        position_data = data["position"]
-        model.add(
-            part_id=data["part_id"],
-            position=GridPosition(
-                int(position_data["x"]),
-                int(position_data["y"]),
-                int(position_data["z"]),
-            ),
-            rotation=Rotation.normalize(int(data.get("rotation", 0))),
-            color=str(data.get("color", "#D62828")),
-            group=int(data.get("group", 0)),
-            step=int(data.get("step", 0)),
-            transparent=bool(data.get("transparent", False)),
-            instance_id=str(data["instance_id"]),
-            check_collision=True,
-        )
+        # Un archivo con campos ausentes o valores imposibles es un archivo
+        # inválido, no un fallo de programación: se traduce al error del
+        # dominio antes de tocar el modelo.
+        try:
+            position_data = data["position"]
+            fields = {
+                "part_id": data["part_id"],
+                "instance_id": str(data["instance_id"]),
+                "position": GridPosition(
+                    int(position_data["x"]),
+                    int(position_data["y"]),
+                    int(position_data["z"]),
+                ),
+                "rotation": Rotation.normalize(int(data.get("rotation", 0))),
+                "color": str(data.get("color", "#D62828")),
+                "group": int(data.get("group", 0)),
+                "step": int(data.get("step", 0)),
+                "transparent": bool(data.get("transparent", False)),
+            }
+        except (KeyError, TypeError, ValueError) as exc:
+            raise InvalidFormatError(
+                f"El archivo contiene una pieza inválida: {exc}"
+            ) from exc
+
+        model.add(check_collision=True, **fields)
 
     return model
 

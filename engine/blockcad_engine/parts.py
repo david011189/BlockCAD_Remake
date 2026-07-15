@@ -2,8 +2,29 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from .errors import PartNotFoundError
+from .errors import (
+    DuplicatePartError,
+    InvalidColorError,
+    InvalidPartError,
+    PartNotFoundError,
+)
 from .geometry import Dimensions
+
+_HEX_DIGITS = frozenset("0123456789abcdefABCDEF")
+
+
+def validate_color(color: str) -> str:
+    """Comprueba el formato #RRGGBB y devuelve el color en mayúsculas."""
+    if (
+        not isinstance(color, str)
+        or len(color) != 7
+        or color[0] != "#"
+        or not all(digit in _HEX_DIGITS for digit in color[1:])
+    ):
+        raise InvalidColorError(
+            f"El color {color!r} debe utilizar el formato hexadecimal #RRGGBB."
+        )
+    return color.upper()
 
 
 @dataclass(frozen=True, slots=True)
@@ -20,11 +41,10 @@ class PartDefinition:
 
     def __post_init__(self) -> None:
         if not self.part_id.strip():
-            raise ValueError("part_id no puede estar vacío.")
+            raise InvalidPartError("part_id no puede estar vacío.")
         if not self.name.strip():
-            raise ValueError("name no puede estar vacío.")
-        if not self.default_color.startswith("#") or len(self.default_color) != 7:
-            raise ValueError("El color debe utilizar el formato hexadecimal #RRGGBB.")
+            raise InvalidPartError("name no puede estar vacío.")
+        validate_color(self.default_color)
 
 
 class PartCatalog:
@@ -35,7 +55,9 @@ class PartCatalog:
 
     def register(self, definition: PartDefinition, *, replace: bool = False) -> None:
         if definition.part_id in self._parts and not replace:
-            raise ValueError(f"La pieza {definition.part_id!r} ya está registrada.")
+            raise DuplicatePartError(
+                f"La pieza {definition.part_id!r} ya está registrada."
+            )
         self._parts[definition.part_id] = definition
 
     def get(self, part_id: str) -> PartDefinition:

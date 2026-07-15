@@ -6,10 +6,10 @@ from uuid import uuid4
 from .errors import (
     CollisionError,
     DuplicateInstanceError,
-    InvalidPlacementError,
+    InstanceNotFoundError,
 )
 from .geometry import Bounds3D, GridPosition, Rotation
-from .parts import PartCatalog, PartDefinition
+from .parts import PartCatalog, PartDefinition, validate_color
 
 
 @dataclass(frozen=True, slots=True)
@@ -75,14 +75,16 @@ class BlockModel:
         try:
             return self._instances[instance_id]
         except KeyError as exc:
-            raise KeyError(f"No existe la instancia {instance_id!r}.") from exc
+            raise InstanceNotFoundError(
+                f"No existe la instancia {instance_id!r}."
+            ) from exc
 
     def index_of(self, instance_id: str) -> int:
         """Posición de la instancia dentro del orden de inserción."""
         for index, key in enumerate(self._instances):
             if key == instance_id:
                 return index
-        raise KeyError(f"No existe la instancia {instance_id!r}.")
+        raise InstanceNotFoundError(f"No existe la instancia {instance_id!r}.")
 
     def add(
         self,
@@ -154,7 +156,9 @@ class BlockModel:
         try:
             return self._instances.pop(instance_id)
         except KeyError as exc:
-            raise KeyError(f"No existe la instancia {instance_id!r}.") from exc
+            raise InstanceNotFoundError(
+                f"No existe la instancia {instance_id!r}."
+            ) from exc
 
     def move(
         self,
@@ -220,10 +224,9 @@ class BlockModel:
         )
 
     def recolor(self, instance_id: str, color: str) -> PlacedPart:
-        if not color.startswith("#") or len(color) != 7:
-            raise ValueError("El color debe utilizar el formato #RRGGBB.")
+        normalized = validate_color(color)
         current = self.get(instance_id)
-        updated = replace(current, color=color.upper())
+        updated = replace(current, color=normalized)
         self._instances[instance_id] = updated
         return updated
 
@@ -253,9 +256,8 @@ class BlockModel:
         ignore_instance_id: str | None = None,
         check_collision: bool,
     ) -> None:
-        if candidate.position.z < 0:
-            raise InvalidPlacementError("Una pieza no puede quedar debajo del suelo.")
-
+        # `GridPosition` ya garantiza z >= 0, así que aquí no hace falta
+        # volver a comprobarlo.
         if check_collision:
             collisions = self.collisions_for(
                 candidate,
