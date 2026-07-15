@@ -15,6 +15,10 @@ dist/
 # Salida generada por la demostración
 modelo_demo.blockcad.json
 
+# Biblioteca de piezas de LDraw: 136 MB que se descargan aparte. Al
+# repositorio solo va el catálogo que se genera a partir de ella.
+.ldraw-cache/
+
 # Editores
 .vscode/
 .idea/
