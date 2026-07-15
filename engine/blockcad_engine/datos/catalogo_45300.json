@@ -1,0 +1,7704 @@
+{
+  "formato": "blockcad-catalogo",
+  "version": 1,
+  "origen": {
+    "inventario": "Brickset-inventory-45300-1.csv",
+    "geometria": "The LDraw Parts Library (CC BY 4.0) - https://www.ldraw.org"
+  },
+  "resumen": {
+    "moldes_en_el_set": 99,
+    "moldes_en_el_catalogo": 90,
+    "piezas_en_el_set": 280,
+    "piezas_en_el_catalogo": 254
+  },
+  "piezas": [
+    {
+      "diseno": "10928",
+      "nombre_lego": "GEAR WHEEL T=8, M=1",
+      "categoria": "Vehicles & Transportation",
+      "cantidad": 4,
+      "colores": [
+        "Dark Stone Grey"
+      ],
+      "ldraw": "10928",
+      "nombre_ldraw": "Technic Gear  8 Tooth Reinforced",
+      "licencia": "Licensed under CC BY 2.0 and CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -12.43,
+          -12.43,
+          -10.0
+        ],
+        "max": [
+          12.43,
+          12.43,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        24.86,
+        24.86,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            -10.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "15535",
+      "nombre_lego": "FLAT TILE 2X2 ROUND W. HOLE Ã˜4.85",
+      "categoria": "Plates",
+      "cantidad": 2,
+      "colores": [
+        "Dark Stone Grey"
+      ],
+      "ldraw": "15535",
+      "nombre_ldraw": "Tile  2 x  2 Round with Hole",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          0.0,
+          -20.0
+        ],
+        "max": [
+          20.0,
+          8.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        8.0,
+        40.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "16424",
+      "nombre_lego": "ROUND TILE 2X2 NO. '1003'",
+      "categoria": "Plates",
+      "cantidad": 2,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "16424",
+      "nombre_ldraw": "=Tile  2 x  2 Round with Round Underside Stud and Black Eye Pattern",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          0.0,
+          -20.0
+        ],
+        "max": [
+          20.0,
+          8.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        8.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "17114",
+      "nombre_lego": "BRICK 2X2 W. 2 BALLS Ø 10,2",
+      "categoria": "Bricks",
+      "cantidad": 1,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "17114",
+      "nombre_ldraw": "Brick  2 x  2 with Two Ball Joints and Axlehole",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -52.81,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          52.81,
+          24.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        105.62,
+        28.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            -20.0,
+            10.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            20.0,
+            10.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "18575",
+      "nombre_lego": "DOUBLE CONICAL WHEEL Z20 1M",
+      "categoria": "Vehicles & Transportation",
+      "cantidad": 2,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "18575",
+      "nombre_ldraw": "Technic Gear 20 Tooth Double Bevel Reinforced",
+      "licencia": "Licensed under CC BY 2.0 and CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -27.0,
+          -27.0,
+          -10.0
+        ],
+        "max": [
+          27.0,
+          27.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        54.0,
+        54.0,
+        20.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "18651",
+      "nombre_lego": "Cross axle 2m w. snap w. fric.",
+      "categoria": "Connectors",
+      "cantidad": 2,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "18651",
+      "nombre_ldraw": "Technic Axle Pin Long with Friction with  2L Axle",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -30.0,
+          -8.0,
+          -8.0
+        ],
+        "max": [
+          29.5,
+          8.0,
+          8.0
+        ]
+      },
+      "medidas_ldu": [
+        59.5,
+        16.0,
+        16.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "18674",
+      "nombre_lego": "PLATE ROUND W. 1 KNOB",
+      "categoria": "Plates",
+      "cantidad": 2,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "18674",
+      "nombre_ldraw": "Plate  2 x  2 Round with  1 Centre Stud",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          20.0,
+          8.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        12.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "18746",
+      "nombre_lego": "MINI FIGURE SNOW BOARD",
+      "categoria": "Minifigure Accessories",
+      "cantidad": 2,
+      "colores": [
+        "Flame Yellowish Orange"
+      ],
+      "ldraw": "18746",
+      "nombre_ldraw": "Minifig Snowboard  2 x  6",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -16.16,
+          -5.06,
+          -59.27
+        ],
+        "max": [
+          16.16,
+          8.0,
+          59.27
+        ]
+      },
+      "medidas_ldu": [
+        32.33,
+        13.07,
+        118.53
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            2.74,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            2.74,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            2.74,
+            20.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "19071",
+      "nombre_lego": "LPF2 SMART HUB 2 I/O 4X8X3",
+      "categoria": "Power Functions",
+      "cantidad": 1,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "19071",
+      "nombre_ldraw": "Electric Power Functions 2.0 Hub with Battery Box",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -60.0,
+          -4.0,
+          -80.0
+        ],
+        "max": [
+          60.0,
+          72.0,
+          80.0
+        ]
+      },
+      "medidas_ldu": [
+        120.0,
+        76.0,
+        160.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -60.0,
+            34.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -60.0,
+            34.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -60.0,
+            34.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            34.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            34.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            34.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            24.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            24.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            24.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            24.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            42.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            42.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            42.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -50.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            50.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            50.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            50.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            -50.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            50.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            24.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            24.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            24.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            24.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            42.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            42.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            42.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            68.0,
+            -60.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            68.0,
+            -40.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            68.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            68.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            68.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            68.0,
+            40.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            68.0,
+            60.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            68.0,
+            -60.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            68.0,
+            -40.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            68.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            68.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            68.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            68.0,
+            40.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            68.0,
+            60.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            68.0,
+            -60.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            68.0,
+            -40.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            68.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            68.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            68.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            68.0,
+            40.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            68.0,
+            60.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "20841",
+      "nombre_lego": "LPF2 SENSOR TILT 2X4X1",
+      "categoria": "Power Functions",
+      "cantidad": 1,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "20841",
+      "nombre_ldraw": "Electric Power Functions 2.0 Tilt Sensor",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -40.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          40.0,
+          24.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        80.0,
+        28.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            20.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            20.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            20.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "20844",
+      "nombre_lego": "LPF2 SENSOR DETECT 2X4X1",
+      "categoria": "Power Functions",
+      "cantidad": 1,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "20844",
+      "nombre_ldraw": "Electric Power Functions 2.0 IR Distance Sensor",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -40.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          40.0,
+          24.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        80.0,
+        28.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            20.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            20.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            20.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "21980",
+      "nombre_lego": "LPF2.0 MEDIUM MOTOR",
+      "categoria": "Power Functions",
+      "cantidad": 1,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "21980",
+      "nombre_ldraw": "Electric Power Functions 2.0 Medium Motor",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -30.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          30.0,
+          56.0,
+          100.0
+        ]
+      },
+      "medidas_ldu": [
+        60.0,
+        60.0,
+        120.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            26.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -20.0,
+            26.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            46.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            26.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            52.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            52.0,
+            40.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            52.0,
+            60.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            52.0,
+            80.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "24505",
+      "nombre_lego": "GEAR WHEEL Z24",
+      "categoria": "Vehicles & Transportation",
+      "cantidad": 2,
+      "colores": [
+        "Dark Stone Grey"
+      ],
+      "ldraw": "24505",
+      "nombre_ldraw": "=Technic Gear 24 Tooth with Single Axle Hole",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -32.39,
+          -32.39,
+          -9.62
+        ],
+        "max": [
+          32.39,
+          32.39,
+          9.62
+        ]
+      },
+      "medidas_ldu": [
+        64.78,
+        64.78,
+        19.25
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "2654",
+      "nombre_lego": "SLIDE SHOE ROUND 2X2",
+      "categoria": "Plates",
+      "cantidad": 6,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "2654",
+      "nombre_ldraw": "~Moved to 2654a",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          20.0,
+          8.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        12.0,
+        40.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "2780",
+      "nombre_lego": "CONNECTOR PEG W. FRICTION",
+      "categoria": "Connectors",
+      "cantidad": 8,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "2780",
+      "nombre_ldraw": "Technic Pin with Friction and Slots",
+      "licencia": "Licensed under CC BY 2.0 and CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -7.8,
+          -8.0
+        ],
+        "max": [
+          20.0,
+          7.8,
+          8.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        15.6,
+        16.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "2815",
+      "nombre_lego": "TYRE FOR WEDGE-BELT WHEEL",
+      "categoria": "Vehicles & Transportation",
+      "cantidad": 2,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "2815",
+      "nombre_ldraw": "Technic Wedge Belt Wheel Tyre",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -38.0,
+          -38.0,
+          -4.0
+        ],
+        "max": [
+          38.0,
+          38.0,
+          4.0
+        ]
+      },
+      "medidas_ldu": [
+        76.0,
+        76.0,
+        8.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "29219",
+      "nombre_lego": "TUBE, W/ DOUBLE 4.85 HOLE",
+      "categoria": "Connectors",
+      "cantidad": 2,
+      "colores": [
+        "Bright Green"
+      ],
+      "ldraw": "29219",
+      "nombre_ldraw": "=Technic Pin Joiner Round with Slot",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -10.0,
+          -10.0
+        ],
+        "max": [
+          20.0,
+          10.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        20.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -20.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3001",
+      "nombre_lego": "BRICK 2X4",
+      "categoria": "Bricks",
+      "cantidad": 6,
+      "colores": [
+        "Flame Yellowish Orange",
+        "Medium Azur"
+      ],
+      "ldraw": "3001",
+      "nombre_ldraw": "Brick  2 x  4",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -40.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          40.0,
+          24.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        80.0,
+        28.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            4.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3003",
+      "nombre_lego": "BRICK 2X2",
+      "categoria": "Bricks",
+      "cantidad": 6,
+      "colores": [
+        "Black",
+        "Medium Azur"
+      ],
+      "ldraw": "3003",
+      "nombre_ldraw": "Brick  2 x  2",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          20.0,
+          24.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        28.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3004",
+      "nombre_lego": "BRICK 1X2",
+      "categoria": "Bricks",
+      "cantidad": 6,
+      "colores": [
+        "Medium Azur"
+      ],
+      "ldraw": "3004",
+      "nombre_ldraw": "Brick  1 x  2",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -4.0,
+          -10.0
+        ],
+        "max": [
+          20.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        28.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3010",
+      "nombre_lego": "BRICK 1X4",
+      "categoria": "Bricks",
+      "cantidad": 2,
+      "colores": [
+        "Medium Azur"
+      ],
+      "ldraw": "3010",
+      "nombre_ldraw": "Brick  1 x  4",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -40.0,
+          -4.0,
+          -10.0
+        ],
+        "max": [
+          40.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        80.0,
+        28.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3023",
+      "nombre_lego": "PLATE 1X2",
+      "categoria": "Plates",
+      "cantidad": 6,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "3023",
+      "nombre_ldraw": "~Moved to 3023b",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -4.0,
+          -10.0
+        ],
+        "max": [
+          20.0,
+          8.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        12.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3040",
+      "nombre_lego": "ROOF TILE 1X2/45Â°",
+      "categoria": "Bricks",
+      "cantidad": 6,
+      "colores": [
+        "Black",
+        "Bright Yellowish Green"
+      ],
+      "ldraw": "3040",
+      "nombre_ldraw": "~Moved to 3040b",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          -4.0,
+          -30.0
+        ],
+        "max": [
+          10.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        28.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            20.0,
+            -10.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3069",
+      "nombre_lego": "FLAT TILE 1X2",
+      "categoria": "Plates",
+      "cantidad": 2,
+      "colores": [
+        "Medium Azur"
+      ],
+      "ldraw": "3069",
+      "nombre_ldraw": "~Moved to 3069b",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          0.0,
+          -10.0
+        ],
+        "max": [
+          20.0,
+          8.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        8.0,
+        20.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "31493",
+      "nombre_lego": "BRICK 1X2 WITH CROSS HOLE",
+      "categoria": "Bricks",
+      "cantidad": 4,
+      "colores": [
+        "Dark Stone Grey"
+      ],
+      "ldraw": "31493",
+      "nombre_ldraw": "=Technic Brick  1 x  2 with Axlehole with Open Sides and Bottom Stud",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -4.0,
+          -10.0
+        ],
+        "max": [
+          20.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        28.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "31510",
+      "nombre_lego": "ELEMENT SEPARATOR",
+      "categoria": "Miscellaneous",
+      "cantidad": 1,
+      "colores": [
+        "Bright Orange"
+      ],
+      "ldraw": "31510",
+      "nombre_ldraw": "=Brick Separator with Top Axle",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -59.29,
+          -10.0
+        ],
+        "max": [
+          20.0,
+          24.0,
+          160.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        83.29,
+        170.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            -8.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "31576",
+      "nombre_lego": "GRASS, W/ 3.2 TUBE",
+      "categoria": "Animals & Nature",
+      "cantidad": 2,
+      "colores": [
+        "Bright Green"
+      ],
+      "ldraw": "31576",
+      "nombre_ldraw": "=Plant Grass Stem",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -8.0,
+          -63.99,
+          -19.39
+        ],
+        "max": [
+          8.0,
+          0.0,
+          14.73
+        ]
+      },
+      "medidas_ldu": [
+        16.0,
+        63.99,
+        34.12
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "3176",
+      "nombre_lego": "COUPLING PLATE 2X2",
+      "categoria": "Plates",
+      "cantidad": 1,
+      "colores": [
+        "Medium Stone Grey"
+      ],
+      "ldraw": "3176",
+      "nombre_ldraw": "Plate  3 x  2 with Hole",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -4.0,
+          -40.0
+        ],
+        "max": [
+          20.0,
+          8.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        12.0,
+        60.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "32001",
+      "nombre_lego": "PLATE 2X6 W. HOLES",
+      "categoria": "Plates",
+      "cantidad": 4,
+      "colores": [
+        "Flame Yellowish Orange"
+      ],
+      "ldraw": "32001",
+      "nombre_ldraw": "Technic Plate  2 x  6 with Holes",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -60.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          60.0,
+          8.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        120.0,
+        12.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            0.0,
+            10.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "32012",
+      "nombre_lego": "BOBBIN",
+      "categoria": "Miscellaneous",
+      "cantidad": 1,
+      "colores": [
+        "Dark Stone Grey"
+      ],
+      "ldraw": "32012",
+      "nombre_ldraw": "Technic Reel  2.5 x  2",
+      "licencia": "Licensed under CC BY 2.0 and CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -25.0,
+          -25.0
+        ],
+        "max": [
+          20.0,
+          25.0,
+          25.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        50.0,
+        50.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "32059",
+      "nombre_lego": "PLATE 4X6 26 DEGREES",
+      "categoria": "Plates",
+      "cantidad": 2,
+      "colores": [
+        "Bright Yellowish Green"
+      ],
+      "ldraw": "32059",
+      "nombre_ldraw": "Plate  4 x  6 without Corners",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -60.0,
+          -4.0,
+          -40.0
+        ],
+        "max": [
+          60.0,
+          8.0,
+          40.0
+        ]
+      },
+      "medidas_ldu": [
+        120.0,
+        12.0,
+        80.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            4.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            4.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            4.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            4.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            4.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            4.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            4.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            4.0,
+            20.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "32062",
+      "nombre_lego": "2M CROSS AXLE W. GROOVE",
+      "categoria": "Connectors",
+      "cantidad": 4,
+      "colores": [
+        "Bright Red"
+      ],
+      "ldraw": "32062",
+      "nombre_ldraw": "Technic Axle  2 Notched",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -19.5,
+          -6.0,
+          -6.0
+        ],
+        "max": [
+          19.5,
+          6.0,
+          6.0
+        ]
+      },
+      "medidas_ldu": [
+        39.0,
+        12.0,
+        12.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            -11.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            -8.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            11.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "32198",
+      "nombre_lego": "BEVEL GEAR Z20",
+      "categoria": "Vehicles & Transportation",
+      "cantidad": 2,
+      "colores": [
+        "Brick Yellow"
+      ],
+      "ldraw": "32198",
+      "nombre_ldraw": "Technic Gear 20 Tooth Bevel",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -26.0,
+          -26.0,
+          -7.0
+        ],
+        "max": [
+          26.0,
+          26.0,
+          3.0
+        ]
+      },
+      "medidas_ldu": [
+        52.0,
+        52.0,
+        10.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "32270",
+      "nombre_lego": "DOUBLE CONICAL WHEEL Z12 1M",
+      "categoria": "Vehicles & Transportation",
+      "cantidad": 2,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "32270",
+      "nombre_ldraw": "Technic Gear 12 Tooth Double Bevel",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -17.0,
+          -17.0,
+          -10.0
+        ],
+        "max": [
+          17.0,
+          17.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        34.0,
+        34.0,
+        20.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "32474",
+      "nombre_lego": "BALL 10.2, W/ CROSS HOLE",
+      "categoria": "Technic Beams",
+      "cantidad": 4,
+      "colores": [
+        "Flame Yellowish Orange"
+      ],
+      "ldraw": "32474",
+      "nombre_ldraw": "Technic Ball Joint with Axlehole Blind",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -12.81,
+          -12.81,
+          -12.81
+        ],
+        "max": [
+          12.81,
+          9.25,
+          12.81
+        ]
+      },
+      "medidas_ldu": [
+        25.62,
+        22.06,
+        25.62
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "32524",
+      "nombre_lego": "TECHNIC 7M BEAM",
+      "categoria": "Technic Beams",
+      "cantidad": 2,
+      "colores": [
+        "Bright Green"
+      ],
+      "ldraw": "32524",
+      "nombre_ldraw": "Technic Beam  7",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -9.0,
+          -10.0,
+          -69.0
+        ],
+        "max": [
+          9.0,
+          10.0,
+          69.0
+        ]
+      },
+      "medidas_ldu": [
+        18.0,
+        20.0,
+        138.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -10.0,
+            -60.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -10.0,
+            -40.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -10.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -10.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -10.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -10.0,
+            40.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -10.0,
+            60.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            -60.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            -40.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            40.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            60.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "32526",
+      "nombre_lego": "TECHNIC ANG. BEAM 3X5 90 DEG.",
+      "categoria": "Technic Beams",
+      "cantidad": 2,
+      "colores": [
+        "Bright Green"
+      ],
+      "ldraw": "32526",
+      "nombre_ldraw": "Technic Beam  3 x  5 Bent 90",
+      "licencia": "Licensed under CC BY 2.0 and CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -9.0,
+          -10.0,
+          -9.0
+        ],
+        "max": [
+          49.0,
+          10.0,
+          89.0
+        ]
+      },
+      "medidas_ldu": [
+        58.0,
+        20.0,
+        98.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -10.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -10.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -10.0,
+            40.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -10.0,
+            60.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -10.0,
+            80.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            40.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            60.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            80.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            -10.0,
+            80.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            10.0,
+            80.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            -10.0,
+            80.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            10.0,
+            80.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "32530",
+      "nombre_lego": "T-BEAM W. PLATE 1X2 W. TUBE",
+      "categoria": "Plates",
+      "cantidad": 4,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "32530",
+      "nombre_ldraw": "Technic Tile  1 x  2 with Two Holes",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -31.0,
+          -10.0
+        ],
+        "max": [
+          20.0,
+          8.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        39.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -22.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -22.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -2.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            -2.0,
+            10.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "32905",
+      "nombre_lego": "WORM GEAR, 2 MODULE, FOR GEAR WHEEL",
+      "categoria": "Vehicles & Transportation",
+      "cantidad": 1,
+      "colores": [
+        "Medium Stone Grey"
+      ],
+      "ldraw": "32905",
+      "nombre_ldraw": "Technic Worm Gear 2L with Axle Hole Two-toothed Sliding",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -12.7,
+          -12.7,
+          -20.0
+        ],
+        "max": [
+          12.7,
+          12.7,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        25.4,
+        25.4,
+        40.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "35164",
+      "nombre_lego": "BRICK 1X6, W/ BOW",
+      "categoria": "Bricks",
+      "cantidad": 2,
+      "colores": [
+        "Transparent Light Blue"
+      ],
+      "ldraw": "35164",
+      "nombre_ldraw": "=Slope Brick Curved  6 x  1",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          -4.0,
+          -100.0
+        ],
+        "max": [
+          10.0,
+          24.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        28.0,
+        120.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            10.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "35390",
+      "nombre_lego": "ROUND BRICK 1X1",
+      "categoria": "Bricks",
+      "cantidad": 6,
+      "colores": [
+        "Transparent Green",
+        "Transparent Red",
+        "Transparent Yellow"
+      ],
+      "ldraw": "35390",
+      "nombre_ldraw": "=Brick  1 x  1 Round with Hollow Stud",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          -4.0,
+          -10.0
+        ],
+        "max": [
+          10.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        28.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3665",
+      "nombre_lego": "ROOF TILE 1X2 INV.",
+      "categoria": "Bricks",
+      "cantidad": 4,
+      "colores": [
+        "Flame Yellowish Orange"
+      ],
+      "ldraw": "3665",
+      "nombre_ldraw": "~Moved to 3665a",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          -4.0,
+          -30.0
+        ],
+        "max": [
+          10.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        28.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            4.0,
+            -20.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3666",
+      "nombre_lego": "PLATE 1X6",
+      "categoria": "Plates",
+      "cantidad": 4,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "3666",
+      "nombre_ldraw": "Plate  1 x  6",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -60.0,
+          -4.0,
+          -10.0
+        ],
+        "max": [
+          60.0,
+          8.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        120.0,
+        12.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -40.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3700",
+      "nombre_lego": "TECHNIC BRICK 1X2, Ã˜4.9",
+      "categoria": "Bricks",
+      "cantidad": 4,
+      "colores": [
+        "Bright Yellowish Green"
+      ],
+      "ldraw": "3700",
+      "nombre_ldraw": "Technic Brick  1 x  2 with Hole",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -4.0,
+          -10.0
+        ],
+        "max": [
+          20.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        28.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3701",
+      "nombre_lego": "TECHNIC BRICK 1X4, Ã˜4,9",
+      "categoria": "Bricks",
+      "cantidad": 4,
+      "colores": [
+        "Bright Yellowish Green"
+      ],
+      "ldraw": "3701",
+      "nombre_ldraw": "Technic Brick  1 x  4 with Holes",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -40.0,
+          -4.0,
+          -10.0
+        ],
+        "max": [
+          40.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        80.0,
+        28.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -20.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -20.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -20.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3702",
+      "nombre_lego": "TECHNIC BRICK 1X8",
+      "categoria": "Bricks",
+      "cantidad": 2,
+      "colores": [
+        "Bright Yellowish Green"
+      ],
+      "ldraw": "3702",
+      "nombre_ldraw": "Technic Brick  1 x  8 with Holes",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -80.0,
+          -4.0,
+          -10.0
+        ],
+        "max": [
+          80.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        160.0,
+        28.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -60.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -60.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -40.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -40.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -20.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -20.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -70.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -60.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -40.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -20.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3703",
+      "nombre_lego": "TECHNIC BRICK 1X16, Ø4,9",
+      "categoria": "Bricks",
+      "cantidad": 2,
+      "colores": [
+        "Bright Yellowish Green"
+      ],
+      "ldraw": "3703",
+      "nombre_ldraw": "Technic Brick  1 x 16 with Holes",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -160.0,
+          -4.0,
+          -10.0
+        ],
+        "max": [
+          160.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        320.0,
+        28.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -140.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -140.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -120.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -120.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -100.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -100.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -80.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -80.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -60.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -60.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -40.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -40.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -20.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -20.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            80.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            80.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            100.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            100.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            120.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            120.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            140.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            140.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -150.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -140.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -130.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -120.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -110.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -100.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -90.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -80.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -70.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -60.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -40.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -20.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            80.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            100.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            120.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            130.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            140.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            150.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3706",
+      "nombre_lego": "CROSS AXLE 6M",
+      "categoria": "Connectors",
+      "cantidad": 2,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "3706",
+      "nombre_ldraw": "Technic Axle  6",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -59.5,
+          -6.0,
+          -6.0
+        ],
+        "max": [
+          59.5,
+          6.0,
+          6.0
+        ]
+      },
+      "medidas_ldu": [
+        119.0,
+        12.0,
+        12.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            57.5,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3709",
+      "nombre_lego": "PLATE 2X4, 3XÃ˜4.9",
+      "categoria": "Plates",
+      "cantidad": 4,
+      "colores": [
+        "Flame Yellowish Orange"
+      ],
+      "ldraw": "3709",
+      "nombre_ldraw": "~Moved to 3709b",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -40.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          40.0,
+          8.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        80.0,
+        12.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            10.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3710",
+      "nombre_lego": "PLATE 1X4",
+      "categoria": "Plates",
+      "cantidad": 4,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "3710",
+      "nombre_ldraw": "Plate  1 x  4",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -40.0,
+          -4.0,
+          -10.0
+        ],
+        "max": [
+          40.0,
+          8.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        80.0,
+        12.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3737",
+      "nombre_lego": "CROSS AXLE 10M",
+      "categoria": "Connectors",
+      "cantidad": 2,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "3737",
+      "nombre_ldraw": "Technic Axle 10",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -99.5,
+          -6.0,
+          -6.0
+        ],
+        "max": [
+          99.5,
+          6.0,
+          6.0
+        ]
+      },
+      "medidas_ldu": [
+        199.0,
+        12.0,
+        12.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            97.5,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3738",
+      "nombre_lego": "PLATE 2X8 W. HOLES",
+      "categoria": "Plates",
+      "cantidad": 2,
+      "colores": [
+        "Bright Green"
+      ],
+      "ldraw": "3738",
+      "nombre_ldraw": "Technic Plate  2 x  8 with Holes",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -80.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          80.0,
+          8.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        160.0,
+        12.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -70.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -70.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            0.0,
+            10.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3743",
+      "nombre_lego": "TOOTHED BAR M=1, Z=10",
+      "categoria": "Vehicles & Transportation",
+      "cantidad": 4,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "3743",
+      "nombre_ldraw": "Technic Gear Rack  1 x  4",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -40.0,
+          -6.0,
+          -10.0
+        ],
+        "max": [
+          40.0,
+          8.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        80.0,
+        14.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            4.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "3895",
+      "nombre_lego": "TECHNIC BRICK 1X12, Ø4,9",
+      "categoria": "Bricks",
+      "cantidad": 2,
+      "colores": [
+        "Bright Yellowish Green"
+      ],
+      "ldraw": "3895",
+      "nombre_ldraw": "Technic Brick  1 x 12 with Holes",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -120.0,
+          -4.0,
+          -10.0
+        ],
+        "max": [
+          120.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        240.0,
+        28.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -100.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -100.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -80.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -80.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -60.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -60.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -40.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -40.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -20.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -20.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            80.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            80.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            100.0,
+            10.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            100.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -110.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -100.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -90.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -80.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -70.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -60.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -40.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -20.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            80.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            100.0,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "4032",
+      "nombre_lego": "PLATE 2X2 ROUND",
+      "categoria": "Plates",
+      "cantidad": 2,
+      "colores": [
+        "Bright Green"
+      ],
+      "ldraw": "4032",
+      "nombre_ldraw": "~Moved to 4032a",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          20.0,
+          8.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        12.0,
+        40.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "4162",
+      "nombre_lego": "FLAT TILE 1X8",
+      "categoria": "Plates",
+      "cantidad": 4,
+      "colores": [
+        "Medium Stone Grey"
+      ],
+      "ldraw": "4162",
+      "nombre_ldraw": "Tile  1 x  8",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -80.0,
+          0.0,
+          -10.0
+        ],
+        "max": [
+          80.0,
+          8.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        160.0,
+        8.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -60.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -40.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            4.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "42022",
+      "nombre_lego": "BRICK 1X6 W/BOW",
+      "categoria": "Bricks",
+      "cantidad": 4,
+      "colores": [
+        "Bright Yellowish Green"
+      ],
+      "ldraw": "42022",
+      "nombre_ldraw": "Slope Brick Curved  6 x  1",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          -4.0,
+          -100.0
+        ],
+        "max": [
+          10.0,
+          24.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        28.0,
+        120.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            10.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "42127",
+      "nombre_lego": "ANGLE ELEMENT, 0 DEGREES [1]",
+      "categoria": "Connectors",
+      "cantidad": 2,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "32013",
+      "nombre_ldraw": "Technic Angle Connector #1",
+      "licencia": "Licensed under CC BY 2.0 and CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          -9.0,
+          -30.0
+        ],
+        "max": [
+          10.0,
+          9.0,
+          9.0
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        18.0,
+        39.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "42128",
+      "nombre_lego": "ANGLE ELEMENT, 157,5 DEGR. [3]",
+      "categoria": "Connectors",
+      "cantidad": 2,
+      "colores": [
+        "Medium Azur"
+      ],
+      "ldraw": "32016",
+      "nombre_ldraw": "Technic Angle Connector #3 (157.5 degree)",
+      "licencia": "Licensed under CC BY 2.0 and CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          -19.54,
+          -30.0
+        ],
+        "max": [
+          10.0,
+          9.0,
+          31.06
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        28.54,
+        61.06
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "42156",
+      "nombre_lego": "ANGLE ELEMENT 135 DEG. [4]",
+      "categoria": "Connectors",
+      "cantidad": 2,
+      "colores": [
+        "Bright Yellowish Green"
+      ],
+      "ldraw": "32192",
+      "nombre_ldraw": "Technic Angle Connector #4 (135 degree)",
+      "licencia": "Licensed under CC BY 2.0 and CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          -27.38,
+          -30.0
+        ],
+        "max": [
+          10.0,
+          9.0,
+          27.38
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        36.38,
+        57.38
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "4282",
+      "nombre_lego": "PLATE 2X16",
+      "categoria": "Plates",
+      "cantidad": 2,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "4282",
+      "nombre_ldraw": "Plate  2 x 16",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -160.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          160.0,
+          8.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        320.0,
+        12.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -150.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -150.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -130.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -130.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -110.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -110.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -90.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -90.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -70.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -70.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            130.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            130.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            150.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            150.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -140.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -120.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -100.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -80.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -60.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -40.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            80.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            100.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            120.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            140.0,
+            4.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "4286",
+      "nombre_lego": "ROOF TILE 1X3/25Â°",
+      "categoria": "Bricks",
+      "cantidad": 4,
+      "colores": [
+        "Flame Yellowish Orange"
+      ],
+      "ldraw": "4286",
+      "nombre_ldraw": "Slope Brick 33  3 x  1",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          -4.0,
+          -50.0
+        ],
+        "max": [
+          10.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        28.0,
+        60.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            20.0,
+            -30.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "4287",
+      "nombre_lego": "ROOF TILE 1X3/25° INV.",
+      "categoria": "Bricks",
+      "cantidad": 4,
+      "colores": [
+        "Bright Yellowish Green"
+      ],
+      "ldraw": "4287",
+      "nombre_ldraw": "~Moved to 4287a",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          -4.0,
+          -50.0
+        ],
+        "max": [
+          10.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        28.0,
+        60.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            2.0,
+            -40.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            12.0,
+            -20.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "44294",
+      "nombre_lego": "CROSS AXLE 7M",
+      "categoria": "Connectors",
+      "cantidad": 2,
+      "colores": [
+        "Medium Stone Grey"
+      ],
+      "ldraw": "44294",
+      "nombre_ldraw": "Technic Axle  7",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -69.5,
+          -6.0,
+          -6.0
+        ],
+        "max": [
+          69.5,
+          6.0,
+          6.0
+        ]
+      },
+      "medidas_ldu": [
+        139.0,
+        12.0,
+        12.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            67.5,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "44865",
+      "nombre_lego": "BRICK 1X2 W. HORIZONTAL SNAP",
+      "categoria": "Bricks",
+      "cantidad": 4,
+      "colores": [
+        "Multicombination"
+      ],
+      "ldraw": "44865",
+      "nombre_ldraw": "Brick  1 x  2 with Pin with Bottom Stud Holder",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -4.0,
+          -30.0
+        ],
+        "max": [
+          20.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        28.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "4519",
+      "nombre_lego": "CROSS AXLE 3M",
+      "categoria": "Connectors",
+      "cantidad": 2,
+      "colores": [
+        "Medium Stone Grey"
+      ],
+      "ldraw": "4519",
+      "nombre_ldraw": "Technic Axle  3",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -29.5,
+          -6.0,
+          -6.0
+        ],
+        "max": [
+          29.5,
+          6.0,
+          6.0
+        ]
+      },
+      "medidas_ldu": [
+        59.0,
+        12.0,
+        12.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            27.5,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "45590",
+      "nombre_lego": "DAMPER 2M",
+      "categoria": "Connectors",
+      "cantidad": 2,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "45590",
+      "nombre_ldraw": "Technic Axle Joiner Double Flexible",
+      "licencia": "Licensed under CC BY 2.0 and CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -9.0,
+          -9.0,
+          -10.0
+        ],
+        "max": [
+          29.0,
+          9.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        38.0,
+        18.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            20.0,
+            0.0,
+            -10.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "4727",
+      "nombre_lego": "FLOWER, STALK",
+      "categoria": "Animals & Nature",
+      "cantidad": 1,
+      "colores": [
+        "Bright Green"
+      ],
+      "ldraw": "4727",
+      "nombre_ldraw": "Plant Flower  2 x  2 Leaves",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          20.0,
+          24.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        28.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "50950",
+      "nombre_lego": "BRICK W/BOW 1/3",
+      "categoria": "Bricks",
+      "cantidad": 2,
+      "colores": [
+        "Bright Yellowish Green"
+      ],
+      "ldraw": "50950",
+      "nombre_ldraw": "Slope Brick Curved  3 x  1",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          0.0,
+          -30.0
+        ],
+        "max": [
+          10.0,
+          24.0,
+          30.0
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        24.0,
+        60.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "55982",
+      "nombre_lego": "RIM WIDE 18x14 W. CROSS Ø4.8",
+      "categoria": "Vehicles & Transportation",
+      "cantidad": 6,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "55982",
+      "nombre_ldraw": "Wheel Rim 14 x 18 with Axlehole",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -21.0,
+          -21.0,
+          -17.0
+        ],
+        "max": [
+          21.0,
+          21.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        42.0,
+        42.0,
+        37.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "56891",
+      "nombre_lego": "TYRE BALLOON WIDE Ø 37x18",
+      "categoria": "Vehicles & Transportation",
+      "cantidad": 2,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "56891",
+      "nombre_ldraw": "Tyre 18/ 56 x 17 Off-Road with Offset Centre",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -46.0,
+          -46.0,
+          -28.0
+        ],
+        "max": [
+          46.0,
+          46.0,
+          17.0
+        ]
+      },
+      "medidas_ldu": [
+        92.0,
+        92.0,
+        45.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "57909",
+      "nombre_lego": "BRICK 2X2 W. BALL Ã˜ 10.2",
+      "categoria": "Bricks",
+      "cantidad": 2,
+      "colores": [
+        "Dark Stone Grey"
+      ],
+      "ldraw": "57909",
+      "nombre_ldraw": "Brick  2 x  2 with Ball Joint and Axlehole",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          52.81,
+          24.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        72.81,
+        28.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            20.0,
+            10.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "59443",
+      "nombre_lego": "CROSS AXLE, EXTENSION, 2M",
+      "categoria": "Connectors",
+      "cantidad": 2,
+      "colores": [
+        "Medium Stone Grey"
+      ],
+      "ldraw": "59443",
+      "nombre_ldraw": "Technic Axle Joiner Inline Smooth",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -8.5,
+          -8.72,
+          -20.0
+        ],
+        "max": [
+          8.5,
+          8.72,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        17.0,
+        17.45,
+        40.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "60474",
+      "nombre_lego": "PLATE 4X4 ROUND W. SNAP",
+      "categoria": "Plates",
+      "cantidad": 2,
+      "colores": [
+        "Medium Azur"
+      ],
+      "ldraw": "60474",
+      "nombre_ldraw": "Plate  4 x  4 Round with Hole and Snapstud",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -40.0,
+          -4.0,
+          -40.0
+        ],
+        "max": [
+          40.0,
+          8.0,
+          40.0
+        ]
+      },
+      "medidas_ldu": [
+        80.0,
+        12.0,
+        80.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            4.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            4.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            4.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "60479",
+      "nombre_lego": "PLATE 1X12",
+      "categoria": "Plates",
+      "cantidad": 2,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "60479",
+      "nombre_ldraw": "Plate  1 x 12",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -120.0,
+          -4.0,
+          -10.0
+        ],
+        "max": [
+          120.0,
+          8.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        240.0,
+        12.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -110.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -100.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -90.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -80.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -70.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -60.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -50.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -40.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            80.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            100.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "60481",
+      "nombre_lego": "ROOF TILE 2X1X2",
+      "categoria": "Bricks",
+      "cantidad": 4,
+      "colores": [
+        "Medium Stone Grey"
+      ],
+      "ldraw": "60481",
+      "nombre_ldraw": "~Moved to 60481a",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          -4.0,
+          -30.0
+        ],
+        "max": [
+          10.0,
+          48.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        52.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "6141",
+      "nombre_lego": "ROUND PLATE 1X1",
+      "categoria": "Plates",
+      "cantidad": 4,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "6141",
+      "nombre_ldraw": "Plate  1 x  1 Round",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          -4.0,
+          -10.0
+        ],
+        "max": [
+          10.0,
+          8.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        12.0,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            3.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "61485",
+      "nombre_lego": "BOTTOM W. TURNTABLE 4X4",
+      "categoria": "Miscellaneous",
+      "cantidad": 1,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "61485",
+      "nombre_ldraw": "Turntable Flat Base  4 x  4",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -40.0,
+          -4.0,
+          -40.0
+        ],
+        "max": [
+          40.0,
+          8.0,
+          40.0
+        ]
+      },
+      "medidas_ldu": [
+        80.0,
+        12.0,
+        80.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            4.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            -20.0,
+            4.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            4.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            0.0,
+            4.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            4.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            4.0,
+            20.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "64799",
+      "nombre_lego": "FRAME PLATE 4X4",
+      "categoria": "Plates",
+      "cantidad": 2,
+      "colores": [
+        "Medium Stone Grey"
+      ],
+      "ldraw": "64799",
+      "nombre_ldraw": "Plate  4 x  4 with Open Centre  2 x  2",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -40.0,
+          -4.0,
+          -40.0
+        ],
+        "max": [
+          40.0,
+          8.0,
+          40.0
+        ]
+      },
+      "medidas_ldu": [
+        80.0,
+        12.0,
+        80.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            4.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -30.0,
+            4.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -20.0,
+            4.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -20.0,
+            4.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            4.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            4.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            4.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            4.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            -30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            4.0,
+            -20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            4.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            4.0,
+            20.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "6562",
+      "nombre_lego": "CONNECTOR PEG/CROSS AXLE",
+      "categoria": "Connectors",
+      "cantidad": 4,
+      "colores": [
+        "Brick Yellow"
+      ],
+      "ldraw": "6562",
+      "nombre_ldraw": "=Technic Axle Pin",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -8.0,
+          -8.0
+        ],
+        "max": [
+          19.5,
+          8.0,
+          8.0
+        ]
+      },
+      "medidas_ldu": [
+        39.5,
+        16.0,
+        16.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "73587",
+      "nombre_lego": "MINI ANTENNA WH/BLA.ASS",
+      "categoria": "Buildings & Furniture",
+      "cantidad": 2,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "73587",
+      "nombre_ldraw": "~_Hinge Control Stick and Base (Complete) Black/Black (Obsolete)",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -8.0,
+          -35.41,
+          -8.0
+        ],
+        "max": [
+          8.0,
+          8.0,
+          17.01
+        ]
+      },
+      "medidas_ldu": [
+        16.0,
+        43.41,
+        25.01
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "85544",
+      "nombre_lego": "V-BELT Ã˜ 24, RED",
+      "categoria": "Cables, Hoses & Strings",
+      "cantidad": 2,
+      "colores": [
+        "Bright Red"
+      ],
+      "ldraw": "85544",
+      "nombre_ldraw": "Train Wheel Large Traction Band",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -39.5,
+          -39.5,
+          -1.5
+        ],
+        "max": [
+          39.5,
+          39.5,
+          1.5
+        ]
+      },
+      "medidas_ldu": [
+        79.0,
+        79.0,
+        3.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "85546",
+      "nombre_lego": "V-BELT Ã˜33, YELLOW",
+      "categoria": "Cables, Hoses & Strings",
+      "cantidad": 2,
+      "colores": [
+        "Bright Yellow"
+      ],
+      "ldraw": "85546",
+      "nombre_ldraw": "Rubber Belt Round 33 /  1.6",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -43.16,
+          -43.16,
+          -1.91
+        ],
+        "max": [
+          43.16,
+          43.16,
+          1.91
+        ]
+      },
+      "medidas_ldu": [
+        86.31,
+        86.31,
+        3.81
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "85984",
+      "nombre_lego": "ROOF TILE 1 X 2 X 2/3, ABS",
+      "categoria": "Bricks",
+      "cantidad": 4,
+      "colores": [
+        "Flame Yellowish Orange"
+      ],
+      "ldraw": "85984",
+      "nombre_ldraw": "Slope Brick 31  1 x  2 x  0.667",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -15.6,
+          -10.0
+        ],
+        "max": [
+          20.0,
+          0.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        40.0,
+        15.6,
+        20.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            -4.6,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "87083",
+      "nombre_lego": "CROSS AXLE 4M WITH END STOP",
+      "categoria": "Connectors",
+      "cantidad": 2,
+      "colores": [
+        "Dark Stone Grey"
+      ],
+      "ldraw": "87083",
+      "nombre_ldraw": "Technic Axle  4 with Stop",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -39.5,
+          -8.0,
+          -8.0
+        ],
+        "max": [
+          40.0,
+          8.0,
+          8.0
+        ]
+      },
+      "medidas_ldu": [
+        79.5,
+        16.0,
+        16.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            38.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "87087",
+      "nombre_lego": "BRICK 1X1 W. 1 KNOB",
+      "categoria": "Bricks",
+      "cantidad": 2,
+      "colores": [
+        "White"
+      ],
+      "ldraw": "87087",
+      "nombre_ldraw": "Brick  1 x  1 with Stud on 1 Side",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          -4.0,
+          -14.0
+        ],
+        "max": [
+          10.0,
+          24.0,
+          10.0
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        28.0,
+        24.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            10.0,
+            -10.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "92013",
+      "nombre_lego": "BRICK 2X2 W. CUP FOR BALL",
+      "categoria": "Bricks",
+      "cantidad": 4,
+      "colores": [
+        "Transparent Light Blue"
+      ],
+      "ldraw": "92013",
+      "nombre_ldraw": "Brick  2 x  2 with Ball Socket Type 3 and Axlehole",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -20.0,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          49.25,
+          24.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        69.25,
+        28.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            -10.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            -10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            0.0,
+            10.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "92402",
+      "nombre_lego": "TYRE NORMAL WIDE Ã˜30,4X14",
+      "categoria": "Vehicles & Transportation",
+      "cantidad": 4,
+      "colores": [
+        "Black"
+      ],
+      "ldraw": "92402",
+      "nombre_ldraw": "Tyre 14/ 50 x 17 with Centre Band",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -38.0,
+          -38.0,
+          -17.0
+        ],
+        "max": [
+          38.0,
+          38.0,
+          17.0
+        ]
+      },
+      "medidas_ldu": [
+        76.0,
+        76.0,
+        34.0
+      ],
+      "conexiones": []
+    },
+    {
+      "diseno": "93273",
+      "nombre_lego": "PLATE W. BOW 1X4X2/3",
+      "categoria": "Bricks",
+      "cantidad": 2,
+      "colores": [
+        "Medium Azur"
+      ],
+      "ldraw": "93273",
+      "nombre_ldraw": "Slope Brick Curved  4 x  1 Double",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -10.0,
+          -16.0,
+          -40.0
+        ],
+        "max": [
+          10.0,
+          0.0,
+          40.0
+        ]
+      },
+      "medidas_ldu": [
+        20.0,
+        16.0,
+        80.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            -12.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "diseno": "98262",
+      "nombre_lego": "FLOWER",
+      "categoria": "Animals & Nature",
+      "cantidad": 1,
+      "colores": [
+        "Bright Red"
+      ],
+      "ldraw": "98262",
+      "nombre_ldraw": "Plant Flower  2 x  2 with Solid Stud",
+      "licencia": "Licensed under CC BY 4.0 : see CAreadme.txt",
+      "caja_ldu": {
+        "min": [
+          -19.68,
+          -4.0,
+          -20.0
+        ],
+        "max": [
+          19.68,
+          24.0,
+          20.0
+        ]
+      },
+      "medidas_ldu": [
+        39.36,
+        28.0,
+        40.0
+      ],
+      "conexiones": [
+        {
+          "tipo": "stud",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    }
+  ],
+  "descartadas": {
+    "sin_forma_fija": [
+      {
+        "diseno": "23241",
+        "nombre_lego": "Ø1,5MM STRING WITH 0,5M",
+        "categoria": "Cables, Hoses & Strings",
+        "cantidad": 1,
+        "colores": [
+          "Black"
+        ],
+        "motivo": "cuerda: no tiene geometría rígida"
+      },
+      {
+        "diseno": "39759",
+        "nombre_lego": "CHAIN 16 M",
+        "categoria": "Cables, Hoses & Strings",
+        "cantidad": 2,
+        "colores": [
+          "Dark Stone Grey"
+        ],
+        "motivo": "cadena: cada eslabón se mueve"
+      }
+    ],
+    "sin_geometria": [],
+    "no_estan_en_ldraw": [
+      {
+        "diseno": "13360",
+        "nombre_lego": "FLAT TILE 1X1 - ROUND 'NO. 8'",
+        "categoria": "Plates",
+        "cantidad": 2,
+        "colores": [
+          "White"
+        ]
+      },
+      {
+        "diseno": "21712",
+        "nombre_lego": "ANGLE PLATE 1X2 / 2X2",
+        "categoria": "Plates",
+        "cantidad": 2,
+        "colores": [
+          "White"
+        ]
+      },
+      {
+        "diseno": "28698",
+        "nombre_lego": "WORM GEAR BLOCK, TRANSP.",
+        "categoria": "Vehicles & Transportation",
+        "cantidad": 1,
+        "colores": [
+          "Transparent"
+        ]
+      },
+      {
+        "diseno": "39223",
+        "nombre_lego": "BRICK Ø16 W. CROSS",
+        "categoria": "Bricks",
+        "cantidad": 4,
+        "colores": [
+          "Transparent Light Blue"
+        ]
+      },
+      {
+        "diseno": "42136",
+        "nombre_lego": "1/2 BUSH",
+        "categoria": "Connectors",
+        "cantidad": 4,
+        "colores": [
+          "Bright Yellow"
+        ]
+      },
+      {
+        "diseno": "42798",
+        "nombre_lego": "BUSH FOR CROSS AXLE",
+        "categoria": "Connectors",
+        "cantidad": 4,
+        "colores": [
+          "Medium Stone Grey"
+        ]
+      },
+      {
+        "diseno": "65668",
+        "nombre_lego": "WEDGE-BELT WHEEL Ø24",
+        "categoria": "Vehicles & Transportation",
+        "cantidad": 6,
+        "colores": [
+          "Transparent Light Blue"
+        ]
+      }
+    ]
+  }
+}
