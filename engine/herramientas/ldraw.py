@@ -258,6 +258,19 @@ class Biblioteca:
             elif campos[0] in ("3", "4") and len(campos) >= 11:
                 cuantos = 3 if campos[0] == "3" else 4
                 numeros = [float(v) for v in campos[2 : 2 + cuantos * 3]]
-                for i in range(cuantos):
-                    bruto = Punto(*numeros[i * 3 : i * 3 + 3])
-                    pieza.vertices.append(transformacion.aplicar(bruto))
+                esquinas = [
+                    transformacion.aplicar(Punto(*numeros[i * 3 : i * 3 + 3]))
+                    for i in range(cuantos)
+                ]
+                # Un cuadrilátero se parte en dos triángulos. Guardarlo con sus
+                # cuatro esquinas bastaba para medir la caja, pero para dibujar
+                # no: los vértices se leen de tres en tres, así que un cuarto
+                # vértice suelto desplazaría todo lo que venga detrás y la
+                # malla saldría hecha trizas.
+                if cuantos == 4:
+                    pieza.vertices += [
+                        esquinas[0], esquinas[1], esquinas[2],
+                        esquinas[0], esquinas[2], esquinas[3],
+                    ]
+                else:
+                    pieza.vertices += esquinas

@@ -40,12 +40,6 @@ class SceneTests(unittest.TestCase):
         )
         self.assertEqual([p["alto"] for p in scene["piezas"]], [PLACA, PLACA])
 
-    def test_tile_has_no_studs(self) -> None:
-        scene = model_to_scene(
-            parse_model("ladrillo 1x1 en 0,0,0\nbaldosa 1x2 en 3,0,0")
-        )
-        self.assertEqual([p["studs"] for p in scene["piezas"]], [True, False])
-
     def test_position_is_the_minimum_corner(self) -> None:
         scene = model_to_scene(parse_model("ladrillo 2x4 en 3,4,6"))
         pieza = scene["piezas"][0]
@@ -297,20 +291,6 @@ class ViewerUnitTests(unittest.TestCase):
 
     def test_the_viewer_converts_from_ldu(self) -> None:
         self.assertIn("const LDU = 1 / 20", self.html)
-
-    def test_the_viewer_no_longer_scales_height_apart(self) -> None:
-        # Antes la altura iba a escala 0,4 porque z venía en placas. Con todo
-        # en LDU esa corrección sobra, y dejarla aplastaría el modelo.
-        construir = self.html.split("function construir(")[1].split("\n}")[0]
-        self.assertNotIn("PLACA", construir)
-        self.assertIn("p.alto * LDU", construir)
-
-    def test_studs_are_counted_not_taken_from_the_size(self) -> None:
-        # `ancho` ya no es "2 studs" sino "40 LDU": usarlo como contador
-        # dibujaría 40 studs sobre un ladrillo que tiene 2.
-        construir = self.html.split("function construir(")[1].split("\n}")[0]
-        self.assertIn("p.ancho / 20", construir)
-        self.assertIn("p.fondo / 20", construir)
 
 
 class ContrastTests(unittest.TestCase):

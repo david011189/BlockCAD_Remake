@@ -250,7 +250,10 @@ una misma orientación tendría varias escrituras; con la matriz cada una de
 las **24 orientaciones de un cubo** es única, y componer giros es multiplicar.
 Solo hay 90 grados, así que las cuentas son exactas y sin coma flotante.
 
-Una pieza tumbada todavía no dibuja sus studs: el visor no sabe girarlos.
+El visor dibuja la geometría real de LDraw, no cajas, así que una pieza se ve
+con sus studs y sus agujeros mire hacia donde mire. Las mallas viven en
+`datos/mallas_45300.json` (4,9 MB, 99 piezas) y el servidor manda solo las que
+el modelo usa: la casa de ejemplo gasta 45 KB.
 
 Por dentro, el **motor mide en LDU** (1 LDU = 0,4 mm, la unidad de LDraw):
 
@@ -343,8 +346,8 @@ El editor de ladrillos, completo y coherente, quedó etiquetado en
 | Hecho | Rotaciones en tres ejes: una pieza apunta a donde haga falta. |
 | Hecho | El catálogo del set, cargado en el motor. |
 | Hecho | Conexiones y aviso de piezas en el aire. |
-| **Siguiente** | Visor con la geometría real de LDraw. |
-| | Selección y edición con el ratón. |
+| Hecho | Visor con la geometría real de LDraw. |
+| **Siguiente** | Selección y edición con el ratón. |
 
 **El giro a Technic está terminado.** El motor mide en LDU, gira en tres ejes,
 conoce las piezas de la caja y sabe qué se sostiene.
@@ -358,8 +361,8 @@ por más camino.
 
 Eso sube el listón de `blockcad_web/`. Deja de ser una forma de mirar el
 modelo para ser **el producto**, así que lo que hoy se le perdona —dibujar
-cajas en vez de la geometría de LDraw, no girar los studs de una pieza
-tumbada— pasa a ser deuda.
+las cajas en vez de la geometría de LDraw— pasa a ser deuda. Esa ya está
+saldada.
 
 Lo que no cambia es el principio de siempre: **el motor no sabe que existen
 los gráficos**. `blockcad_web` depende de él, nunca al revés. Esa frontera es

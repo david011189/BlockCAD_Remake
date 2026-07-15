@@ -3,14 +3,22 @@ from __future__ import annotations
 import json
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from functools import lru_cache
 from pathlib import Path
 
-from blockcad_engine import BlockCADError, BlockModel, DslError, parse_model
+from blockcad_engine import (
+    BlockCADError,
+    BlockModel,
+    DslError,
+    Orientation,
+    parse_model,
+)
 from blockcad_engine.dsl import model_to_source
 from blockcad_engine.serialization import model_from_dict, model_to_dict
 
 _HTML = Path(__file__).with_name("index.html")
 _VENDOR = Path(__file__).with_name("vendor")
+_DATOS = Path(__file__).resolve().parents[1] / "blockcad_engine" / "datos"
 
 EJEMPLO = '''modelo "Casa sencilla"
 
@@ -32,6 +40,71 @@ placa 2x4 en 2,0,15 color verde
 // Un remate liso
 baldosa 1x2 en 1,1,16 color blanco
 '''
+
+
+@lru_cache(maxsize=1)
+def _archivo_mallas() -> dict:
+    """Las mallas. 3,6 MB, así que se leen una sola vez."""
+    archivo = _DATOS / "mallas_45300.json"
+    if not archivo.is_file():
+        return {"triangulos": {}, "extension": {}}
+    return json.loads(archivo.read_text(encoding="utf-8"))
+
+
+def _reanclar(orientacion: Orientation, medidas) -> list[int]:
+    """Lo que hay que desplazar una caja girada para que vuelva al origen.
+
+    Girar la manda fuera de su sitio: lo que quede en negativo es justo lo que
+    hay que devolver.
+    """
+    return [
+        -sum(min(0, fila[k] * medidas[k]) for k in range(3))
+        for fila in orientacion.filas
+    ]
+
+
+def _transformacion(item, definition) -> dict:
+    """La matriz y el origen que colocan la malla de una pieza donde va.
+
+    Se compone aquí y no en el navegador porque hay que dar dos giros con su
+    reanclaje cada uno, en orden, y equivocarse es facilísimo:
+
+    1. El giro propio de la malla. LDraw dibuja el lado largo en X y este
+       catálogo lo cuenta en Y, así que la malla llega girada respecto a su
+       caja. Se reancla con la EXTENSIÓN DE LA MALLA, que no es la de la caja:
+       lleva los studs y viene con el ancho y el fondo cambiados.
+    2. La orientación que le ha dado quien construye. Se reancla con la caja
+       de colisión, porque es la que define dónde está la pieza.
+
+    Componiendo: mundo = Ru·(Rm·p + om) + ou + posición, o sea matriz Ru·Rm y
+    origen Ru·om + ou + posición.
+    """
+    malla = definition.metadata.get("malla", definition.part_id)
+    extension = _archivo_mallas()["extension"].get(malla)
+
+    giro_malla = Orientation.z(int(definition.metadata.get("malla_giro", 0)))
+    total = item.orientation.then(giro_malla)
+
+    # Sin malla no hay nada que reanclar: el visor dibujará su caja.
+    om = _reanclar(giro_malla, extension) if extension else [0, 0, 0]
+    ou = _reanclar(
+        item.orientation,
+        (
+            definition.dimensions.width,
+            definition.dimensions.depth,
+            definition.dimensions.height,
+        ),
+    )
+
+    girado = item.orientation.apply(*om)
+    return {
+        "matriz": [list(fila) for fila in total.filas],
+        "origen": [
+            item.position.x + girado[0] + ou[0],
+            item.position.y + girado[1] + ou[1],
+            item.position.z + girado[2] + ou[2],
+        ],
+    }
 
 
 def model_to_scene(model: BlockModel) -> dict:
@@ -57,13 +130,12 @@ def model_to_scene(model: BlockModel) -> dict:
                 "fondo": dimensions.depth,
                 "alto": dimensions.height,
                 "color": item.color,
-                # Los studs solo se dibujan si la pieza sigue de pie: en
-                # una viga tumbada mirarían de lado, y el visor todavía
-                # no sabe girarlos.
-                "studs": definition.has_top_studs and item.orientation.keeps_z_up,
                 "transparente": item.transparent,
                 "nombre": definition.name,
                 "flotante": item.instance_id in flotantes,
+                # Qué malla dibujar y dónde. Sin malla, el visor cae a la caja.
+                "malla": definition.metadata.get("malla", definition.part_id),
+                **_transformacion(item, definition),
             }
         )
     return {
@@ -104,6 +176,24 @@ def compile_json(source: str) -> dict:
         "ok": True,
         "nombre": model.name,
         "json": json.dumps(model_to_dict(model), indent=2, ensure_ascii=False),
+    }
+
+
+def mallas_pedidas(texto: str) -> dict:
+    """Devuelve solo las mallas que hagan falta.
+
+    El archivo entero son 3,6 MB y 99 piezas; un modelo usa un puñado. Mandarlo
+    todo en cada compilación sería tirar el ancho de banda por gusto.
+    """
+    try:
+        pedidas = json.loads(texto)
+    except json.JSONDecodeError:
+        return {}
+    disponibles = _archivo_mallas()["triangulos"]
+    return {
+        nombre: disponibles[nombre]
+        for nombre in pedidas
+        if isinstance(nombre, str) and nombre in disponibles
     }
 
 
@@ -179,6 +269,7 @@ class _Handler(BaseHTTPRequestHandler):
             "/api/modelo": compile_source,
             "/api/json": compile_json,
             "/api/importar": import_json,
+            "/api/mallas": mallas_pedidas,
         }
         accion = rutas.get(self.path)
         if accion is None:

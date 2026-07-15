@@ -230,9 +230,6 @@ import { OrbitControls } from '/vendor/OrbitControls.js';
 // stud como unidad, así que basta con dividir: un stud son 20 LDU. Las
 // proporciones salen solas y ya no hay que escalar la altura aparte.
 const LDU = 1 / 20;
-const RADIO_STUD = 0.3;    // 4,8 mm de diámetro
-const ALTO_STUD = 0.225;   // 1,8 mm
-
 const CLAVE = 'blockcad:codigo';
 
 const lienzo = document.getElementById('lienzo');
@@ -269,8 +266,50 @@ rejilla.material.transparent = true;
 rejilla.material.opacity = 0.6;
 escena.add(rejilla);
 
+// Todo el modelo vive dentro de este grupo, y dentro se habla en LDU y con
+// los ejes del motor: X e Y horizontales, Z hacia arriba.
+//
+// El grupo hace las dos conversiones de una vez. Antes se intercambiaban Y y Z
+// pieza a pieza, y eso no es un giro sino un reflejo: a una caja simétrica le
+// da igual, pero a una malla le invierte las normales y se ilumina del revés.
+// Un cuarto de vuelta sobre X sí es un giro, y además deja el código de dentro
+// hablando el mismo idioma que el motor.
 const modelo = new THREE.Group();
+modelo.rotation.x = -Math.PI / 2;
+modelo.scale.setScalar(LDU);
 escena.add(modelo);
+
+// Las mallas se piden una vez y se quedan: un modelo repite pocas piezas
+// muchas veces.
+const mallas = new Map();
+
+async function pedirMallas(nombres) {
+  const faltan = [...new Set(nombres)].filter((n) => n && !mallas.has(n));
+  if (!faltan.length) return;
+
+  const respuesta = await fetch('/api/mallas', {
+    method: 'POST',
+    body: JSON.stringify(faltan),
+  });
+  const recibidas = await respuesta.json();
+
+  for (const nombre of faltan) {
+    const triangulos = recibidas[nombre];
+    if (!triangulos) {
+      // Sin malla no se dibuja una caja mal: se dibuja la caja, y punto.
+      mallas.set(nombre, null);
+      continue;
+    }
+    const geometria = new THREE.BufferGeometry();
+    geometria.setAttribute(
+      'position',
+      new THREE.BufferAttribute(new Float32Array(triangulos), 3),
+    );
+    // LDraw no trae normales; se calculan una vez por pieza, no por copia.
+    geometria.computeVertexNormals();
+    mallas.set(nombre, geometria);
+  }
+}
 
 // Una arista negra sobre una pieza negra no dibuja nada. La silueta tiene que
 // leerse en las dos, así que el borde se elige según lo oscura que sea.
@@ -284,7 +323,9 @@ function esOscura(color) {
 function limpiar(grupo) {
   while (grupo.children.length) {
     const hijo = grupo.children.pop();
-    if (hijo.geometry) hijo.geometry.dispose();
+    // Las mallas se comparten entre todas las copias de una pieza: liberarlas
+    // aquí dejaría la escena sin geometría en el siguiente dibujado.
+    if (hijo.geometry && !hijo.userData.compartida) hijo.geometry.dispose();
     if (hijo.material) hijo.material.dispose();
   }
 }
@@ -293,30 +334,42 @@ function construir(piezas) {
   limpiar(modelo);
 
   for (const p of piezas) {
-    // Todo llega en LDU: ancho, fondo, alto y posición.
-    const ancho = p.ancho * LDU;
-    const fondo = p.fondo * LDU;
-    const alto = p.alto * LDU;
+    const oscura = esOscura(p.color);
     const material = new THREE.MeshLambertMaterial({
       color: p.color,
       transparent: p.transparente,
       opacity: p.transparente ? 0.45 : 1,
     });
 
-    const caja = new THREE.BoxGeometry(ancho, alto, fondo);
+    const geometria = mallas.get(p.malla);
+    if (geometria) {
+      // La pieza de verdad. El servidor manda la matriz y el origen ya
+      // compuestos, así que aquí solo hay que aplicarlos.
+      const cuerpo = new THREE.Mesh(geometria, material);
+      cuerpo.userData.compartida = true;
+      cuerpo.matrixAutoUpdate = false;
+      const m = p.matriz;
+      const o = p.origen;
+      cuerpo.matrix.set(
+        m[0][0], m[0][1], m[0][2], o[0],
+        m[1][0], m[1][1], m[1][2], o[1],
+        m[2][0], m[2][1], m[2][2], o[2],
+        0, 0, 0, 1,
+      );
+      modelo.add(cuerpo);
+
+      // Una malla con sus studs y su sombreado ya se distingue sola, así que
+      // el contorno se reserva para lo que hay que señalar.
+      if (p.flotante) marcarEnElAire(p);
+      continue;
+    }
+
+    // Sin malla, una caja. Es lo que pasa con una pieza que LDraw no tenga.
+    const caja = new THREE.BoxGeometry(p.ancho, p.fondo, p.alto);
     const cuerpo = new THREE.Mesh(caja, material);
-    // El motor usa z como altura; Three.js usa y. Además la caja se dibuja
-    // desde su centro, mientras que el motor guarda la esquina mínima.
-    cuerpo.position.set(
-      p.x * LDU + ancho / 2,
-      p.z * LDU + alto / 2,
-      p.y * LDU + fondo / 2,
-    );
+    cuerpo.position.set(p.x + p.ancho / 2, p.y + p.fondo / 2, p.z + p.alto / 2);
     modelo.add(cuerpo);
 
-    // Una pieza en el aire lleva el contorno en ámbar. No es un error, así
-    // que no va en rojo: se avisa y se deja construir.
-    const oscura = esOscura(p.color);
     const aristas = new THREE.LineSegments(
       new THREE.EdgesGeometry(caja),
       new THREE.LineBasicMaterial({
@@ -327,26 +380,19 @@ function construir(piezas) {
     );
     aristas.position.copy(cuerpo.position);
     modelo.add(aristas);
-
-    if (!p.studs) continue;
-    // Cuántos studs caben: las medidas vienen en LDU y un stud son 20.
-    const studsX = Math.round(p.ancho / 20);
-    const studsY = Math.round(p.fondo / 20);
-    for (let i = 0; i < studsX; i++) {
-      for (let j = 0; j < studsY; j++) {
-        const stud = new THREE.Mesh(
-          new THREE.CylinderGeometry(RADIO_STUD, RADIO_STUD, ALTO_STUD, 16),
-          material,
-        );
-        stud.position.set(
-          p.x * LDU + i + 0.5,
-          p.z * LDU + alto + ALTO_STUD / 2,
-          p.y * LDU + j + 0.5,
-        );
-        modelo.add(stud);
-      }
-    }
   }
+}
+
+// Una pieza en el aire se rodea de ámbar. No es un error, así que no va en
+// rojo: se avisa y se deja construir.
+function marcarEnElAire(p) {
+  const caja = new THREE.BoxGeometry(p.ancho, p.fondo, p.alto);
+  const marca = new THREE.LineSegments(
+    new THREE.EdgesGeometry(caja),
+    new THREE.LineBasicMaterial({ color: 0xe0a458, transparent: true, opacity: 0.95 }),
+  );
+  marca.position.set(p.x + p.ancho / 2, p.y + p.fondo / 2, p.z + p.alto / 2);
+  modelo.add(marca);
 }
 
 function centrar() {
@@ -404,6 +450,9 @@ async function compilar() {
     pintarGutter(datos.linea);
     return;
   }
+
+  // Las mallas antes de dibujar: sin ellas saldrían cajas.
+  await pedirMallas(datos.piezas.map((p) => p.malla));
 
   construir(datos.piezas);
   pintarGutter(null);

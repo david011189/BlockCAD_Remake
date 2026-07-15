@@ -101,34 +101,41 @@ class PartCatalog:
         catalog = cls()
         basic_parts = (
             PartDefinition(
-                "brick_1x1", "Ladrillo 1×1", Dimensions(1 * STUD, 1 * STUD, LADRILLO)
+                "brick_1x1", "Ladrillo 1×1", Dimensions(1 * STUD, 1 * STUD, LADRILLO),
+                metadata={"malla": "3005"},
             ),
             PartDefinition(
-                "brick_1x2", "Ladrillo 1×2", Dimensions(1 * STUD, 2 * STUD, LADRILLO)
+                "brick_1x2", "Ladrillo 1×2", Dimensions(1 * STUD, 2 * STUD, LADRILLO),
+                metadata={"malla": "3004", "malla_giro": "90"},
             ),
             PartDefinition(
-                "brick_2x2", "Ladrillo 2×2", Dimensions(2 * STUD, 2 * STUD, LADRILLO)
+                "brick_2x2", "Ladrillo 2×2", Dimensions(2 * STUD, 2 * STUD, LADRILLO),
+                metadata={"malla": "3003"},
             ),
             PartDefinition(
-                "brick_2x4", "Ladrillo 2×4", Dimensions(2 * STUD, 4 * STUD, LADRILLO)
+                "brick_2x4", "Ladrillo 2×4", Dimensions(2 * STUD, 4 * STUD, LADRILLO),
+                metadata={"malla": "3001", "malla_giro": "90"},
             ),
             PartDefinition(
                 "plate_1x2",
                 "Placa 1×2",
                 Dimensions(1 * STUD, 2 * STUD, PLACA),
                 category="plate",
+                metadata={"malla": "3023", "malla_giro": "90"},
             ),
             PartDefinition(
                 "plate_2x4",
                 "Placa 2×4",
                 Dimensions(2 * STUD, 4 * STUD, PLACA),
                 category="plate",
+                metadata={"malla": "3020", "malla_giro": "90"},
             ),
             PartDefinition(
                 "tile_1x2",
                 "Baldosa 1×2",
                 Dimensions(1 * STUD, 2 * STUD, PLACA),
                 category="tile",
+                metadata={"malla": "3069", "malla_giro": "90"},
                 has_top_studs=False,
             ),
         )
