@@ -1,0 +1,26 @@
+# Cómo debe tratar Git cada tipo de archivo.
+#
+# Sin este archivo, el resultado depende del core.autocrlf de cada equipo:
+# alguien con otra configuración podría meter finales de línea CRLF en el
+# repositorio y ensuciar los diffs de todo el proyecto.
+
+# Todo el texto se guarda con LF, y también se saca con LF en cualquier
+# sistema. Windows, VS Code y Python trabajan con LF sin problema, y así el
+# disco y el repositorio dicen lo mismo.
+* text=auto eol=lf
+
+# Binarios: Git no debe convertirlos ni intentar mostrar diferencias línea a
+# línea. La documentación .docx es un ZIP; una conversión la destruiría.
+*.docx binary
+*.pdf  binary
+*.png  binary
+*.jpg  binary
+*.zip  binary
+
+# Three.js viene de fuera y no lo mantenemos nosotros. Marcarlo como
+# «vendored» evita que GitHub cuente su 1,2 MB como código del proyecto y
+# clasifique el repositorio como JavaScript en vez de Python.
+engine/blockcad_web/vendor/** linguist-vendored
+
+# El formato propio es texto.
+*.blockcad text
