@@ -77,6 +77,13 @@ class BlockModel:
         except KeyError as exc:
             raise KeyError(f"No existe la instancia {instance_id!r}.") from exc
 
+    def index_of(self, instance_id: str) -> int:
+        """Posición de la instancia dentro del orden de inserción."""
+        for index, key in enumerate(self._instances):
+            if key == instance_id:
+                return index
+        raise KeyError(f"No existe la instancia {instance_id!r}.")
+
     def add(
         self,
         part_id: str,
@@ -110,6 +117,20 @@ class BlockModel:
         *,
         check_collision: bool = True,
     ) -> None:
+        self.insert_instance(instance, check_collision=check_collision)
+
+    def insert_instance(
+        self,
+        instance: PlacedPart,
+        *,
+        index: int | None = None,
+        check_collision: bool = True,
+    ) -> None:
+        """Añade una instancia y, opcionalmente, la sitúa en un índice concreto.
+
+        El índice permite que deshacer una eliminación devuelva la pieza a su
+        lugar original dentro del orden de inserción.
+        """
         if instance.instance_id in self._instances:
             raise DuplicateInstanceError(
                 f"La instancia {instance.instance_id!r} ya existe."
@@ -117,7 +138,17 @@ class BlockModel:
 
         self.catalog.get(instance.part_id)
         self._validate_instance(instance, check_collision=check_collision)
-        self._instances[instance.instance_id] = instance
+
+        if index is None or index >= len(self._instances):
+            self._instances[instance.instance_id] = instance
+            return
+
+        if index < 0:
+            raise ValueError("El índice no puede ser negativo.")
+
+        items = list(self._instances.items())
+        items.insert(index, (instance.instance_id, instance))
+        self._instances = dict(items)
 
     def remove(self, instance_id: str) -> PlacedPart:
         try:
@@ -158,14 +189,15 @@ class BlockModel:
             check_collision=check_collision,
         )
 
-    def rotate_clockwise(
+    def set_rotation(
         self,
         instance_id: str,
+        rotation: Rotation | int,
         *,
         check_collision: bool = True,
     ) -> PlacedPart:
         current = self.get(instance_id)
-        candidate = replace(current, rotation=current.rotation.clockwise())
+        candidate = replace(current, rotation=Rotation.normalize(int(rotation)))
         self._validate_instance(
             candidate,
             ignore_instance_id=instance_id,
@@ -173,6 +205,19 @@ class BlockModel:
         )
         self._instances[instance_id] = candidate
         return candidate
+
+    def rotate_clockwise(
+        self,
+        instance_id: str,
+        *,
+        check_collision: bool = True,
+    ) -> PlacedPart:
+        current = self.get(instance_id)
+        return self.set_rotation(
+            instance_id,
+            current.rotation.clockwise(),
+            check_collision=check_collision,
+        )
 
     def recolor(self, instance_id: str, color: str) -> PlacedPart:
         if not color.startswith("#") or len(color) != 7:

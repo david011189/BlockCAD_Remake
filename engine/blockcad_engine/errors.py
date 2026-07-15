@@ -16,3 +16,11 @@ class InvalidPlacementError(BlockCADError):
 
 class CollisionError(InvalidPlacementError):
     """La pieza ocuparía el mismo volumen que otra pieza."""
+
+
+class CommandError(BlockCADError):
+    """Un comando se ejecutó o se deshizo fuera de orden."""
+
+
+class TransactionError(BlockCADError):
+    """Una transacción se utilizó de forma incorrecta."""
