@@ -259,13 +259,28 @@ blockcad-web
 
 ## Hoja de ruta
 
-| Paso | Estado | Contenido |
-|---|---|---|
-| 1 | Hecho | Núcleo: piezas, coordenadas, colisiones, JSON. |
-| 2 | Hecho | Comandos: deshacer, rehacer, transacciones. |
-| — | Hecho | Lenguaje textual y editor web con vista 3D. |
-| 3 | Siguiente | Conexiones: studs, tubos, anclajes y soporte. |
-| 4 | | Catálogo ampliado y piezas paramétricas. |
-| 5 | | Importar el formato original y LDraw. |
-| 6 | | Renderizado propio y selección. |
-| 7 | | Interfaz de escritorio con PySide6. |
+El proyecto empezó como un remake de BlockCAD, un editor de ladrillos de
+sistema. En julio de 2026 giró hacia **LEGO Technic y WeDo 2.0**, lo que
+invalidó los pasos 3 a 7 del plan original y obligó a rehacer el motor.
+
+El editor de ladrillos, completo y coherente, quedó etiquetado en
+`sistema-v1`: `git checkout sistema-v1` para volver a él.
+
+| Estado | Contenido |
+|---|---|
+| Hecho | Núcleo: piezas, coordenadas, colisiones, JSON. (`paso-1`) |
+| Hecho | Comandos: deshacer, rehacer, transacciones. (`paso-2`) |
+| Hecho | Lenguaje textual y editor web con vista 3D. |
+| Hecho | Lector de LDraw y catálogo del set 45300: 277 de 280 piezas. |
+| Hecho | El motor mide en LDU, que es lo que hace colocable una viga. |
+| **Siguiente** | Rotaciones en tres ejes: una viga apunta a donde haga falta. |
+| | Conexiones: pines, ejes y agujeros, en rejilla de medio módulo. |
+| | Cargar el catálogo de WeDo en el motor. |
+| | Visor con la geometría real de LDraw. |
+
+Dos preguntas abiertas:
+
+- La **licencia del BlockCAD original** nunca se verificó. Importaba para leer
+  su formato; con el giro a Technic puede haber dejado de importar.
+- **¿El editor web ya es la interfaz?** Si lo es, no hace falta rehacer un
+  visor 3D en PySide6 para llegar al mismo sitio.

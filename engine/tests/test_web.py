@@ -291,6 +291,37 @@ class ViewerUnitTests(unittest.TestCase):
         self.assertIn("p.fondo / 20", construir)
 
 
+class PackagingTests(unittest.TestCase):
+    """Lo que no es .py hay que declararlo, o no llega al paquete instalado.
+
+    Se coló dos veces: al incluir Three.js y al generar el catálogo. Nada
+    saltaba porque en el repositorio los archivos están; solo faltaban en el
+    `pip install`, y ahí el visor se quedaba sin librería.
+    """
+
+    def setUp(self) -> None:
+        self.pyproject = (
+            Path(blockcad_web.__file__).resolve().parents[1] / "pyproject.toml"
+        ).read_text(encoding="utf-8")
+
+    def test_the_bundled_library_is_declared(self) -> None:
+        self.assertIn("vendor/*", self.pyproject)
+
+    def test_the_catalog_is_declared(self) -> None:
+        self.assertIn("datos/*.json", self.pyproject)
+
+    def test_every_runtime_file_lives_where_it_is_declared(self) -> None:
+        # Si alguien mueve un archivo, la declaración deja de cubrirlo.
+        for relativo in (
+            "index.html",
+            "vendor/three.module.js",
+            "vendor/OrbitControls.js",
+            "vendor/LICENSE-three.txt",
+        ):
+            with self.subTest(archivo=relativo):
+                self.assertTrue((_WEB / relativo).is_file())
+
+
 class OfflineTests(unittest.TestCase):
     """El visor debe funcionar sin conexión: nada puede venir de internet."""
 
