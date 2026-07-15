@@ -7,6 +7,7 @@ from pathlib import Path
 
 from blockcad_engine import BlockCADError, BlockModel, DslError, parse_model
 from blockcad_engine.parts import PartCatalog
+from blockcad_engine.serialization import model_to_dict
 
 _HTML = Path(__file__).with_name("index.html")
 _VENDOR = Path(__file__).with_name("vendor")
@@ -74,6 +75,26 @@ def compile_source(source: str) -> dict:
     return scene
 
 
+def compile_json(source: str) -> dict:
+    """Compila el código y devuelve el JSON del motor, listo para descargar.
+
+    El formato lo define `serialization.model_to_dict`, no el navegador: así
+    lo que se exporta es exactamente lo que el motor sabe volver a leer.
+    """
+    try:
+        model = parse_model(source)
+    except DslError as error:
+        return {"ok": False, "linea": error.line, "mensaje": error.message}
+    except BlockCADError as error:
+        return {"ok": False, "linea": None, "mensaje": str(error)}
+
+    return {
+        "ok": True,
+        "nombre": model.name,
+        "json": json.dumps(model_to_dict(model), indent=2, ensure_ascii=False),
+    }
+
+
 def catalog_summary() -> list[dict]:
     catalogo = PartCatalog.with_basic_parts()
     return [
@@ -136,13 +157,17 @@ class _Handler(BaseHTTPRequestHandler):
             self._send(404, b"No encontrado", "text/plain; charset=utf-8")
 
     def do_POST(self) -> None:
-        if self.path != "/api/modelo":
+        if self.path not in ("/api/modelo", "/api/json"):
             self._send(404, b"No encontrado", "text/plain; charset=utf-8")
             return
 
         length = int(self.headers.get("Content-Length", 0))
         source = self.rfile.read(length).decode("utf-8")
-        self._send_json(compile_source(source))
+
+        if self.path == "/api/modelo":
+            self._send_json(compile_source(source))
+        else:
+            self._send_json(compile_json(source))
 
 
 def serve(port: int = 8765, *, open_browser: bool = True) -> None:

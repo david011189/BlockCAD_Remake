@@ -33,7 +33,20 @@
   }
   header h1 { font-size: 15px; font-weight: 600; letter-spacing: .02em; }
   header h1 span { color: var(--suave); font-weight: 400; }
-  .acciones { margin-left: auto; display: flex; gap: 8px; }
+  .acciones { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  .separador {
+    width: 1px;
+    height: 20px;
+    background: var(--borde);
+    margin: 0 2px;
+  }
+  .guardado {
+    color: var(--suave);
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity .25s;
+  }
+  .guardado.visible { opacity: 1; }
   button {
     background: #222735;
     color: var(--texto);
@@ -109,9 +122,15 @@
 <header>
   <h1>BlockCAD <span>— escribe código, mira el modelo</span></h1>
   <div class="acciones">
+    <span class="guardado" id="guardado">guardado</span>
+    <button id="abrir" title="Abrir un archivo .blockcad">Abrir</button>
+    <button id="guardar" title="Descargar el código como archivo .blockcad">Guardar</button>
+    <button id="exportar" title="Descargar el modelo en el formato JSON del motor">Exportar JSON</button>
+    <span class="separador"></span>
+    <button id="ejemplo">Ejemplo</button>
     <button id="centrar">Centrar</button>
-    <button id="ejemplo">Cargar ejemplo</button>
   </div>
+  <input type="file" id="archivo" accept=".blockcad,.txt" hidden>
 </header>
 
 <main>
@@ -146,10 +165,13 @@ const PLACA = 0.4;
 const RADIO_STUD = 0.3;    // 4,8 mm de diámetro
 const ALTO_STUD = 0.225;   // 1,8 mm
 
+const CLAVE = 'blockcad:codigo';
+
 const lienzo = document.getElementById('lienzo');
 const areaCodigo = document.getElementById('codigo');
 const gutter = document.getElementById('gutter');
 const estado = document.getElementById('estado');
+const avisoGuardado = document.getElementById('guardado');
 
 const renderer = new THREE.WebGLRenderer({ canvas: lienzo, antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -295,9 +317,48 @@ async function compilar() {
   }
 }
 
+// --- Guardado -------------------------------------------------------------
+
+let avisoTemporizador;
+
+function guardarEnNavegador() {
+  try {
+    localStorage.setItem(CLAVE, areaCodigo.value);
+  } catch (error) {
+    // Modo privado o almacenamiento lleno: no es motivo para romper el editor,
+    // pero el usuario debe saber que su código no se está guardando solo.
+    estado.className = 'fallo';
+    estado.textContent = 'No se pudo guardar en este navegador: ' + error.message;
+    return;
+  }
+  avisoGuardado.classList.add('visible');
+  clearTimeout(avisoTemporizador);
+  avisoTemporizador = setTimeout(() => avisoGuardado.classList.remove('visible'), 900);
+}
+
+function nombreArchivo(extension) {
+  const linea = areaCodigo.value.match(/^\s*modelo\s+"([^"]*)"/m);
+  const base = (linea ? linea[1] : 'modelo').trim() || 'modelo';
+  return base.replace(/[^\p{L}\p{N}._-]+/gu, '_') + extension;
+}
+
+function descargar(nombre, contenido, tipo) {
+  const url = URL.createObjectURL(new Blob([contenido], { type: tipo }));
+  const enlace = document.createElement('a');
+  enlace.href = url;
+  enlace.download = nombre;
+  enlace.click();
+  URL.revokeObjectURL(url);
+}
+
+// --- Eventos --------------------------------------------------------------
+
 let temporizador;
 function alEscribir() {
   pintarGutter(null);
+  // El código se guarda aunque no compile: perder trabajo a medias sería peor
+  // que perderlo terminado.
+  guardarEnNavegador();
   clearTimeout(temporizador);
   temporizador = setTimeout(compilar, 400);
 }
@@ -305,11 +366,47 @@ function alEscribir() {
 areaCodigo.addEventListener('input', alEscribir);
 areaCodigo.addEventListener('scroll', () => { gutter.scrollTop = areaCodigo.scrollTop; });
 document.getElementById('centrar').addEventListener('click', centrar);
+
 document.getElementById('ejemplo').addEventListener('click', async () => {
+  if (areaCodigo.value.trim() && !confirm('Se reemplazará el código actual. ¿Seguir?')) return;
   const r = await fetch('/api/ejemplo');
   areaCodigo.value = (await r.json()).codigo;
+  guardarEnNavegador();
   primeraVez = true;
   compilar();
+});
+
+document.getElementById('guardar').addEventListener('click', () => {
+  descargar(nombreArchivo('.blockcad'), areaCodigo.value, 'text/plain;charset=utf-8');
+});
+
+const entradaArchivo = document.getElementById('archivo');
+document.getElementById('abrir').addEventListener('click', () => {
+  if (areaCodigo.value.trim() && !confirm('Se reemplazará el código actual. ¿Seguir?')) return;
+  entradaArchivo.click();
+});
+entradaArchivo.addEventListener('change', async () => {
+  const archivo = entradaArchivo.files[0];
+  if (!archivo) return;
+  areaCodigo.value = await archivo.text();
+  entradaArchivo.value = '';   // permite reabrir el mismo archivo
+  guardarEnNavegador();
+  primeraVez = true;
+  compilar();
+});
+
+document.getElementById('exportar').addEventListener('click', async () => {
+  const respuesta = await fetch('/api/json', { method: 'POST', body: areaCodigo.value });
+  const datos = await respuesta.json();
+  if (!datos.ok) {
+    estado.className = 'fallo';
+    estado.textContent = datos.linea
+      ? `No se puede exportar. Línea ${datos.linea}: ${datos.mensaje}`
+      : `No se puede exportar. ${datos.mensaje}`;
+    pintarGutter(datos.linea);
+    return;
+  }
+  descargar(nombreArchivo('.blockcad.json'), datos.json, 'application/json;charset=utf-8');
 });
 
 // El tabulador debe indentar, no saltar de campo: el lenguaje usa bloques.
@@ -341,9 +438,24 @@ function bucle() {
 }
 bucle();
 
-fetch('/api/ejemplo')
-  .then((r) => r.json())
-  .then((d) => { areaCodigo.value = d.codigo; compilar(); });
+// Al abrir, mandan tus cambios: el ejemplo solo aparece la primera vez.
+async function arrancar() {
+  let guardado = null;
+  try {
+    guardado = localStorage.getItem(CLAVE);
+  } catch (error) {
+    guardado = null;
+  }
+
+  if (guardado !== null && guardado.trim()) {
+    areaCodigo.value = guardado;
+  } else {
+    const respuesta = await fetch('/api/ejemplo');
+    areaCodigo.value = (await respuesta.json()).codigo;
+  }
+  compilar();
+}
+arrancar();
 </script>
 </body>
 </html>

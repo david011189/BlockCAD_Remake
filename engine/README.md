@@ -33,6 +33,23 @@ Funciona sin conexión: Three.js va incluido en `blockcad_web/vendor/` bajo
 licencia MIT, compatible con la GPL de este proyecto. Ni el motor, ni el
 servidor, ni el visor descargan nada de internet.
 
+### Tu trabajo no se pierde
+
+El código se guarda solo en el navegador mientras escribes, también cuando
+todavía no compila, y vuelve al recargar. El ejemplo solo aparece la primera
+vez.
+
+| Botón | Qué hace |
+|---|---|
+| **Abrir** | Carga un archivo `.blockcad` desde tu disco. |
+| **Guardar** | Descarga el código como `.blockcad`, con el nombre del modelo. |
+| **Exportar JSON** | Descarga el modelo en el formato del motor, el mismo que lee `load_model`. |
+| **Ejemplo** | Vuelve a cargar la casa de muestra. |
+| **Centrar** | Encuadra la cámara sobre el modelo. |
+
+El guardado automático vive en este navegador y en este equipo. Para
+conservar algo de verdad, usa **Guardar**.
+
 ## El lenguaje
 
 Una instrucción por línea. Los errores indican siempre la línea y, cuando dos

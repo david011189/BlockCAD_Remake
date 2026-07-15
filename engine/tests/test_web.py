@@ -1,10 +1,17 @@
+import json
 import re
+import tempfile
 import unittest
 from pathlib import Path
 
 import blockcad_web
-from blockcad_engine import parse_model
-from blockcad_web.server import EJEMPLO, compile_source, model_to_scene
+from blockcad_engine import GridPosition, Rotation, load_model, parse_model
+from blockcad_web.server import (
+    EJEMPLO,
+    compile_json,
+    compile_source,
+    model_to_scene,
+)
 
 _WEB = Path(blockcad_web.__file__).parent
 
@@ -67,6 +74,80 @@ class CompileTests(unittest.TestCase):
         resultado = compile_source(EJEMPLO)
         self.assertTrue(resultado["ok"], resultado.get("mensaje"))
         self.assertEqual(len(resultado["piezas"]), 21)
+
+
+class ExportTests(unittest.TestCase):
+    """Lo exportado debe ser exactamente lo que el motor sabe volver a leer."""
+
+    def test_exported_json_can_be_loaded_back(self) -> None:
+        fuente = (
+            'modelo "Ida y vuelta"\n'
+            "ladrillo 2x4 en 1,2,3 rot 90 color azul grupo 2 paso 5\n"
+            "baldosa 1x2 en 0,0,0 color #00AAFF transparente"
+        )
+        resultado = compile_json(fuente)
+        self.assertTrue(resultado["ok"], resultado.get("mensaje"))
+
+        with tempfile.TemporaryDirectory() as carpeta:
+            ruta = Path(carpeta) / "modelo.blockcad.json"
+            ruta.write_text(resultado["json"], encoding="utf-8")
+            recuperado = load_model(ruta)
+
+        self.assertEqual(recuperado.name, "Ida y vuelta")
+        self.assertEqual(len(recuperado.instances), 2)
+
+        ladrillo = next(
+            i for i in recuperado.instances if i.part_id == "brick_2x4"
+        )
+        self.assertEqual(ladrillo.position, GridPosition(1, 2, 3))
+        self.assertEqual(ladrillo.rotation, Rotation.DEG_90)
+        self.assertEqual(ladrillo.color, "#457B9D")
+        self.assertEqual(ladrillo.group, 2)
+        self.assertEqual(ladrillo.step, 5)
+
+        baldosa = next(i for i in recuperado.instances if i.part_id == "tile_1x2")
+        self.assertTrue(baldosa.transparent)
+
+    def test_exported_json_uses_the_engine_format(self) -> None:
+        datos = json.loads(compile_json("ladrillo 1x1 en 0,0,0")["json"])
+        self.assertEqual(datos["format"], "blockcad-remake")
+        self.assertEqual(datos["version"], 1)
+
+    def test_export_reports_errors_instead_of_raising(self) -> None:
+        resultado = compile_json("ladrillo 2x4 en 0,0,0\nladrillo 1x1 en 1,1,0")
+        self.assertFalse(resultado["ok"])
+        self.assertEqual(resultado["linea"], 2)
+
+    def test_exported_name_travels(self) -> None:
+        resultado = compile_json('modelo "Torre"\nladrillo 1x1 en 0,0,0')
+        self.assertEqual(resultado["nombre"], "Torre")
+        self.assertEqual(json.loads(resultado["json"])["name"], "Torre")
+
+    def test_example_exports_cleanly(self) -> None:
+        resultado = compile_json(EJEMPLO)
+        self.assertTrue(resultado["ok"])
+        self.assertEqual(len(json.loads(resultado["json"])["parts"]), 21)
+
+
+class EditorTests(unittest.TestCase):
+    """El editor no debe perder el trabajo del usuario."""
+
+    def setUp(self) -> None:
+        self.html = (_WEB / "index.html").read_text(encoding="utf-8")
+
+    def test_the_code_is_saved_in_the_browser(self) -> None:
+        self.assertIn("localStorage.setItem", self.html)
+
+    def test_saving_happens_while_typing_not_only_on_success(self) -> None:
+        # guardarEnNavegador() debe llamarse desde alEscribir(), que corre en
+        # cada pulsación, y no desde compilar(), que solo acaba bien si el
+        # código es válido.
+        escribir = self.html.split("function alEscribir()")[1].split("}")[0]
+        self.assertIn("guardarEnNavegador()", escribir)
+
+    def test_the_editor_restores_instead_of_loading_the_example(self) -> None:
+        arrancar = self.html.split("async function arrancar()")[1]
+        self.assertIn("localStorage.getItem", arrancar)
 
 
 class OfflineTests(unittest.TestCase):
