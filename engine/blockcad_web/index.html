@@ -550,6 +550,7 @@ const AYUDA = [
   ['ladrillo 2x2 encima color azul', 'la apoya sobre la pieza anterior'],
   ['ladrillo 2x4 en 0,0,0 llamado base', 'le pone nombre'],
   ['ladrillo 1x1 encima de base', 'la apoya sobre la pieza con ese nombre'],
+  ['un modelo entero', 'si lo pegas aquí, se carga en el editor'],
   ['borrar 7', 'borra la línea 7'],
   ['borrar ultima', 'borra la última pieza'],
   ['deshacer', 'deshace la última orden'],
@@ -601,6 +602,13 @@ function borrar(argumento) {
 // sobra en el lenguaje, así que se descarta en vez de dar un error.
 const VERBOS = /^(añade|anade|añadir|agrega|agregar|pon|poner|coloca|colocar)\s+/i;
 
+// `catalogo` y `modelo` solo valen en las primeras líneas de un archivo, así
+// que quien los manda no está añadiendo una pieza: está pegando un programa
+// entero. Añadirlo al final del código lo dejaría en medio y daría un error
+// que no dice nada ("debe ir en la primera línea", cuando en lo pegado sí lo
+// está).
+const ES_PROGRAMA = /^[ \t]*(catalogo|modelo)[ \t]+"/m;
+
 async function anadirPiezas(entrada) {
   const texto = entrada
     .split('\n')
@@ -632,6 +640,17 @@ async function anadirPiezas(entrada) {
 async function enviar() {
   const texto = areaOrden.value.trim();
   if (!texto) return;
+
+  // Un programa entero no se añade al final del código: lo sustituye. Es lo
+  // que quiere quien pega un modelo completo en la consola.
+  if (ES_PROGRAMA.test(texto)) {
+    if (!puedoReemplazar()) return;
+    registrar();
+    reemplazar(texto);
+    areaOrden.value = '';
+    decir('Es un modelo completo, así que lo he cargado en el editor.', 'hecho');
+    return;
+  }
 
   const [primera, ...resto] = texto.split(/\s+/);
   const orden = primera.toLowerCase();
@@ -676,14 +695,27 @@ async function enviar() {
   }
 }
 
-document.getElementById('enviar').addEventListener('click', enviar);
+// La caja crece con lo que se escriba. Con tres filas fijas, pegar un modelo
+// de siete líneas ocultaba justo la de arriba, que es la que suele importar.
+function ajustarCaja() {
+  areaOrden.style.height = 'auto';
+  areaOrden.style.height = `${Math.min(areaOrden.scrollHeight, 180)}px`;
+}
+
+async function enviarYAjustar() {
+  await enviar();
+  ajustarCaja();
+}
+
+document.getElementById('enviar').addEventListener('click', enviarYAjustar);
+areaOrden.addEventListener('input', ajustarCaja);
 
 // Enter envía; Mayúsculas+Enter hace un salto de línea, para mandar varias
 // piezas de una vez.
 areaOrden.addEventListener('keydown', (evento) => {
   if (evento.key === 'Enter' && !evento.shiftKey) {
     evento.preventDefault();
-    enviar();
+    enviarYAjustar();
   }
 });
 

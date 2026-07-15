@@ -256,6 +256,28 @@ class EditorTests(unittest.TestCase):
             with self.subTest(verbo=verbo):
                 self.assertIn(verbo, verbos)
 
+    def test_pasting_a_whole_model_loads_it_instead_of_appending(self) -> None:
+        # Fallo real: al pegar un modelo completo en la consola, se añadía al
+        # final del código y la línea `catalogo` acababa en medio. El error
+        # decía "debe ir en la primera línea" cuando en lo pegado sí lo
+        # estaba, y la caja de 3 filas ni siquiera dejaba verla.
+        enviar = self.html.split("async function enviar()")[1].split("\n}")[0]
+        self.assertIn("ES_PROGRAMA.test(texto)", enviar)
+        self.assertLess(
+            enviar.index("ES_PROGRAMA"),
+            enviar.index("anadirPiezas"),
+            "hay que detectar el programa antes de añadir nada",
+        )
+
+    def test_a_whole_model_is_recognised_by_its_directives(self) -> None:
+        patron = self.html.split("const ES_PROGRAMA = ")[1].split("\n")[0]
+        self.assertIn("catalogo", patron)
+        self.assertIn("modelo", patron)
+
+    def test_the_console_box_grows_with_what_you_paste(self) -> None:
+        self.assertIn("function ajustarCaja()", self.html)
+        self.assertIn("scrollHeight", self.html)
+
     def test_the_console_undo_keeps_snapshots(self) -> None:
         registrar = self.html.split("function registrar()")[1].split("}")[0]
         self.assertIn("historial.pasado.push(areaCodigo.value)", registrar)
