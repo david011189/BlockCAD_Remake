@@ -56,6 +56,45 @@ class PlacedPart:
         dimensions = definition.dimensions.rotated(self.orientation)
         return Bounds3D.from_position_and_dimensions(self.position, dimensions)
 
+    def world_connections(
+        self, definition: PartDefinition
+    ) -> tuple[tuple[str, tuple[int, int, int]], ...]:
+        """Dónde caen sus puntos de conexión, ya girados y colocados.
+
+        Girar mueve la caja fuera de su sitio: un ladrillo de 2x4 girado un
+        cuarto de vuelta ocupa donde antes no ocupaba. Como el motor guarda la
+        esquina mínima DESPUÉS de girar, hay que reanclar la pieza —y con ella
+        sus puntos— para que esa esquina vuelva al origen.
+        """
+        if not definition.connections:
+            return ()
+
+        medidas = (
+            definition.dimensions.width,
+            definition.dimensions.depth,
+            definition.dimensions.height,
+        )
+        # Al girar, cada eje recibe una medida distinta y puede acabar en
+        # negativo. Lo que sobresale por debajo de cero es lo que hay que
+        # devolver al sitio.
+        desplazamiento = tuple(
+            -sum(min(0, fila[k] * medidas[k]) for k in range(3))
+            for fila in self.orientation.filas
+        )
+
+        puntos = []
+        for conexion in definition.connections:
+            girado = self.orientation.apply(*conexion.punto)
+            puntos.append((
+                conexion.tipo,
+                (
+                    self.position.x + girado[0] + desplazamiento[0],
+                    self.position.y + girado[1] + desplazamiento[1],
+                    self.position.z + girado[2] + desplazamiento[2],
+                ),
+            ))
+        return tuple(puntos)
+
 
 class BlockModel:
     """Documento principal que contiene todas las piezas colocadas."""
@@ -264,6 +303,82 @@ class BlockModel:
                 collisions.append(existing)
 
         return tuple(collisions)
+
+    def connected_to(self, instance_id: str) -> tuple[PlacedPart, ...]:
+        """Piezas unidas a esta por compartir un punto de conexión.
+
+        Un agujero aparece en las dos caras de la pieza, así que dos vigas
+        pegadas comparten los puntos de la cara que se tocan. Es lo que
+        permite saber que están unidas sin modelar el pin.
+        """
+        pieza = self.get(instance_id)
+        mios = {
+            punto
+            for _, punto in pieza.world_connections(self.catalog.get(pieza.part_id))
+        }
+        if not mios:
+            return ()
+
+        unidas = []
+        for otra in self._instances.values():
+            if otra.instance_id == instance_id:
+                continue
+            suyos = {
+                punto
+                for _, punto in otra.world_connections(self.catalog.get(otra.part_id))
+            }
+            if mios & suyos:
+                unidas.append(otra)
+        return tuple(unidas)
+
+    def resting_on(self, instance_id: str) -> tuple[PlacedPart, ...]:
+        """Piezas sobre las que esta se apoya: las que tiene justo debajo.
+
+        Hace falta además de `connected_to` porque un ladrillo no tiene puntos
+        en su base: sus studs están arriba, y el de encima no aporta nada por
+        abajo. Entre ladrillos, lo que hay es apoyo, no puntos compartidos.
+        """
+        pieza = self.get(instance_id)
+        caja = pieza.bounds(self.catalog.get(pieza.part_id))
+
+        debajo = []
+        for otra in self._instances.values():
+            if otra.instance_id == instance_id:
+                continue
+            suya = otra.bounds(self.catalog.get(otra.part_id))
+            if suya.max_z != caja.min_z:
+                continue
+            # Que se toquen de canto no sostiene nada: las plantas tienen que
+            # solaparse de verdad.
+            if (
+                suya.min_x < caja.max_x
+                and suya.max_x > caja.min_x
+                and suya.min_y < caja.max_y
+                and suya.max_y > caja.min_y
+            ):
+                debajo.append(otra)
+        return tuple(debajo)
+
+    def is_supported(self, instance_id: str) -> bool:
+        """Si la pieza se apoya en el suelo, en otra pieza, o va unida a alguna."""
+        pieza = self.get(instance_id)
+        if pieza.position.z == 0:
+            return True
+        return bool(self.resting_on(instance_id)) or bool(
+            self.connected_to(instance_id)
+        )
+
+    def floating(self) -> tuple[PlacedPart, ...]:
+        """Las piezas que se quedan en el aire.
+
+        No es un error: el BlockCAD original permitía piezas flotantes y aquí
+        también. Es un aviso, para que quien construye sepa lo que hay.
+        """
+        return tuple(
+            pieza
+            for pieza in self._instances.values()
+            if not self.is_supported(pieza.instance_id)
+        )
 
     def _validate_instance(
         self,

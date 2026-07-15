@@ -165,6 +165,7 @@
     min-height: 35px;
   }
   footer.fallo { color: var(--error); }
+  footer.aviso { color: #e0a458; }
 </style>
 </head>
 <body>
@@ -313,13 +314,15 @@ function construir(piezas) {
     );
     modelo.add(cuerpo);
 
+    // Una pieza en el aire lleva el contorno en ámbar. No es un error, así
+    // que no va en rojo: se avisa y se deja construir.
     const oscura = esOscura(p.color);
     const aristas = new THREE.LineSegments(
       new THREE.EdgesGeometry(caja),
       new THREE.LineBasicMaterial({
-        color: oscura ? 0xaab3c4 : 0x000000,
+        color: p.flotante ? 0xe0a458 : (oscura ? 0xaab3c4 : 0x000000),
         transparent: true,
-        opacity: oscura ? 0.55 : 0.3,
+        opacity: p.flotante ? 0.95 : (oscura ? 0.55 : 0.3),
       }),
     );
     aristas.position.copy(cuerpo.position);
@@ -404,9 +407,16 @@ async function compilar() {
 
   construir(datos.piezas);
   pintarGutter(null);
-  estado.className = '';
   const n = datos.piezas.length;
-  estado.textContent = `${datos.nombre} — ${n} ${n === 1 ? 'pieza' : 'piezas'}`;
+  let texto = `${datos.nombre} — ${n} ${n === 1 ? 'pieza' : 'piezas'}`;
+
+  // Una pieza en el aire no es un error: se avisa y se sigue construyendo.
+  if (datos.flotantes) {
+    const f = datos.flotantes;
+    texto += ` · ${f} ${f === 1 ? 'pieza' : 'piezas'} en el aire`;
+  }
+  estado.className = datos.flotantes ? 'aviso' : '';
+  estado.textContent = texto;
 
   if (primeraVez && n) {
     centrar();

@@ -126,22 +126,60 @@ def caja_de_colision(pieza) -> tuple[float, float, float]:
     ancho = ancho en X, fondo = ancho en Z, alto = ancho en Y.
     """
     minimo, maximo = pieza.caja()
-    techo = minimo.y
-
-    # Un stud del techo se apoya justo 4 LDU por debajo del punto más alto.
-    hay_studs_arriba = any(
-        conexion.tipo == "stud"
-        and abs(conexion.punto.y - (techo + ALTO_STUD)) < 0.01
-        for conexion in pieza.conexiones
-    )
-    if hay_studs_arriba:
-        techo += ALTO_STUD
-
+    techo = _techo(pieza)
     return (
         round(maximo.x - minimo.x, 2),
         round(maximo.z - minimo.z, 2),
         round(maximo.y - techo, 2),
     )
+
+
+def _techo(pieza) -> float:
+    """La cara superior de la pieza, sin contar los studs que sobresalen.
+
+    En LDraw la vertical es Y y apunta hacia abajo, así que el techo es el
+    min_y de la caja.
+    """
+    minimo, _ = pieza.caja()
+    hay_studs = any(
+        conexion.tipo == "stud"
+        and abs(conexion.punto.y - (minimo.y + ALTO_STUD)) < 0.01
+        for conexion in pieza.conexiones
+    )
+    return minimo.y + (ALTO_STUD if hay_studs else 0)
+
+
+def conexiones_en_ejes_del_motor(pieza) -> list[dict]:
+    """Pasa los puntos de conexión a las coordenadas que usa el motor.
+
+    Hay que cruzar dos convenios a la vez, y es donde es fácil equivocarse:
+
+    - LDraw mide la vertical en Y y hacia ABAJO; el motor, en Z y hacia
+      arriba. Por eso la altura sale de restar a `max_y`.
+    - El origen de LDraw está donde el autor de la pieza quisiera; el del
+      motor es la esquina mínima de la caja de colisión.
+
+    Cada agujero aparece dos veces en LDraw, una por cara, y eso no es ruido:
+    es lo que hace que dos vigas pegadas compartan el punto.
+    """
+    minimo, maximo = pieza.caja()
+    techo = _techo(pieza)
+
+    vistos = {}
+    for conexion in pieza.conexiones:
+        punto = (
+            round(conexion.punto.x - minimo.x, 2),
+            round(conexion.punto.z - minimo.z, 2),
+            round(maximo.y - conexion.punto.y, 2),
+        )
+        # Un punto por encima del techo es el propio stud sobresaliendo: no
+        # es una conexión más, es el mismo sitio visto desde fuera.
+        vistos[(conexion.tipo, punto)] = None
+
+    return [
+        {"tipo": tipo, "punto": list(punto)}
+        for tipo, punto in sorted(vistos, key=lambda v: (v[0], v[1]))
+    ]
 
 
 def describir(biblioteca: Biblioteca, numero: str) -> dict | None:
@@ -165,8 +203,10 @@ def describir(biblioteca: Biblioteca, numero: str) -> dict | None:
         # El '=' delante marca un alias en LDraw; no forma parte del nombre.
         "nombre_ldraw": pieza.nombre.lstrip("=").strip(),
         "licencia": pieza.licencia,
-        # Lo que el motor necesita: el bulto sin studs, en sus ejes.
+        # Lo que el motor necesita: el bulto sin studs y los puntos de
+        # conexión, todo en sus ejes.
         "caja_motor_ldu": list(caja_de_colision(pieza)),
+        "conexiones_motor": conexiones_en_ejes_del_motor(pieza),
         # Ojo: en LDraw la vertical es Y y apunta hacia abajo. La caja incluye
         # los studs, que sobresalen 4 LDU, así que NO es la caja de colisión.
         "caja_ldu": {

@@ -19,7 +19,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from .errors import InvalidFormatError
-from .geometry import Dimensions
+from .geometry import Connection, Dimensions
 from .parts import PartCatalog, PartDefinition
 
 _DATOS = Path(__file__).parent / "datos"
@@ -111,6 +111,10 @@ def _definicion(pieza: dict) -> PartDefinition:
             "cantidad_en_el_set": str(pieza.get("cantidad", 0)),
         },
         aliases=tuple(aliases),
+        connections=tuple(
+            Connection(c["tipo"], tuple(round(v) for v in c["punto"]))
+            for c in pieza.get("conexiones_motor", ())
+        ),
     )
 
 

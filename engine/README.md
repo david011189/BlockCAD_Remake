@@ -83,6 +83,28 @@ sobreviven a cualquier orden.
 Una instrucción por línea. Los errores indican siempre la línea y, cuando dos
 piezas chocan, también la línea de la otra pieza.
 
+### Piezas en el aire
+
+Una pieza sin apoyo **se avisa, no se rechaza**: el BlockCAD original permitía
+piezas flotantes y aquí también. La barra de estado dice cuántas hay y el
+visor las marca con el contorno en ámbar.
+
+Una pieza está sujeta si toca el suelo, si se apoya en otra, o si comparte un
+punto de conexión con otra. Lo último hace falta para Technic: dos vigas
+pegadas comparten los agujeros de la cara que se tocan, porque un agujero
+atraviesa la pieza y sale por los dos lados.
+
+Un ladrillo, en cambio, tiene studs arriba y nada debajo, así que dos
+apilados no comparten ningún punto: se sostienen por apoyo. Por eso hacen
+falta las dos reglas.
+
+```python
+modelo.floating()                  # las que quedan al aire
+modelo.is_supported(instance_id)
+modelo.resting_on(instance_id)     # las que tiene debajo
+modelo.connected_to(instance_id)   # las que comparten un punto con ella
+```
+
 ### Elegir el catálogo
 
 Sin decir nada se construye con siete piezas idealizadas: ladrillos, placas y

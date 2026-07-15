@@ -153,6 +153,23 @@ class Orientation:
 
 
 @dataclass(frozen=True, slots=True)
+class Connection:
+    """Un sitio por donde una pieza se une a otra.
+
+    El punto va en LDU y relativo a la esquina mínima de la pieza, así que
+    para saber dónde cae de verdad hay que girarlo y sumarle su posición.
+
+    Los tipos vienen de LDraw: `stud` es un pivote, `agujero_pin` el hueco de
+    un pin y `agujero_eje` el de un eje. Un agujero aparece en las dos caras
+    de la pieza, y eso no es un duplicado: es lo que hace que dos vigas
+    pegadas compartan el punto y se sepan conectadas.
+    """
+
+    tipo: str
+    punto: tuple[int, int, int]
+
+
+@dataclass(frozen=True, slots=True)
 class GridPosition:
     """Posición de la esquina mínima de una pieza, en LDU.
 

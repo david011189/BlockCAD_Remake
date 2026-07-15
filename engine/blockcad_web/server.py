@@ -40,6 +40,10 @@ def model_to_scene(model: BlockModel) -> dict:
     El navegador no conoce el catálogo, así que aquí se resuelven las
     dimensiones ya rotadas de cada pieza.
     """
+    # Una pieza en el aire no es un error: se avisa y se deja construir. Se
+    # calcula una vez y se marca cada pieza, en vez de preguntarlo por pieza.
+    flotantes = {p.instance_id for p in model.floating()}
+
     piezas = []
     for item in model.instances:
         definition = model.catalog.get(item.part_id)
@@ -59,9 +63,14 @@ def model_to_scene(model: BlockModel) -> dict:
                 "studs": definition.has_top_studs and item.orientation.keeps_z_up,
                 "transparente": item.transparent,
                 "nombre": definition.name,
+                "flotante": item.instance_id in flotantes,
             }
         )
-    return {"nombre": model.name, "piezas": piezas}
+    return {
+        "nombre": model.name,
+        "piezas": piezas,
+        "flotantes": len(flotantes),
+    }
 
 
 def compile_source(source: str) -> dict:

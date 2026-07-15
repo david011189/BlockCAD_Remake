@@ -8,7 +8,7 @@ from .errors import (
     InvalidPartError,
     PartNotFoundError,
 )
-from .geometry import LADRILLO, PLACA, STUD, Dimensions
+from .geometry import LADRILLO, PLACA, STUD, Connection, Dimensions
 
 _HEX_DIGITS = frozenset("0123456789abcdefABCDEF")
 
@@ -42,6 +42,9 @@ class PartDefinition:
     #: número de molde —3001—, pero nadie quiere escribir eso: el alias
     #: `brick_2x4` deja que el lenguaje siga diciendo "ladrillo 2x4".
     aliases: tuple[str, ...] = ()
+    #: Por dónde se une a otras piezas, relativo a su esquina mínima. El
+    #: catálogo básico no las trae; las del set sí.
+    connections: tuple[Connection, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.part_id.strip():

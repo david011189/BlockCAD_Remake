@@ -28,6 +28,16 @@
         20.0,
         24.86
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            12.43,
+            0.0,
+            12.43
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -12.43,
@@ -72,6 +82,7 @@
         20.0,
         8.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -10.0,
@@ -107,6 +118,7 @@
         40.0,
         8.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -141,6 +153,16 @@
         40.0,
         40.0,
         8.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            20.0,
+            4.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -185,6 +207,64 @@
         105.62,
         40.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            32.81,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            52.81,
+            20.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            72.81,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            42.81,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            42.81,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            62.81,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            62.81,
+            30.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -278,6 +358,7 @@
         20.0,
         54.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -27.0,
@@ -312,6 +393,16 @@
         59.5,
         16.0,
         16.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            20.0,
+            8.0,
+            8.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -356,6 +447,24 @@
         40.0,
         40.0,
         8.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            20.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            20.0,
+            4.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -408,6 +517,48 @@
         32.33,
         118.53,
         13.07
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            16.16,
+            39.27,
+            5.26
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            16.16,
+            49.27,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            16.16,
+            59.27,
+            5.26
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            16.16,
+            69.27,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            16.16,
+            79.27,
+            5.26
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -484,6 +635,496 @@
         120.0,
         160.0,
         72.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            60.0,
+            38.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            80.0,
+            38.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            100.0,
+            38.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            120.0,
+            60.0,
+            38.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            120.0,
+            80.0,
+            38.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            120.0,
+            100.0,
+            38.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            50.0,
+            48.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            60.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            70.0,
+            48.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            80.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            90.0,
+            48.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            100.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            110.0,
+            48.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            50.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            70.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            90.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            110.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            130.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            70.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            90.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            110.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            130.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            70.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            90.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            110.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            130.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            30.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            50.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            70.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            90.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            110.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            130.0,
+            72.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            50.0,
+            48.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            60.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            70.0,
+            48.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            80.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            90.0,
+            48.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            100.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            110.0,
+            48.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            40.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            60.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            80.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            100.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            120.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            140.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            40.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            60.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            80.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            100.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            120.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            140.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            80.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            80.0,
+            40.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            80.0,
+            60.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            80.0,
+            80.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            80.0,
+            100.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            80.0,
+            120.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            80.0,
+            140.0,
+            4.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -1009,6 +1650,96 @@
         40.0,
         24.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            20.0,
+            4.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -40.0,
@@ -1133,6 +1864,80 @@
         40.0,
         24.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            20.0,
+            4.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -40.0,
@@ -1241,6 +2046,64 @@
         28.0,
         40.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            4.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            4.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            18.0,
+            40.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            18.0,
+            36.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            4.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            4.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            18.0,
+            40.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -1332,6 +2195,104 @@
         60.0,
         120.0,
         56.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            30.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            10.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            30.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            50.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            56.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            30.0,
+            56.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            10.0,
+            56.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            30.0,
+            56.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            30.0,
+            40.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            30.0,
+            60.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            30.0,
+            80.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            30.0,
+            100.0,
+            4.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -1465,6 +2426,7 @@
         19.25,
         64.78
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -32.39,
@@ -1500,6 +2462,7 @@
         40.0,
         12.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -1535,6 +2498,7 @@
         16.0,
         15.6
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -1570,6 +2534,7 @@
         8.0,
         76.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -38.0,
@@ -1604,6 +2569,112 @@
         80.0,
         40.0,
         80.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            20.0,
+            62.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            10.0,
+            20.0,
+            22.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            0.0,
+            62.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            40.0,
+            62.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            0.0,
+            62.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            40.0,
+            62.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            0.0,
+            62.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            40.0,
+            62.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            70.0,
+            20.0,
+            22.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            80.0,
+            20.0,
+            62.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            20.0,
+            4.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -1745,6 +2816,24 @@
         20.0,
         20.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            10.0,
+            10.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -1797,6 +2886,96 @@
         80.0,
         40.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            20.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            20.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            20.0,
+            20.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -1923,6 +3102,48 @@
         40.0,
         24.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            20.0,
+            20.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -1999,6 +3220,32 @@
         20.0,
         24.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -2058,6 +3305,64 @@
         80.0,
         20.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            10.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            10.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -2151,6 +3456,32 @@
         20.0,
         8.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            8.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -2212,6 +3543,24 @@
         40.0,
         24.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            24.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -10.0,
@@ -2264,6 +3613,7 @@
         20.0,
         8.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -2298,6 +3648,32 @@
         40.0,
         20.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -2359,6 +3735,32 @@
         170.0,
         83.29
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            20.0,
+            40.0,
+            32.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -2419,6 +3821,7 @@
         34.12,
         63.99
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -8.0,
@@ -2453,6 +3856,48 @@
         40.0,
         60.0,
         8.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            50.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            50.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            40.0,
+            4.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -2529,6 +3974,104 @@
         120.0,
         40.0,
         8.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            30.0,
+            8.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -2662,6 +4205,7 @@
         50.0,
         50.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -2696,6 +4240,256 @@
         120.0,
         80.0,
         8.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            50.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            60.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            70.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            50.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            70.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            50.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            70.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            50.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            70.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            50.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            70.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            50.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            60.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            70.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            40.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            60.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            40.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            60.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            80.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            80.0,
+            40.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            80.0,
+            60.0,
+            4.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -2981,6 +4775,32 @@
         12.0,
         12.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            8.5,
+            6.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            11.5,
+            6.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            30.5,
+            6.0,
+            6.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -19.5,
@@ -3041,6 +4861,7 @@
         10.0,
         52.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -26.0,
@@ -3076,6 +4897,7 @@
         20.0,
         34.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -17.0,
@@ -3111,6 +4933,7 @@
         25.62,
         22.06
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -12.81,
@@ -3145,6 +4968,120 @@
         18.0,
         138.0,
         20.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            9.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            9.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            29.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            29.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            49.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            49.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            69.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            69.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            89.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            89.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            109.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            109.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            129.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            129.0,
+            20.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -3294,6 +5231,120 @@
         98.0,
         20.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            9.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            9.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            29.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            29.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            49.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            49.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            69.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            69.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            89.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            9.0,
+            89.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            29.0,
+            89.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            29.0,
+            89.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            49.0,
+            89.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            49.0,
+            89.0,
+            20.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -9.0,
@@ -3442,6 +5493,40 @@
         20.0,
         39.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            0.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            0.0,
+            30.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            20.0,
+            10.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            20.0,
+            30.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -3510,6 +5595,7 @@
         40.0,
         25.4
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -12.7,
@@ -3544,6 +5630,24 @@
         20.0,
         120.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            90.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            110.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -3599,6 +5703,16 @@
         20.0,
         24.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -10.0,
@@ -3642,6 +5756,24 @@
         20.0,
         40.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            20.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -3694,6 +5826,96 @@
         120.0,
         20.0,
         8.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            80.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            100.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            10.0,
+            8.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -3819,6 +6041,48 @@
         20.0,
         24.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -3894,6 +6158,112 @@
         80.0,
         20.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -4034,6 +6404,240 @@
         160.0,
         20.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            80.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            80.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            100.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            100.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            120.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            120.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            140.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            140.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            80.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            100.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            120.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            130.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            140.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            150.0,
+            10.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -4302,6 +6906,496 @@
         320.0,
         20.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            80.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            80.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            100.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            100.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            120.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            120.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            140.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            140.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            160.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            160.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            180.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            180.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            200.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            200.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            220.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            220.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            240.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            240.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            260.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            260.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            280.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            280.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            300.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            300.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            80.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            100.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            120.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            130.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            140.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            150.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            160.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            170.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            180.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            190.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            200.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            210.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            220.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            230.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            240.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            250.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            260.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            270.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            280.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            290.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            300.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            310.0,
+            10.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -4827,6 +7921,16 @@
         12.0,
         12.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            117.0,
+            6.0,
+            6.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -59.5,
@@ -4870,6 +7974,72 @@
         80.0,
         40.0,
         8.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            30.0,
+            8.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -4971,6 +8141,64 @@
         20.0,
         8.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            8.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -40.0,
@@ -5063,6 +8291,16 @@
         12.0,
         12.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            197.0,
+            6.0,
+            6.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -99.5,
@@ -5106,6 +8344,136 @@
         160.0,
         40.0,
         8.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            130.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            130.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            150.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            150.0,
+            30.0,
+            8.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -5271,6 +8639,32 @@
         20.0,
         14.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            10.0,
+            4.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -40.0,
@@ -5330,6 +8724,368 @@
         240.0,
         20.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            40.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            60.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            80.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            80.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            100.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            100.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            120.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            120.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            140.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            140.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            160.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            160.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            180.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            180.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            200.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            200.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            220.0,
+            0.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            220.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            80.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            100.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            120.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            130.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            140.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            150.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            160.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            170.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            180.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            190.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            200.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            210.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            220.0,
+            10.0,
+            6.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            230.0,
+            10.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -5727,6 +9483,7 @@
         40.0,
         28.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -5762,6 +9519,7 @@
         40.0,
         12.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -5796,6 +9554,64 @@
         160.0,
         20.0,
         4.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            80.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            100.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            120.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            140.0,
+            10.0,
+            4.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -5889,6 +9705,24 @@
         120.0,
         24.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            90.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            110.0,
+            24.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -10.0,
@@ -5940,6 +9774,24 @@
         20.0,
         39.0,
         18.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            30.0,
+            9.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            30.0,
+            9.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -5993,6 +9845,24 @@
         61.06,
         28.54
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            30.0,
+            9.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            30.0,
+            9.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -10.0,
@@ -6045,6 +9915,7 @@
         10.0,
         18.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -9.0,
@@ -6079,6 +9950,24 @@
         20.0,
         57.38,
         36.38
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            0.0,
+            30.0,
+            9.0
+          ]
+        },
+        {
+          "tipo": "agujero_pin",
+          "punto": [
+            20.0,
+            30.0,
+            9.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -6132,6 +10021,7 @@
         20.0,
         18.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -9.0,
@@ -6166,6 +10056,384 @@
         320.0,
         40.0,
         8.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            130.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            130.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            150.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            150.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            170.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            170.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            190.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            190.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            210.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            210.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            230.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            230.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            250.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            250.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            270.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            270.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            290.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            290.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            310.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            310.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            80.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            100.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            120.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            140.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            160.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            180.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            200.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            220.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            240.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            260.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            280.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            300.0,
+            20.0,
+            4.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -6579,6 +10847,24 @@
         60.0,
         24.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            50.0,
+            24.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -10.0,
@@ -6630,6 +10916,32 @@
         20.0,
         60.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            22.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            12.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            50.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -6691,6 +11003,16 @@
         12.0,
         12.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            137.0,
+            6.0,
+            6.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -69.5,
@@ -6734,6 +11056,24 @@
         40.0,
         40.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -6787,6 +11127,16 @@
         12.0,
         12.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            57.0,
+            6.0,
+            6.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -29.5,
@@ -6830,6 +11180,24 @@
         38.0,
         20.0,
         18.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            9.0,
+            0.0,
+            9.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            29.0,
+            0.0,
+            9.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -6883,6 +11251,16 @@
         40.0,
         24.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            20.0,
+            24.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -6927,6 +11305,7 @@
         60.0,
         24.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -10.0,
@@ -6961,6 +11340,16 @@
         42.0,
         37.0,
         42.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            21.0,
+            17.0,
+            21.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -7006,6 +11395,7 @@
         45.0,
         92.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -46.0,
@@ -7040,6 +11430,56 @@
         72.81,
         40.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            20.0,
+            20.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            40.0,
+            20.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -7125,6 +11565,7 @@
         40.0,
         17.45
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -8.5,
@@ -7159,6 +11600,136 @@
         80.0,
         80.0,
         8.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            50.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            50.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            70.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            50.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            70.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            50.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            40.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            60.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            40.0,
+            4.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -7323,6 +11894,192 @@
         240.0,
         20.0,
         8.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            80.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            90.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            100.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            110.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            120.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            130.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            140.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            150.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            160.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            170.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            180.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            190.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            200.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            210.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            220.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            230.0,
+            10.0,
+            8.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -7544,6 +12301,16 @@
         40.0,
         48.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            48.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -10.0,
@@ -7587,6 +12354,24 @@
         20.0,
         20.0,
         8.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            10.0,
+            10.0,
+            5.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -7639,6 +12424,72 @@
         80.0,
         80.0,
         12.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            40.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            20.0,
+            60.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            40.0,
+            60.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            40.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud_hueco",
+          "punto": [
+            60.0,
+            60.0,
+            4.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -7739,6 +12590,200 @@
         80.0,
         80.0,
         8.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            40.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            50.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            60.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            70.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            70.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            70.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            40.0,
+            70.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            50.0,
+            70.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            10.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            60.0,
+            70.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            10.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            20.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            30.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            40.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            50.0,
+            8.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            60.0,
+            4.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            70.0,
+            70.0,
+            8.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -7968,6 +13013,16 @@
         16.0,
         16.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            20.0,
+            8.0,
+            8.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -8012,6 +13067,7 @@
         10.0,
         60.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -30.0,
@@ -8047,6 +13103,7 @@
         25.01,
         43.41
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -8.0,
@@ -8082,6 +13139,7 @@
         3.0,
         79.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -39.5,
@@ -8117,6 +13175,7 @@
         3.81,
         86.31
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -43.16,
@@ -8151,6 +13210,16 @@
         40.0,
         20.0,
         15.6
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            20.0,
+            10.0,
+            4.6
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -8196,6 +13265,16 @@
         16.0,
         16.0
       ],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            77.5,
+            8.0,
+            8.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -39.5,
@@ -8239,6 +13318,24 @@
         20.0,
         24.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            4.0,
+            14.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            14.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -8291,6 +13388,40 @@
         69.25,
         40.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            30.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            10.0,
+            24.0
+          ]
+        },
+        {
+          "tipo": "stud",
+          "punto": [
+            30.0,
+            30.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -8360,6 +13491,7 @@
         34.0,
         76.0
       ],
+      "conexiones_motor": [],
       "caja_ldu": {
         "min": [
           -38.0,
@@ -8394,6 +13526,16 @@
         20.0,
         80.0,
         12.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            10.0,
+            40.0,
+            12.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
@@ -8438,6 +13580,16 @@
         39.36,
         40.0,
         24.0
+      ],
+      "conexiones_motor": [
+        {
+          "tipo": "stud",
+          "punto": [
+            19.68,
+            20.0,
+            24.0
+          ]
+        }
       ],
       "caja_ldu": {
         "min": [
