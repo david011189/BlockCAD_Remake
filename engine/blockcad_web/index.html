@@ -65,10 +65,45 @@
     width: 42%;
     min-width: 280px;
     display: flex;
+    flex-direction: column;
     background: var(--panel);
     border-right: 1px solid var(--borde);
     overflow: hidden;
   }
+  .fuente { flex: 1; display: flex; min-height: 0; overflow: hidden; }
+
+  .consola {
+    border-top: 1px solid var(--borde);
+    background: #13161d;
+    padding: 10px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .consola textarea {
+    background: var(--panel);
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    padding: 8px 10px;
+    resize: vertical;
+    min-height: 44px;
+  }
+  .consola textarea:focus { border-color: var(--acento); }
+  .consola-pie { display: flex; align-items: center; gap: 10px; }
+  button.primario {
+    background: #2f7d4f;
+    border-color: #3b9e63;
+    color: #eafaf0;
+  }
+  button.primario:hover { background: #38955e; border-color: #56c184; color: #fff; }
+  #consola-mensaje {
+    font-size: 12px;
+    color: var(--suave);
+    white-space: pre-line;
+    line-height: 1.4;
+  }
+  #consola-mensaje.fallo { color: var(--error); }
+  #consola-mensaje.hecho { color: #6fcf97; }
   .gutter {
     padding: 12px 8px 12px 12px;
     text-align: right;
@@ -137,12 +172,23 @@
 
 <main>
   <section class="editor">
-    <div class="gutter" id="gutter"></div>
-    <textarea id="codigo" spellcheck="false" autocomplete="off"
-      placeholder='modelo "Mi construcción"
+    <div class="fuente">
+      <div class="gutter" id="gutter"></div>
+      <textarea id="codigo" spellcheck="false" autocomplete="off"
+        placeholder='modelo "Mi construcción"
 
 ladrillo 2x4 en 0,0,0 color rojo
 ladrillo 2x4 en 2,0,0 color amarillo'></textarea>
+    </div>
+
+    <div class="consola">
+      <textarea id="orden" spellcheck="false" autocomplete="off" rows="3"
+        placeholder="Escribe una pieza o una orden. Prueba con: ayuda"></textarea>
+      <div class="consola-pie">
+        <button id="enviar" class="primario">enviar</button>
+        <span id="consola-mensaje"></span>
+      </div>
+    </div>
   </section>
   <section class="visor">
     <canvas id="lienzo"></canvas>
@@ -287,6 +333,9 @@ function pintarGutter(fallo) {
 }
 
 let primeraVez = true;
+// La consola lo consulta: si el código ya está roto, no puede culpar a la
+// orden nueva de un error que venía de antes.
+let codigoValido = true;
 
 async function compilar() {
   let datos;
@@ -301,6 +350,8 @@ async function compilar() {
     estado.textContent = 'No se pudo hablar con el servidor: ' + error.message;
     return;
   }
+
+  codigoValido = datos.ok;
 
   if (!datos.ok) {
     estado.className = 'fallo';
@@ -441,6 +492,152 @@ document.getElementById('exportar').addEventListener('click', async () => {
     return;
   }
   descargar(nombreArchivo('.blockcad.json'), datos.json, 'application/json;charset=utf-8');
+});
+
+// --- Consola de órdenes ---------------------------------------------------
+
+const areaOrden = document.getElementById('orden');
+const consolaMensaje = document.getElementById('consola-mensaje');
+
+// Deshacer de la consola: instantáneas del texto. El texto es el modelo, así
+// que guardarlo entero es suficiente y no crea un segundo origen de la verdad.
+const historial = { pasado: [], futuro: [] };
+const TOPE = 100;
+
+function registrar() {
+  historial.pasado.push(areaCodigo.value);
+  if (historial.pasado.length > TOPE) historial.pasado.shift();
+  historial.futuro = [];
+}
+
+function decir(texto, clase = '') {
+  consolaMensaje.textContent = texto;
+  consolaMensaje.className = clase;
+}
+
+function aplicar(texto) {
+  areaCodigo.value = texto;
+  guardarEnNavegador();
+  pintarGutter(null);
+  compilar();
+}
+
+const AYUDA = [
+  'ladrillo 2x4 en 0,0,0 color rojo   añade esa pieza al final',
+  'borrar 7                            borra la línea 7',
+  'borrar ultima                       borra la última pieza',
+  'deshacer / rehacer                  sobre las órdenes de esta consola',
+  'centrar                             encuadra la cámara',
+  'limpiar                             vacía el editor',
+  'ayuda                               esta lista',
+].join('\n');
+
+function borrar(argumento) {
+  const lineas = areaCodigo.value.split('\n');
+
+  let indice;
+  if (argumento === 'ultima' || argumento === 'última') {
+    indice = lineas.findLastIndex((linea) => linea.trim());
+  } else {
+    const numero = Number.parseInt(argumento, 10);
+    if (!Number.isInteger(numero)) {
+      decir(`No entiendo qué borrar: ${argumento || '(nada)'}. Usa "borrar 7" o "borrar ultima".`, 'fallo');
+      return;
+    }
+    indice = numero - 1;
+  }
+
+  if (indice < 0 || indice >= lineas.length) {
+    decir(`No hay línea ${argumento} que borrar.`, 'fallo');
+    return;
+  }
+
+  const borrada = lineas[indice].trim();
+  registrar();
+  lineas.splice(indice, 1);
+  aplicar(lineas.join('\n'));
+  decir(`Borrada la línea ${indice + 1}: ${borrada || '(vacía)'}`, 'hecho');
+}
+
+async function anadirPiezas(texto) {
+  const base = areaCodigo.value.replace(/\s+$/, '');
+  const propuesta = base ? `${base}\n${texto}` : texto;
+
+  // Si el código ya estaba roto no se puede culpar a lo nuevo; se añade sin
+  // más. Si estaba bien y la propuesta falla, el fallo es de esta orden y no
+  // se toca el editor.
+  if (codigoValido) {
+    const respuesta = await fetch('/api/modelo', { method: 'POST', body: propuesta });
+    const datos = await respuesta.json();
+    if (!datos.ok) {
+      decir(datos.mensaje, 'fallo');
+      return;
+    }
+  }
+
+  registrar();
+  aplicar(propuesta);
+  areaOrden.value = '';
+  const cuantas = texto.split('\n').filter((l) => l.trim()).length;
+  decir(cuantas === 1 ? 'Añadida.' : `Añadidas ${cuantas} líneas.`, 'hecho');
+}
+
+async function enviar() {
+  const texto = areaOrden.value.trim();
+  if (!texto) return;
+
+  const [primera, ...resto] = texto.split(/\s+/);
+  const orden = primera.toLowerCase();
+  const soloUna = !texto.includes('\n');
+
+  if (soloUna && orden === 'ayuda') {
+    decir(AYUDA);
+    areaOrden.value = '';
+  } else if (soloUna && orden === 'centrar') {
+    centrar();
+    decir('Cámara centrada.', 'hecho');
+    areaOrden.value = '';
+  } else if (soloUna && orden === 'limpiar') {
+    if (!puedoReemplazar()) return;
+    registrar();
+    aplicar('');
+    areaOrden.value = '';
+    decir('Editor vacío. Puedes recuperarlo con "deshacer".', 'hecho');
+  } else if (soloUna && orden === 'deshacer') {
+    if (!historial.pasado.length) {
+      decir('No hay ninguna orden que deshacer.', 'fallo');
+      return;
+    }
+    historial.futuro.push(areaCodigo.value);
+    aplicar(historial.pasado.pop());
+    areaOrden.value = '';
+    decir('Deshecho.', 'hecho');
+  } else if (soloUna && orden === 'rehacer') {
+    if (!historial.futuro.length) {
+      decir('No hay nada que rehacer.', 'fallo');
+      return;
+    }
+    historial.pasado.push(areaCodigo.value);
+    aplicar(historial.futuro.pop());
+    areaOrden.value = '';
+    decir('Rehecho.', 'hecho');
+  } else if (soloUna && orden === 'borrar') {
+    borrar((resto[0] || '').toLowerCase());
+    areaOrden.value = '';
+  } else {
+    await anadirPiezas(texto);
+  }
+}
+
+document.getElementById('enviar').addEventListener('click', enviar);
+
+// Enter envía; Mayúsculas+Enter hace un salto de línea, para mandar varias
+// piezas de una vez.
+areaOrden.addEventListener('keydown', (evento) => {
+  if (evento.key === 'Enter' && !evento.shiftKey) {
+    evento.preventDefault();
+    enviar();
+  }
 });
 
 // El tabulador debe indentar, no saltar de campo: el lenguaje usa bloques.

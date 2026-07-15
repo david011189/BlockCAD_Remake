@@ -56,6 +56,28 @@ el motor lo convierte de vuelta a código con `model_to_source`. Ojo: el JSON
 guarda piezas, no bucles, así que un `repetir` vuelve expandido en líneas
 sueltas; el modelo es el mismo, el código no.
 
+### La consola
+
+Debajo del código hay una caja para mandar órdenes sueltas. Enter envía;
+Mayúsculas+Enter salta de línea para mandar varias piezas de una vez.
+
+| Orden | Qué hace |
+|---|---|
+| `ladrillo 2x4 en 0,0,0 color rojo` | Añade esa pieza al final del código. |
+| `borrar 7` | Borra la línea 7. |
+| `borrar ultima` | Borra la última pieza. |
+| `deshacer` / `rehacer` | Sobre las órdenes de la consola. |
+| `centrar` | Encuadra la cámara. |
+| `limpiar` | Vacía el editor; se puede deshacer. |
+| `ayuda` | La lista. |
+
+Una orden que no compile —una pieza que choca, por ejemplo— se rechaza y
+**no toca el código**: la consola comprueba antes de añadir.
+
+La consola edita el texto, no un modelo aparte. El código sigue siendo el
+único origen de la verdad, así que tus `repetir` y tus comentarios
+sobreviven a cualquier orden.
+
 ## El lenguaje
 
 Una instrucción por línea. Los errores indican siempre la línea y, cuando dos

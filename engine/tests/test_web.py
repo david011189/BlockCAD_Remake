@@ -214,6 +214,27 @@ class EditorTests(unittest.TestCase):
         entrada = self.html.split('id="archivo"')[1].split(">")[0]
         self.assertIn(".json", entrada)
 
+    def test_the_console_validates_before_touching_the_code(self) -> None:
+        # Una orden mal escrita no debe ensuciar el editor: primero se
+        # comprueba contra el motor y solo entonces se añade.
+        anadir = self.html.split("async function anadirPiezas(")[1].split("\n}")[0]
+        self.assertLess(
+            anadir.index("/api/modelo"),
+            anadir.index("aplicar(propuesta)"),
+        )
+
+    def test_the_console_edits_the_text_not_a_parallel_model(self) -> None:
+        # El texto es el único origen de la verdad. Un modelo aparte en el
+        # servidor obligaría a regenerar el código y borraría los repetir y
+        # los comentarios del usuario.
+        consola = self.html.split("--- Consola de órdenes")[1]
+        self.assertIn("areaCodigo.value", consola)
+        self.assertNotIn("/api/editor", consola)
+
+    def test_the_console_undo_keeps_snapshots(self) -> None:
+        registrar = self.html.split("function registrar()")[1].split("}")[0]
+        self.assertIn("historial.pasado.push(areaCodigo.value)", registrar)
+
     def test_replacing_the_code_asks_first(self) -> None:
         for boton in ("nuevo", "abrir", "ejemplo"):
             with self.subTest(boton=boton):
