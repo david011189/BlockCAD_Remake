@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "blockcad-engine"
+version = "0.1.0"
+description = "Motor independiente para el remake moderno de BlockCAD"
+requires-python = ">=3.11"
+authors = [{name = "BlockCAD Remake"}]
+license = {text = "GPL-2.0-or-later"}
+
+[project.scripts]
+blockcad-demo = "blockcad_engine.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["blockcad_engine*"]
