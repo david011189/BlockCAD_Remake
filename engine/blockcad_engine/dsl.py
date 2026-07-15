@@ -56,14 +56,27 @@ _PART_ID_RE = re.compile(r"^(?P<prefijo>[a-z]+)_(?P<medida>\d+x\d+)$")
 _NAME_RE = re.compile(r'^modelo\s+"(?P<nombre>[^"]*)"\s*$')
 
 _REPEAT_RE = re.compile(
-    r"^repetir\s+(?P<veces>\d+)(?:\s+veces)?\s+desplazando\s+"
-    r"(?P<dx>-?\d+)\s*,\s*(?P<dy>-?\d+)\s*,\s*(?P<dz>-?\d+)\s*:$"
+    r"^repetir\s+(?P<veces>\d+)(?:\s+veces)?"
+    # Sin desplazamiento el bloque se repite en el sitio, que es lo que hace
+    # falta al apilar con `encima`.
+    r"(?:\s+desplazando\s+(?P<dx>-?\d+)\s*,\s*(?P<dy>-?\d+)\s*,\s*(?P<dz>-?\d+))?"
+    r"\s*:$"
 )
 
 _PIECE_RE = re.compile(
     r"^(?P<tipo>[A-Za-z_][A-Za-z0-9_]*)"
     r"(?:\s+(?P<medida>\d+x\d+))?"
-    r"\s+en\s+(?P<x>-?\d+)\s*,\s*(?P<y>-?\d+)\s*,\s*(?P<z>-?\d+)"
+    r"\s+(?P<lugar>(?:encima|en)\b.*)$"
+)
+
+_ABSOLUTO_RE = re.compile(
+    r"^en\s+(?P<x>-?\d+)\s*,\s*(?P<y>-?\d+)\s*,\s*(?P<z>-?\d+)"
+    r"(?P<opciones>.*)$"
+)
+
+_ENCIMA_RE = re.compile(
+    r"^encima(?:\s+de\s+(?P<nombre>[^\W\d]\w*))?"
+    r"(?:\s+desplazado\s+(?P<dx>-?\d+)\s*,\s*(?P<dy>-?\d+))?"
     r"(?P<opciones>.*)$"
 )
 
@@ -135,6 +148,8 @@ def _parse_options(text: str, line: int) -> dict:
             options["step"] = _int_option(_value(token), "paso", line)
         elif token == "transparente":
             options["transparent"] = True
+        elif token == "llamado":
+            options["nombre"] = _value(token)
         else:
             raise DslError(line, f"Opción desconocida: {token!r}.")
         index += 1
@@ -184,6 +199,8 @@ class _Builder:
     def __init__(self, model: BlockModel) -> None:
         self.model = model
         self._line_by_id: dict[str, int] = {}
+        self._by_name: dict[str, PlacedPart] = {}
+        self._last: PlacedPart | None = None
 
     def place(self, line: _Line, offset: tuple[int, int, int]) -> None:
         match = _PIECE_RE.match(line.text)
@@ -191,24 +208,21 @@ class _Builder:
             raise DslError(
                 line.number,
                 f"No entiendo esta instrucción: {line.text!r}. "
-                "Se esperaba algo como 'ladrillo 2x4 en 0,0,0 color rojo'.",
+                "Se esperaba algo como 'ladrillo 2x4 en 0,0,0 color rojo' "
+                "o 'ladrillo 2x4 encima color azul'.",
             )
 
         part_id = _resolve_part_id(
             match.group("tipo"), match.group("medida"), line.number
         )
-        options = _parse_options(match.group("opciones"), line.number)
+        position, options = self._locate(match.group("lugar"), line, offset)
 
         try:
-            position = GridPosition(
-                int(match.group("x")) + offset[0],
-                int(match.group("y")) + offset[1],
-                int(match.group("z")) + offset[2],
-            )
             definition = self.model.catalog.get(part_id)
         except BlockCADError as exc:
             raise DslError(line.number, str(exc)) from exc
 
+        nombre = options.pop("nombre", None)
         candidate = PlacedPart.create(
             part_id=part_id,
             position=position,
@@ -222,6 +236,90 @@ class _Builder:
 
         self.model.add_instance(candidate, check_collision=False)
         self._line_by_id[candidate.instance_id] = line.number
+        self._last = candidate
+
+        if nombre is not None:
+            anterior = self._by_name.get(nombre)
+            if anterior is not None:
+                raise DslError(
+                    line.number,
+                    f"Ya hay una pieza llamada {nombre!r}, "
+                    f"en la línea {self._line_by_id[anterior.instance_id]}.",
+                )
+            self._by_name[nombre] = candidate
+
+    def _locate(
+        self,
+        lugar: str,
+        line: _Line,
+        offset: tuple[int, int, int],
+    ) -> tuple[GridPosition, dict]:
+        absoluto = _ABSOLUTO_RE.match(lugar)
+        if absoluto:
+            options = _parse_options(absoluto.group("opciones"), line.number)
+            try:
+                return (
+                    GridPosition(
+                        int(absoluto.group("x")) + offset[0],
+                        int(absoluto.group("y")) + offset[1],
+                        int(absoluto.group("z")) + offset[2],
+                    ),
+                    options,
+                )
+            except BlockCADError as exc:
+                raise DslError(line.number, str(exc)) from exc
+
+        encima = _ENCIMA_RE.match(lugar)
+        if not encima:
+            raise DslError(
+                line.number,
+                f"No entiendo dónde va la pieza: {lugar!r}. Usa 'en 0,0,0', "
+                "'encima' o 'encima de <nombre>'.",
+            )
+
+        options = _parse_options(encima.group("opciones"), line.number)
+        return self._on_top_of(encima, line), options
+
+    def _on_top_of(self, match: re.Match, line: _Line) -> GridPosition:
+        """Calcula la posición justo encima de otra pieza.
+
+        El desplazamiento de un `repetir` no se aplica aquí: `encima` significa
+        «sobre esa pieza», y sumarle el del bucle lo convertiría en otra cosa.
+        La referencia ya está donde está.
+        """
+        nombre = match.group("nombre")
+        if nombre:
+            referencia = self._by_name.get(nombre)
+            if referencia is None:
+                conocidas = ", ".join(sorted(self._by_name))
+                raise DslError(
+                    line.number,
+                    f"No hay ninguna pieza llamada {nombre!r}. "
+                    + (
+                        f"Las que tienen nombre son: {conocidas}."
+                        if conocidas
+                        else "Ponle nombre antes, con 'llamado base' al final "
+                        "de su línea."
+                    ),
+                )
+        else:
+            referencia = self._last
+            if referencia is None:
+                raise DslError(
+                    line.number,
+                    "'encima' necesita una pieza anterior sobre la que "
+                    "apoyarse. La primera debe decir dónde va, con 'en 0,0,0'.",
+                )
+
+        altura = self.model.catalog.get(referencia.part_id).dimensions.height
+        try:
+            return GridPosition(
+                referencia.position.x + int(match.group("dx") or 0),
+                referencia.position.y + int(match.group("dy") or 0),
+                referencia.position.z + altura,
+            )
+        except BlockCADError as exc:
+            raise DslError(line.number, str(exc)) from exc
 
     def _describe(self, collisions: tuple[PlacedPart, ...], current: int) -> str:
         lines = sorted({self._line_by_id[item.instance_id] for item in collisions})
@@ -266,9 +364,9 @@ def _run_block(
 
         body = lines[body_start:body_end]
         delta = (
-            int(repeat.group("dx")),
-            int(repeat.group("dy")),
-            int(repeat.group("dz")),
+            int(repeat.group("dx") or 0),
+            int(repeat.group("dy") or 0),
+            int(repeat.group("dz") or 0),
         )
         for step in range(int(repeat.group("veces"))):
             _run_block(

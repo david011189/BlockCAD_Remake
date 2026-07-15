@@ -63,6 +63,92 @@ class SyntaxTests(unittest.TestCase):
         self.assertEqual(model.instances[0].rotation, Rotation.DEG_270)
 
 
+class RelativeTests(unittest.TestCase):
+    """Apoyar una pieza sobre otra sin calcular la altura a mano."""
+
+    def test_encima_stacks_on_the_previous_piece(self) -> None:
+        model = parse_model(
+            "ladrillo 2x4 en 0,0,0 color verde\nladrillo 2x4 encima color azul"
+        )
+        self.assertEqual(model.instances[1].position, GridPosition(0, 0, 3))
+
+    def test_the_height_comes_from_the_piece_below(self) -> None:
+        # Una placa mide 1 y un ladrillo 3: la altura no puede estar fija.
+        model = parse_model("placa 2x4 en 0,0,0\nladrillo 2x4 encima")
+        self.assertEqual(model.instances[1].position.z, 1)
+
+        model = parse_model("ladrillo 2x4 en 0,0,0\nplaca 2x4 encima")
+        self.assertEqual(model.instances[1].position.z, 3)
+
+    def test_encima_de_a_named_piece(self) -> None:
+        model = parse_model(
+            "ladrillo 2x4 en 0,0,0 llamado base\n"
+            "placa 2x4 en 8,0,0\n"
+            "ladrillo 2x4 encima de base color azul"
+        )
+        # Se apoya en la base, no en la pieza de la línea anterior.
+        self.assertEqual(model.instances[2].position, GridPosition(0, 0, 3))
+
+    def test_desplazado_moves_it_sideways(self) -> None:
+        model = parse_model(
+            "ladrillo 2x4 en 0,0,0 llamado base\n"
+            "ladrillo 1x1 encima de base desplazado 1,2"
+        )
+        self.assertEqual(model.instances[1].position, GridPosition(1, 2, 3))
+
+    def test_repeat_without_desplazando_stacks_a_tower(self) -> None:
+        model = parse_model(
+            "ladrillo 2x2 en 0,0,0\nrepetir 4 veces:\n    ladrillo 2x2 encima"
+        )
+        self.assertEqual(
+            [item.position.z for item in model.instances],
+            [0, 3, 6, 9, 12],
+        )
+
+    def test_repeat_offset_does_not_apply_to_encima(self) -> None:
+        # `encima` significa «sobre esa pieza»: sumarle el desplazamiento del
+        # bucle lo convertiría en otra cosa y dejaría huecos.
+        model = parse_model(
+            "ladrillo 2x2 en 0,0,0\n"
+            "repetir 2 desplazando 0,0,99:\n"
+            "    ladrillo 2x2 encima"
+        )
+        self.assertEqual([i.position.z for i in model.instances], [0, 3, 6])
+
+    def test_a_name_can_be_used_before_it_is_shadowed(self) -> None:
+        model = parse_model(
+            "ladrillo 2x4 en 0,0,0 llamado base\n"
+            "ladrillo 2x4 encima de base llamado piso\n"
+            "ladrillo 1x1 encima de piso"
+        )
+        self.assertEqual(model.instances[2].position, GridPosition(0, 0, 6))
+
+    def test_encima_without_a_previous_piece_explains_itself(self) -> None:
+        with self.assertRaises(DslError) as capturado:
+            parse_model("ladrillo 2x4 encima")
+        self.assertIn("en 0,0,0", capturado.exception.message)
+
+    def test_unknown_name_lists_the_known_ones(self) -> None:
+        with self.assertRaises(DslError) as capturado:
+            parse_model("ladrillo 2x4 en 0,0,0 llamado base\nladrillo 1x1 encima de pepe")
+        self.assertIn("base", capturado.exception.message)
+
+    def test_repeated_name_is_rejected(self) -> None:
+        with self.assertRaises(DslError) as capturado:
+            parse_model(
+                "ladrillo 2x4 en 0,0,0 llamado base\n"
+                "ladrillo 1x1 en 5,0,0 llamado base"
+            )
+        self.assertEqual(capturado.exception.line, 2)
+
+    def test_stacking_never_collides_with_its_support(self) -> None:
+        # Si la altura estuviera mal, la pieza se solaparía con la de abajo.
+        model = parse_model(
+            "ladrillo 2x4 en 0,0,0\n" + "ladrillo 2x4 encima\n" * 10
+        )
+        self.assertEqual(len(model.instances), 11)
+
+
 class CommentTests(unittest.TestCase):
     def test_hash_comment_at_line_start(self) -> None:
         model = parse_model("# esto es un comentario\nladrillo 1x1 en 0,0,0")

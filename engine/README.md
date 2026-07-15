@@ -87,12 +87,46 @@ piezas chocan, también la línea de la otra pieza.
 
 ```
 <tipo> <medida> en <x>,<y>,<z> [opciones]
+<tipo> <medida> encima [de <nombre>] [desplazado <dx>,<dy>] [opciones]
 ```
 
 - **tipo**: `ladrillo`, `placa`, `baldosa`, o un identificador del catálogo
   como `brick_2x4`.
 - **medida**: `1x1`, `1x2`, `2x2`, `2x4`… según lo que exista en el catálogo.
 - **en**: posición de la esquina mínima.
+
+### Apoyar una pieza sobre otra
+
+`encima` evita calcular la altura a mano. La toma de la pieza de abajo, así
+que sobre un ladrillo sube 3 y sobre una placa sube 1.
+
+```
+ladrillo 2x4 en 0,0,0 color verde
+ladrillo 2x4 encima color azul          // sobre la pieza anterior
+```
+
+Con `llamado` se le pone nombre a una pieza para volver a ella más tarde,
+desde cualquier punto del código:
+
+```
+ladrillo 2x4 en 0,0,0 color verde llamado base
+placa 2x4 en 8,0,0 color rojo
+ladrillo 2x4 encima de base color azul  // sobre la base, no sobre la placa
+ladrillo 1x1 encima de base desplazado 1,2 color rojo
+```
+
+Una torre sale de un `repetir` sin desplazamiento, porque cada vuelta se
+apoya en la anterior:
+
+```
+ladrillo 2x2 en 0,0,0 color rojo
+repetir 4 veces:
+    ladrillo 2x2 encima color azul
+```
+
+El desplazamiento de un `repetir` **no** se aplica a `encima`: esa pieza va
+sobre su referencia y punto. El bucle solo mueve las posiciones escritas
+con `en`.
 
 Opciones, todas opcionales y en cualquier orden:
 
@@ -103,6 +137,7 @@ Opciones, todas opcionales y en cualquier orden:
 | `grupo` | `grupo 2` | Número de grupo. |
 | `paso` | `paso 5` | Número de paso de montaje. |
 | `transparente` | `transparente` | Dibuja la pieza translúcida. |
+| `llamado` | `llamado base` | Le da nombre, para usarla luego con `encima de`. |
 
 Colores con nombre: `rojo`, `azul`, `celeste`, `amarillo`, `verde`,
 `naranja`, `blanco`, `negro`, `gris`, `marron`, `rosa`, `morado`.
