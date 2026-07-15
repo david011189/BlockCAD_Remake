@@ -82,6 +82,7 @@
     color: var(--error);
     font-weight: 700;
   }
+  textarea::placeholder { color: #4d5566; }
   textarea {
     flex: 1;
     padding: 12px;
@@ -123,6 +124,7 @@
   <h1>BlockCAD <span>— escribe código, mira el modelo</span></h1>
   <div class="acciones">
     <span class="guardado" id="guardado">guardado</span>
+    <button id="nuevo" title="Vaciar el editor para empezar un modelo nuevo">Nuevo</button>
     <button id="abrir" title="Abrir un archivo .blockcad">Abrir</button>
     <button id="guardar" title="Descargar el código como archivo .blockcad">Guardar</button>
     <button id="exportar" title="Descargar el modelo en el formato JSON del motor">Exportar JSON</button>
@@ -136,7 +138,11 @@
 <main>
   <section class="editor">
     <div class="gutter" id="gutter"></div>
-    <textarea id="codigo" spellcheck="false" autocomplete="off"></textarea>
+    <textarea id="codigo" spellcheck="false" autocomplete="off"
+      placeholder='modelo "Mi construcción"
+
+ladrillo 2x4 en 0,0,0 color rojo
+ladrillo 2x4 en 2,0,0 color amarillo'></textarea>
   </section>
   <section class="visor">
     <canvas id="lienzo"></canvas>
@@ -367,13 +373,29 @@ areaCodigo.addEventListener('input', alEscribir);
 areaCodigo.addEventListener('scroll', () => { gutter.scrollTop = areaCodigo.scrollTop; });
 document.getElementById('centrar').addEventListener('click', centrar);
 
-document.getElementById('ejemplo').addEventListener('click', async () => {
-  if (areaCodigo.value.trim() && !confirm('Se reemplazará el código actual. ¿Seguir?')) return;
-  const r = await fetch('/api/ejemplo');
-  areaCodigo.value = (await r.json()).codigo;
+// Sustituir lo escrito sin avisar sería destruir trabajo de un clic.
+function puedoReemplazar() {
+  return !areaCodigo.value.trim()
+    || confirm('Se reemplazará el código actual. ¿Seguir?');
+}
+
+function reemplazar(codigo) {
+  areaCodigo.value = codigo;
   guardarEnNavegador();
   primeraVez = true;
   compilar();
+}
+
+document.getElementById('nuevo').addEventListener('click', () => {
+  if (!puedoReemplazar()) return;
+  reemplazar('');
+  areaCodigo.focus();
+});
+
+document.getElementById('ejemplo').addEventListener('click', async () => {
+  if (!puedoReemplazar()) return;
+  const r = await fetch('/api/ejemplo');
+  reemplazar((await r.json()).codigo);
 });
 
 document.getElementById('guardar').addEventListener('click', () => {
@@ -382,17 +404,15 @@ document.getElementById('guardar').addEventListener('click', () => {
 
 const entradaArchivo = document.getElementById('archivo');
 document.getElementById('abrir').addEventListener('click', () => {
-  if (areaCodigo.value.trim() && !confirm('Se reemplazará el código actual. ¿Seguir?')) return;
+  if (!puedoReemplazar()) return;
   entradaArchivo.click();
 });
 entradaArchivo.addEventListener('change', async () => {
   const archivo = entradaArchivo.files[0];
   if (!archivo) return;
-  areaCodigo.value = await archivo.text();
+  const texto = await archivo.text();
   entradaArchivo.value = '';   // permite reabrir el mismo archivo
-  guardarEnNavegador();
-  primeraVez = true;
-  compilar();
+  reemplazar(texto);
 });
 
 document.getElementById('exportar').addEventListener('click', async () => {
@@ -447,7 +467,9 @@ async function arrancar() {
     guardado = null;
   }
 
-  if (guardado !== null && guardado.trim()) {
+  // `null` es «nunca has usado el editor» y trae el ejemplo. Una cadena
+  // vacía es «pulsaste Nuevo», y entonces el lienzo debe seguir en blanco.
+  if (guardado !== null) {
     areaCodigo.value = guardado;
   } else {
     const respuesta = await fetch('/api/ejemplo');

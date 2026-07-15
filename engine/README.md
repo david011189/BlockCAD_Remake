@@ -37,10 +37,11 @@ servidor, ni el visor descargan nada de internet.
 
 El código se guarda solo en el navegador mientras escribes, también cuando
 todavía no compila, y vuelve al recargar. El ejemplo solo aparece la primera
-vez.
+vez; si vacías el editor con **Nuevo**, sigue vacío al volver.
 
 | Botón | Qué hace |
 |---|---|
+| **Nuevo** | Vacía el editor para empezar de cero. Pregunta antes de borrar. |
 | **Abrir** | Carga un archivo `.blockcad` desde tu disco. |
 | **Guardar** | Descarga el código como `.blockcad`, con el nombre del modelo. |
 | **Exportar JSON** | Descarga el modelo en el formato del motor, el mismo que lee `load_model`. |

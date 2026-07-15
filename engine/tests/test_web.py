@@ -149,6 +149,20 @@ class EditorTests(unittest.TestCase):
         arrancar = self.html.split("async function arrancar()")[1]
         self.assertIn("localStorage.getItem", arrancar)
 
+    def test_an_emptied_editor_stays_empty_after_reloading(self) -> None:
+        # Distinguir null («nunca lo has usado», trae el ejemplo) de cadena
+        # vacía («pulsaste Nuevo», sigue en blanco). Comprobar `.trim()` aquí
+        # devolvería el ejemplo justo después de vaciar el editor.
+        arrancar = self.html.split("async function arrancar()")[1]
+        self.assertIn("guardado !== null", arrancar)
+        self.assertNotIn("guardado.trim()", arrancar)
+
+    def test_replacing_the_code_asks_first(self) -> None:
+        for boton in ("nuevo", "abrir", "ejemplo"):
+            with self.subTest(boton=boton):
+                manejador = self.html.split(f"getElementById('{boton}')")[1]
+                self.assertIn("puedoReemplazar()", manejador.split("});")[0])
+
 
 class OfflineTests(unittest.TestCase):
     """El visor debe funcionar sin conexión: nada puede venir de internet."""
