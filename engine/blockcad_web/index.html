@@ -101,9 +101,23 @@
     color: var(--suave);
     white-space: pre-line;
     line-height: 1.4;
+    max-height: 116px;
+    overflow-y: auto;
   }
   #consola-mensaje.fallo { color: var(--error); }
   #consola-mensaje.hecho { color: #6fcf97; }
+  /* La ayuda va en dos columnas reales: la orden y lo que hace no pueden
+     leerse como una sola frase. */
+  #consola-mensaje.ayuda {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 3px 14px;
+    align-items: baseline;
+  }
+  #consola-mensaje.ayuda code {
+    font: 12px/1.4 ui-monospace, Consolas, monospace;
+    color: var(--acento);
+  }
   .gutter {
     padding: 12px 8px 12px 12px;
     text-align: right;
@@ -522,15 +536,29 @@ function aplicar(texto) {
   compilar();
 }
 
+// Orden y descripción van en columnas de verdad. Alinearlas con espacios
+// hacía que se leyeran como una sola frase, porque el CSS los colapsa.
 const AYUDA = [
-  'ladrillo 2x4 en 0,0,0 color rojo   añade esa pieza al final',
-  'borrar 7                            borra la línea 7',
-  'borrar ultima                       borra la última pieza',
-  'deshacer / rehacer                  sobre las órdenes de esta consola',
-  'centrar                             encuadra la cámara',
-  'limpiar                             vacía el editor',
-  'ayuda                               esta lista',
-].join('\n');
+  ['ladrillo 2x4 en 0,0,0 color rojo', 'añade esa pieza al final'],
+  ['borrar 7', 'borra la línea 7'],
+  ['borrar ultima', 'borra la última pieza'],
+  ['deshacer', 'deshace la última orden'],
+  ['rehacer', 'la vuelve a aplicar'],
+  ['centrar', 'encuadra la cámara'],
+  ['limpiar', 'vacía el editor'],
+  ['ayuda', 'esta lista'],
+];
+
+function mostrarAyuda() {
+  consolaMensaje.className = 'ayuda';
+  consolaMensaje.replaceChildren(...AYUDA.flatMap(([orden, que]) => {
+    const codigo = document.createElement('code');
+    codigo.textContent = orden;
+    const texto = document.createElement('span');
+    texto.textContent = que;
+    return [codigo, texto];
+  }));
+}
 
 function borrar(argumento) {
   const lineas = areaCodigo.value.split('\n');
@@ -559,7 +587,16 @@ function borrar(argumento) {
   decir(`Borrada la línea ${indice + 1}: ${borrada || '(vacía)'}`, 'hecho');
 }
 
-async function anadirPiezas(texto) {
+// Escribir "añade ladrillo 2x4 ..." es lo natural en una consola. El verbo
+// sobra en el lenguaje, así que se descarta en vez de dar un error.
+const VERBOS = /^(añade|anade|añadir|agrega|agregar|pon|poner|coloca|colocar)\s+/i;
+
+async function anadirPiezas(entrada) {
+  const texto = entrada
+    .split('\n')
+    .map((linea) => linea.replace(VERBOS, ''))
+    .join('\n');
+
   const base = areaCodigo.value.replace(/\s+$/, '');
   const propuesta = base ? `${base}\n${texto}` : texto;
 
@@ -591,7 +628,7 @@ async function enviar() {
   const soloUna = !texto.includes('\n');
 
   if (soloUna && orden === 'ayuda') {
-    decir(AYUDA);
+    mostrarAyuda();
     areaOrden.value = '';
   } else if (soloUna && orden === 'centrar') {
     centrar();

@@ -231,6 +231,24 @@ class EditorTests(unittest.TestCase):
         self.assertIn("areaCodigo.value", consola)
         self.assertNotIn("/api/editor", consola)
 
+    def test_the_help_does_not_align_with_spaces(self) -> None:
+        # El CSS colapsa los espacios múltiples, así que alinear columnas con
+        # ellos hacía que la orden y su descripción se leyeran como una sola
+        # frase, y el usuario intentaba escribirla entera.
+        ayuda = self.html.split("const AYUDA = [")[1].split("];")[0]
+        self.assertNotIn("   ", ayuda)
+        self.assertIn("['ladrillo 2x4 en 0,0,0 color rojo',", ayuda)
+
+    def test_the_help_is_rendered_in_two_columns(self) -> None:
+        self.assertIn("#consola-mensaje.ayuda", self.html)
+        self.assertIn("grid-template-columns", self.html)
+
+    def test_the_console_forgives_a_leading_verb(self) -> None:
+        verbos = self.html.split("const VERBOS = ")[1].split("\n")[0]
+        for verbo in ("añade", "agrega", "pon"):
+            with self.subTest(verbo=verbo):
+                self.assertIn(verbo, verbos)
+
     def test_the_console_undo_keeps_snapshots(self) -> None:
         registrar = self.html.split("function registrar()")[1].split("}")[0]
         self.assertIn("historial.pasado.push(areaCodigo.value)", registrar)
