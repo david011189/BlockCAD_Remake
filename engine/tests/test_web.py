@@ -313,6 +313,39 @@ class ViewerUnitTests(unittest.TestCase):
         self.assertIn("p.fondo / 20", construir)
 
 
+class ContrastTests(unittest.TestCase):
+    """Una pieza tiene que verse sea del color que sea.
+
+    Los colores de LEGO van del negro (#1B1B1B) al blanco (#F4F4F4), así que
+    NINGÚN fondo contrasta con todos: medido, el peor caso no pasa de 1.58:1
+    ni con el gris óptimo. Por eso el fondo es un compromiso y lo que
+    garantiza la silueta es el contorno, que se adapta a la pieza.
+    """
+
+    def setUp(self) -> None:
+        self.html = (_WEB / "index.html").read_text(encoding="utf-8")
+
+    def test_the_outline_adapts_to_the_piece(self) -> None:
+        # Un contorno negro sobre una pieza negra no dibuja nada.
+        self.assertIn("function esOscura(", self.html)
+        construir = self.html.split("function construir(")[1].split("\n}")[0]
+        self.assertIn("oscura ? 0xaab3c4 : 0x000000", construir)
+
+    def test_the_background_is_not_almost_black(self) -> None:
+        # Con el #0f1116 de antes, una viga negra daba 1.10:1 y desaparecía.
+        fondo = re.search(r"escena\.background = new THREE\.Color\((0x[0-9a-f]+)\)", self.html)
+        self.assertIsNotNone(fondo)
+        valor = int(fondo.group(1), 16)
+        canales = ((valor >> 16) & 255, (valor >> 8) & 255, valor & 255)
+        self.assertGreater(min(canales), 0x28)
+
+    def test_colours_are_six_digits(self) -> None:
+        # `0x39405060` tenía ocho y se salía del rango: la rejilla salía de un
+        # tono cualquiera y nadie se enteraba.
+        for encontrado in re.findall(r"0x[0-9a-fA-F]{7,}", self.html):
+            self.fail(f"{encontrado} no es un color: sobra algún dígito")
+
+
 class PackagingTests(unittest.TestCase):
     """Lo que no es .py hay que declararlo, o no llega al paquete instalado.
 

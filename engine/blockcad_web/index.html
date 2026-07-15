@@ -244,7 +244,10 @@ const renderer = new THREE.WebGLRenderer({ canvas: lienzo, antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 
 const escena = new THREE.Scene();
-escena.background = new THREE.Color(0x0f1116);
+// Ni muy oscuro ni muy claro: el negro de LEGO es #1B1B1B y el blanco
+// #F4F4F4, así que el fondo tiene que separarse de los dos. Con el fondo casi
+// negro de antes, una viga negra desaparecía.
+escena.background = new THREE.Color(0x39404e);
 
 const camara = new THREE.PerspectiveCamera(45, 1, 0.1, 500);
 camara.position.set(14, 12, 16);
@@ -258,13 +261,24 @@ const sol = new THREE.DirectionalLight(0xffffff, 1.6);
 sol.position.set(8, 16, 10);
 escena.add(sol);
 
-const rejilla = new THREE.GridHelper(80, 80, 0x39405060, 0x272c37);
+// Ojo: un color son seis dígitos. El 0x39405060 que había aquí antes tenía
+// ocho y se salía del rango, así que la rejilla salía de un tono cualquiera.
+const rejilla = new THREE.GridHelper(80, 80, 0x525b6b, 0x464e5c);
 rejilla.material.transparent = true;
-rejilla.material.opacity = 0.5;
+rejilla.material.opacity = 0.6;
 escena.add(rejilla);
 
 const modelo = new THREE.Group();
 escena.add(modelo);
+
+// Una arista negra sobre una pieza negra no dibuja nada. La silueta tiene que
+// leerse en las dos, así que el borde se elige según lo oscura que sea.
+// La fórmula es la luminancia relativa: el ojo ve el verde mucho más que el
+// azul, y un azul "medio" es bastante más oscuro de lo que parece su número.
+function esOscura(color) {
+  const c = new THREE.Color(color);
+  return 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b < 0.22;
+}
 
 function limpiar(grupo) {
   while (grupo.children.length) {
@@ -299,9 +313,14 @@ function construir(piezas) {
     );
     modelo.add(cuerpo);
 
+    const oscura = esOscura(p.color);
     const aristas = new THREE.LineSegments(
       new THREE.EdgesGeometry(caja),
-      new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3 }),
+      new THREE.LineBasicMaterial({
+        color: oscura ? 0xaab3c4 : 0x000000,
+        transparent: true,
+        opacity: oscura ? 0.55 : 0.3,
+      }),
     );
     aristas.position.copy(cuerpo.position);
     modelo.add(aristas);
