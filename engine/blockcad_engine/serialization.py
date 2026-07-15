@@ -5,13 +5,18 @@ from pathlib import Path
 from typing import Any
 
 from .errors import InvalidFormatError
-from .geometry import GridPosition, Rotation
+from .geometry import PLACA, STUD, GridPosition, Rotation
 from .model import DEFAULT_MODEL_NAME, BlockModel
 from .parts import PartCatalog
 
 
 FORMAT_NAME = "blockcad-remake"
-FORMAT_VERSION = 1
+
+#: La versión 2 guarda las posiciones en LDU. La 1 las guardaba en studs y
+#: placas, y se sigue leyendo: hay archivos de usuarios por ahí.
+FORMAT_VERSION = 2
+
+VERSIONES_LEIBLES = (1, 2)
 
 
 def model_to_dict(model: BlockModel) -> dict[str, Any]:
@@ -46,10 +51,14 @@ def model_from_dict(
 ) -> BlockModel:
     if payload.get("format") != FORMAT_NAME:
         raise InvalidFormatError("El archivo no utiliza el formato BlockCAD Remake.")
-    if payload.get("version") != FORMAT_VERSION:
-        raise InvalidFormatError(
-            f"Versión de archivo no soportada: {payload.get('version')!r}."
-        )
+
+    version = payload.get("version")
+    if version not in VERSIONES_LEIBLES:
+        raise InvalidFormatError(f"Versión de archivo no soportada: {version!r}.")
+
+    # La versión 1 medía en studs y placas. Se traduce al vuelo: los archivos
+    # que la gente ya tenga guardados deben seguir abriéndose.
+    escala = (STUD, STUD, PLACA) if version == 1 else (1, 1, 1)
 
     model = BlockModel(
         catalog=catalog or PartCatalog.with_basic_parts(),
@@ -66,9 +75,9 @@ def model_from_dict(
                 "part_id": data["part_id"],
                 "instance_id": str(data["instance_id"]),
                 "position": GridPosition(
-                    int(position_data["x"]),
-                    int(position_data["y"]),
-                    int(position_data["z"]),
+                    int(position_data["x"]) * escala[0],
+                    int(position_data["y"]) * escala[1],
+                    int(position_data["z"]) * escala[2],
                 ),
                 "rotation": Rotation.normalize(int(data.get("rotation", 0))),
                 "color": str(data.get("color", "#D62828")),

@@ -177,14 +177,33 @@ al principio de la línea porque en cualquier otro sitio empieza un color.
 
 ### Convención de coordenadas
 
-- `x`: izquierda/derecha, medido en studs.
-- `y`: adelante/atrás, medido en studs.
-- `z`: altura, medida en unidades de placa.
-- Una placa tiene altura `1`; un ladrillo normal, `3`.
+En el **lenguaje** cuentas como siempre:
+
+- `x`: izquierda/derecha, en studs.
+- `y`: adelante/atrás, en studs.
+- `z`: altura, en placas. Una placa es `1`; un ladrillo, `3`.
+- Se admiten decimales: `0.5` studs es media distancia.
 - La rotación es `0`, `90`, `180` o `270` grados.
 
-El visor respeta la proporción real: un stud mide 8 mm y una placa 3,2 mm de
-alto, así que la altura se dibuja a escala 0,4.
+Por dentro, el **motor mide en LDU** (1 LDU = 0,4 mm, la unidad de LDraw):
+
+| | LDU | mm |
+|---|---|---|
+| Stud | 20 | 8 |
+| Placa (alto) | 8 | 3,2 |
+| Ladrillo (alto) | 24 | 9,6 |
+| Módulo Technic | 20 | 8 |
+| Medio módulo | 10 | 4 |
+
+**Por qué.** Con `z` en placas enteras, una viga Technic es incolocable: mide
+8 mm de alto, o sea 2,5 placas. En LDU todo LEGO cae en enteros. El paso real
+de la rejilla Technic es **medio módulo**, no el módulo: la caja de engranajes
+6588 tiene agujeros a media distancia, y ninguna de las 97 piezas del set
+45300 rompe el paso de 10.
+
+El lenguaje traduce studs y placas a LDU en un solo sitio. Si una posición no
+cae exacta —`0.33` studs son 6,6 LDU— se rechaza en vez de redondear: mover
+una pieza en silencio sería peor que el error.
 
 ### Uso desde Python
 

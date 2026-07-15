@@ -1,9 +1,49 @@
+"""Geometría del motor, medida en LDU.
+
+Por qué LDU y no studs y placas
+-------------------------------
+
+El motor medía `x` e `y` en studs y `z` en placas. Con esas unidades una viga
+Technic es incolocable: mide 8 mm de alto, o sea 2,5 placas, y las
+coordenadas son enteras.
+
+1 LDU = 0,4 mm, la unidad de LDraw, y es la única en la que todo LEGO cae en
+números enteros:
+
+    stud .............. 20 LDU  (8 mm)
+    placa (alto) ....... 8 LDU  (3,2 mm)
+    ladrillo (alto) ... 24 LDU  (9,6 mm)
+    módulo Technic .... 20 LDU  (8 mm)
+    medio módulo ...... 10 LDU
+
+Medio módulo, y no el módulo entero, es el paso real de la rejilla Technic:
+la caja de engranajes 6588 tiene agujeros a media distancia. Comprobado
+contra las 97 piezas del set 45300, ninguna lo rompe.
+
+Esto es interior del motor. Quien escribe código BlockCAD sigue contando en
+studs y placas; el lenguaje traduce.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import IntEnum
 
 from .errors import InvalidGeometryError
+
+#: Un LDU en milímetros.
+LDU_MM = 0.4
+
+#: Separación entre studs, y también entre agujeros Technic.
+STUD = 20
+MODULO_TECHNIC = 20
+
+#: Paso real de la rejilla Technic.
+MEDIO_MODULO = 10
+
+#: Alturas.
+PLACA = 8
+LADRILLO = 24
 
 
 def _is_integer(value: object) -> bool:
@@ -36,7 +76,11 @@ class Rotation(IntEnum):
 
 @dataclass(frozen=True, slots=True)
 class GridPosition:
-    """Posición entera en la cuadrícula de construcción."""
+    """Posición de la esquina mínima de una pieza, en LDU.
+
+    `x` e `y` son horizontales y `z` es la altura. Ojo si vienes de LDraw:
+    allí la vertical es Y y apunta hacia abajo.
+    """
 
     x: int
     y: int
@@ -54,7 +98,12 @@ class GridPosition:
 
 @dataclass(frozen=True, slots=True)
 class Dimensions:
-    """Dimensiones de una pieza: ancho X, fondo Y y altura Z."""
+    """Tamaño de una pieza en LDU: ancho X, fondo Y y altura Z.
+
+    Es la caja que ocupa, no la de su malla: un ladrillo mide 24 de alto, no
+    28, porque sus studs sobresalen 4 y se meten dentro de la pieza de
+    arriba. Contarlos aquí haría imposible apilar.
+    """
 
     width: int
     depth: int

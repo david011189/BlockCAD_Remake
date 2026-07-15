@@ -8,7 +8,7 @@ from .errors import (
     InvalidPartError,
     PartNotFoundError,
 )
-from .geometry import Dimensions
+from .geometry import LADRILLO, PLACA, STUD, Dimensions
 
 _HEX_DIGITS = frozenset("0123456789abcdefABCDEF")
 
@@ -76,28 +76,41 @@ class PartCatalog:
 
     @classmethod
     def with_basic_parts(cls) -> "PartCatalog":
+        """Catálogo mínimo, medido en LDU.
+
+        Un ladrillo de N×M studs mide `N*STUD` de ancho por `M*STUD` de fondo
+        y `LADRILLO` de alto.
+        """
         catalog = cls()
         basic_parts = (
-            PartDefinition("brick_1x1", "Ladrillo 1×1", Dimensions(1, 1, 3)),
-            PartDefinition("brick_1x2", "Ladrillo 1×2", Dimensions(1, 2, 3)),
-            PartDefinition("brick_2x2", "Ladrillo 2×2", Dimensions(2, 2, 3)),
-            PartDefinition("brick_2x4", "Ladrillo 2×4", Dimensions(2, 4, 3)),
+            PartDefinition(
+                "brick_1x1", "Ladrillo 1×1", Dimensions(1 * STUD, 1 * STUD, LADRILLO)
+            ),
+            PartDefinition(
+                "brick_1x2", "Ladrillo 1×2", Dimensions(1 * STUD, 2 * STUD, LADRILLO)
+            ),
+            PartDefinition(
+                "brick_2x2", "Ladrillo 2×2", Dimensions(2 * STUD, 2 * STUD, LADRILLO)
+            ),
+            PartDefinition(
+                "brick_2x4", "Ladrillo 2×4", Dimensions(2 * STUD, 4 * STUD, LADRILLO)
+            ),
             PartDefinition(
                 "plate_1x2",
                 "Placa 1×2",
-                Dimensions(1, 2, 1),
+                Dimensions(1 * STUD, 2 * STUD, PLACA),
                 category="plate",
             ),
             PartDefinition(
                 "plate_2x4",
                 "Placa 2×4",
-                Dimensions(2, 4, 1),
+                Dimensions(2 * STUD, 4 * STUD, PLACA),
                 category="plate",
             ),
             PartDefinition(
                 "tile_1x2",
                 "Baldosa 1×2",
-                Dimensions(1, 2, 1),
+                Dimensions(1 * STUD, 2 * STUD, PLACA),
                 category="tile",
                 has_top_studs=False,
             ),

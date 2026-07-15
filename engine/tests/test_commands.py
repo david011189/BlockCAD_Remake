@@ -1,5 +1,6 @@
 import unittest
 
+from blockcad_engine.geometry import LADRILLO, PLACA, STUD
 from blockcad_engine import (
     BlockEditor,
     CollisionError,
@@ -32,8 +33,8 @@ class HistoryTests(unittest.TestCase):
 
     def test_undoing_remove_restores_original_order(self) -> None:
         first = self.editor.add("brick_1x1", GridPosition(0, 0, 0))
-        second = self.editor.add("brick_1x1", GridPosition(2, 0, 0))
-        third = self.editor.add("brick_1x1", GridPosition(4, 0, 0))
+        second = self.editor.add("brick_1x1", GridPosition(2 * STUD, 0, 0))
+        third = self.editor.add("brick_1x1", GridPosition(4 * STUD, 0, 0))
 
         self.editor.remove(second.instance_id)
         self.editor.undo()
@@ -58,8 +59,8 @@ class HistoryTests(unittest.TestCase):
 
     def test_undo_translate_restores_previous_position(self) -> None:
         part = self.editor.add("brick_2x4", GridPosition(0, 0, 0))
-        self.editor.translate(part.instance_id, dx=4, dz=3)
-        self.assertEqual(self.editor.get(part.instance_id).position, GridPosition(4, 0, 3))
+        self.editor.translate(part.instance_id, dx=4 * STUD, dz=LADRILLO)
+        self.assertEqual(self.editor.get(part.instance_id).position, GridPosition(4 * STUD, 0, LADRILLO))
 
         self.editor.undo()
         self.assertEqual(self.editor.get(part.instance_id).position, GridPosition(0, 0, 0))
@@ -75,13 +76,13 @@ class HistoryTests(unittest.TestCase):
         self.editor.undo()
         self.assertTrue(self.editor.can_redo)
 
-        self.editor.add("brick_1x1", GridPosition(5, 0, 0))
+        self.editor.add("brick_1x1", GridPosition(5 * STUD, 0, 0))
         self.assertFalse(self.editor.can_redo)
 
     def test_failed_command_is_not_recorded(self) -> None:
         self.editor.add("brick_2x4", GridPosition(0, 0, 0))
         with self.assertRaises(CollisionError):
-            self.editor.add("brick_1x1", GridPosition(1, 1, 0))
+            self.editor.add("brick_1x1", GridPosition(STUD, STUD, 0))
 
         self.assertEqual(len(self.editor.instances), 1)
         self.assertEqual(self.editor.history.undo_labels, ("Añadir brick_2x4",))
@@ -93,7 +94,7 @@ class HistoryTests(unittest.TestCase):
     def test_history_limit_discards_oldest_entries(self) -> None:
         editor = BlockEditor(history_limit=2)
         for index in range(4):
-            editor.add("brick_1x1", GridPosition(index * 2, 0, 0))
+            editor.add("brick_1x1", GridPosition(index * 2 * STUD, 0, 0))
 
         self.assertEqual(len(editor.history.undo_labels), 2)
 
@@ -105,8 +106,8 @@ class TransactionTests(unittest.TestCase):
     def test_transaction_groups_commands_into_one_undo(self) -> None:
         with self.editor.transaction("Construir muro"):
             self.editor.add("brick_2x4", GridPosition(0, 0, 0))
-            self.editor.add("brick_2x4", GridPosition(2, 0, 0))
-            self.editor.add("brick_2x4", GridPosition(4, 0, 0))
+            self.editor.add("brick_2x4", GridPosition(2 * STUD, 0, 0))
+            self.editor.add("brick_2x4", GridPosition(4 * STUD, 0, 0))
 
         self.assertEqual(len(self.editor.instances), 3)
         self.assertEqual(self.editor.history.undo_labels, ("Construir muro",))
@@ -122,8 +123,8 @@ class TransactionTests(unittest.TestCase):
 
         with self.assertRaises(CollisionError):
             with self.editor.transaction("Construir torre"):
-                self.editor.add("brick_2x4", GridPosition(0, 0, 3))
-                self.editor.add("brick_2x4", GridPosition(0, 0, 6))
+                self.editor.add("brick_2x4", GridPosition(0, 0, LADRILLO))
+                self.editor.add("brick_2x4", GridPosition(0, 0, 2 * LADRILLO))
                 self.editor.add("brick_1x1", GridPosition(0, 0, 0))
 
         self.assertEqual(len(self.editor.instances), 1)
@@ -138,8 +139,8 @@ class TransactionTests(unittest.TestCase):
         with self.editor.transaction("Casa"):
             self.editor.add("brick_2x4", GridPosition(0, 0, 0))
             with self.editor.transaction("Techo"):
-                self.editor.add("tile_1x2", GridPosition(0, 0, 3))
-                self.editor.add("tile_1x2", GridPosition(0, 2, 3))
+                self.editor.add("tile_1x2", GridPosition(0, 0, LADRILLO))
+                self.editor.add("tile_1x2", GridPosition(0, 2 * STUD, LADRILLO))
 
         self.assertEqual(self.editor.history.undo_labels, ("Casa",))
         self.editor.undo()
@@ -162,7 +163,7 @@ class MacroCommandTests(unittest.TestCase):
         macro = MacroCommand(
             "Grupo",
             [
-                AddPartCommand("brick_2x4", GridPosition(0, 0, 3)),
+                AddPartCommand("brick_2x4", GridPosition(0, 0, LADRILLO)),
                 AddPartCommand("brick_1x1", GridPosition(0, 0, 0)),
             ],
         )

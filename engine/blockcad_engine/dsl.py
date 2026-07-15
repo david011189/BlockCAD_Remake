@@ -20,7 +20,7 @@ from __future__ import annotations
 import re
 
 from .errors import BlockCADError, DslError
-from .geometry import GridPosition, Rotation
+from .geometry import PLACA, STUD, GridPosition, Rotation
 from .model import DEFAULT_MODEL_NAME, BlockModel, PlacedPart
 from .parts import PartCatalog, validate_color
 
@@ -59,7 +59,8 @@ _REPEAT_RE = re.compile(
     r"^repetir\s+(?P<veces>\d+)(?:\s+veces)?"
     # Sin desplazamiento el bloque se repite en el sitio, que es lo que hace
     # falta al apilar con `encima`.
-    r"(?:\s+desplazando\s+(?P<dx>-?\d+)\s*,\s*(?P<dy>-?\d+)\s*,\s*(?P<dz>-?\d+))?"
+    r"(?:\s+desplazando\s+(?P<dx>-?\d+(?:\.\d+)?)\s*,\s*"
+    r"(?P<dy>-?\d+(?:\.\d+)?)\s*,\s*(?P<dz>-?\d+(?:\.\d+)?))?"
     r"\s*:$"
 )
 
@@ -69,16 +70,43 @@ _PIECE_RE = re.compile(
     r"\s+(?P<lugar>(?:encima|en)\b.*)$"
 )
 
+# Se admiten decimales porque el motor trabaja en LDU y hay posiciones reales
+# que no son un número entero de studs: media distancia son 0,5 studs, y una
+# viga Technic mide 2,5 placas de alto. El separador decimal es el punto; la
+# coma ya separa las coordenadas.
+_NUMERO = r"-?\d+(?:\.\d+)?"
+
 _ABSOLUTO_RE = re.compile(
-    r"^en\s+(?P<x>-?\d+)\s*,\s*(?P<y>-?\d+)\s*,\s*(?P<z>-?\d+)"
+    rf"^en\s+(?P<x>{_NUMERO})\s*,\s*(?P<y>{_NUMERO})\s*,\s*(?P<z>{_NUMERO})"
     r"(?P<opciones>.*)$"
 )
 
 _ENCIMA_RE = re.compile(
     r"^encima(?:\s+de\s+(?P<nombre>[^\W\d]\w*))?"
-    r"(?:\s+desplazado\s+(?P<dx>-?\d+)\s*,\s*(?P<dy>-?\d+))?"
+    rf"(?:\s+desplazado\s+(?P<dx>{_NUMERO})\s*,\s*(?P<dy>{_NUMERO}))?"
     r"(?P<opciones>.*)$"
 )
+
+
+def _a_ldu(valor: str, unidad: int, nombre_unidad: str, line: int) -> int:
+    """Traduce lo que escribe el usuario a las unidades del motor.
+
+    El lenguaje cuenta en studs y placas, que es como piensa quien construye.
+    El motor cuenta en LDU, que es la única unidad donde todo LEGO es entero.
+    Aquí se cruza esa frontera, y en un solo sitio.
+
+    Los decimales valen —media distancia es 0,5 studs— pero el resultado
+    tiene que caer exacto: redondear en silencio movería la pieza sin avisar.
+    """
+    exacto = float(valor) * unidad
+    entero = round(exacto)
+    if abs(exacto - entero) > 1e-6:
+        raise DslError(
+            line,
+            f"{valor} {nombre_unidad} son {exacto:.2f} LDU, y una posición no "
+            f"puede caer entre dos. Un {nombre_unidad[:-1]} son {unidad} LDU.",
+        )
+    return entero
 
 
 def _strip_comment(line: str) -> str:
@@ -257,15 +285,23 @@ class _Builder:
         absoluto = _ABSOLUTO_RE.match(lugar)
         if absoluto:
             options = _parse_options(absoluto.group("opciones"), line.number)
+            # x e y se cuentan en studs y z en placas; el motor los quiere en
+            # LDU. El desplazamiento del `repetir` ya viene traducido.
             try:
                 return (
                     GridPosition(
-                        int(absoluto.group("x")) + offset[0],
-                        int(absoluto.group("y")) + offset[1],
-                        int(absoluto.group("z")) + offset[2],
+                        _a_ldu(absoluto.group("x"), STUD, "studs", line.number)
+                        + offset[0],
+                        _a_ldu(absoluto.group("y"), STUD, "studs", line.number)
+                        + offset[1],
+                        _a_ldu(absoluto.group("z"), PLACA, "placas", line.number)
+                        + offset[2],
                     ),
                     options,
                 )
+            except DslError:
+                # Ya sabe su línea: volver a envolverlo la escribiría dos veces.
+                raise
             except BlockCADError as exc:
                 raise DslError(line.number, str(exc)) from exc
 
@@ -314,10 +350,14 @@ class _Builder:
         altura = self.model.catalog.get(referencia.part_id).dimensions.height
         try:
             return GridPosition(
-                referencia.position.x + int(match.group("dx") or 0),
-                referencia.position.y + int(match.group("dy") or 0),
+                referencia.position.x
+                + _a_ldu(match.group("dx") or "0", STUD, "studs", line.number),
+                referencia.position.y
+                + _a_ldu(match.group("dy") or "0", STUD, "studs", line.number),
                 referencia.position.z + altura,
             )
+        except DslError:
+            raise
         except BlockCADError as exc:
             raise DslError(line.number, str(exc)) from exc
 
@@ -363,10 +403,11 @@ def _run_block(
             body_end += 1
 
         body = lines[body_start:body_end]
+        # El desplazamiento también se escribe en studs y placas.
         delta = (
-            int(repeat.group("dx") or 0),
-            int(repeat.group("dy") or 0),
-            int(repeat.group("dz") or 0),
+            _a_ldu(repeat.group("dx") or "0", STUD, "studs", line.number),
+            _a_ldu(repeat.group("dy") or "0", STUD, "studs", line.number),
+            _a_ldu(repeat.group("dz") or "0", PLACA, "placas", line.number),
         )
         for step in range(int(repeat.group("veces"))):
             _run_block(
@@ -392,6 +433,16 @@ def _part_phrase(part_id: str) -> str:
     return part_id
 
 
+def _desde_ldu(ldu: int, unidad: int) -> str:
+    """El camino inverso: de LDU a lo que lee una persona.
+
+    Se escribe entero siempre que se pueda, para que el código generado se
+    parezca al que escribiría alguien a mano.
+    """
+    valor = ldu / unidad
+    return str(int(valor)) if valor == int(valor) else f"{valor:g}"
+
+
 def model_to_source(model: BlockModel) -> str:
     """Genera código BlockCAD a partir de un modelo.
 
@@ -410,7 +461,15 @@ def model_to_source(model: BlockModel) -> str:
     for item in model.instances:
         partes = [
             _part_phrase(item.part_id),
-            f"en {item.position.x},{item.position.y},{item.position.z}",
+            "en "
+            + ",".join(
+                _desde_ldu(valor, unidad)
+                for valor, unidad in (
+                    (item.position.x, STUD),
+                    (item.position.y, STUD),
+                    (item.position.z, PLACA),
+                )
+            ),
         ]
         if item.rotation != Rotation.DEG_0:
             partes.append(f"rot {int(item.rotation)}")

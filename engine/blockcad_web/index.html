@@ -225,9 +225,10 @@ ladrillo 2x4 en 2,0,0 color amarillo'></textarea>
 import * as THREE from 'three';
 import { OrbitControls } from '/vendor/OrbitControls.js';
 
-// Proporciones reales de LEGO: un stud mide 8 mm de lado y una placa 3,2 mm
-// de alto. Con el stud como unidad, la altura de una placa es 0,4.
-const PLACA = 0.4;
+// El motor manda todo en LDU (1 LDU = 0,4 mm). Aquí se dibuja tomando el
+// stud como unidad, así que basta con dividir: un stud son 20 LDU. Las
+// proporciones salen solas y ya no hay que escalar la altura aparte.
+const LDU = 1 / 20;
 const RADIO_STUD = 0.3;    // 4,8 mm de diámetro
 const ALTO_STUD = 0.225;   // 1,8 mm
 
@@ -277,21 +278,24 @@ function construir(piezas) {
   limpiar(modelo);
 
   for (const p of piezas) {
-    const alto = p.alto * PLACA;
+    // Todo llega en LDU: ancho, fondo, alto y posición.
+    const ancho = p.ancho * LDU;
+    const fondo = p.fondo * LDU;
+    const alto = p.alto * LDU;
     const material = new THREE.MeshLambertMaterial({
       color: p.color,
       transparent: p.transparente,
       opacity: p.transparente ? 0.45 : 1,
     });
 
-    const caja = new THREE.BoxGeometry(p.ancho, alto, p.fondo);
+    const caja = new THREE.BoxGeometry(ancho, alto, fondo);
     const cuerpo = new THREE.Mesh(caja, material);
     // El motor usa z como altura; Three.js usa y. Además la caja se dibuja
     // desde su centro, mientras que el motor guarda la esquina mínima.
     cuerpo.position.set(
-      p.x + p.ancho / 2,
-      p.z * PLACA + alto / 2,
-      p.y + p.fondo / 2,
+      p.x * LDU + ancho / 2,
+      p.z * LDU + alto / 2,
+      p.y * LDU + fondo / 2,
     );
     modelo.add(cuerpo);
 
@@ -303,16 +307,19 @@ function construir(piezas) {
     modelo.add(aristas);
 
     if (!p.studs) continue;
-    for (let i = 0; i < p.ancho; i++) {
-      for (let j = 0; j < p.fondo; j++) {
+    // Cuántos studs caben: las medidas vienen en LDU y un stud son 20.
+    const studsX = Math.round(p.ancho / 20);
+    const studsY = Math.round(p.fondo / 20);
+    for (let i = 0; i < studsX; i++) {
+      for (let j = 0; j < studsY; j++) {
         const stud = new THREE.Mesh(
           new THREE.CylinderGeometry(RADIO_STUD, RADIO_STUD, ALTO_STUD, 16),
           material,
         );
         stud.position.set(
-          p.x + i + 0.5,
-          p.z * PLACA + alto + ALTO_STUD / 2,
-          p.y + j + 0.5,
+          p.x * LDU + i + 0.5,
+          p.z * LDU + alto + ALTO_STUD / 2,
+          p.y * LDU + j + 0.5,
         );
         modelo.add(stud);
       }

@@ -6,6 +6,7 @@ from pathlib import Path
 
 import blockcad_web
 from blockcad_engine import GridPosition, Rotation, load_model, parse_model
+from blockcad_engine.geometry import LADRILLO, PLACA, STUD
 from blockcad_web.server import (
     EJEMPLO,
     compile_json,
@@ -23,18 +24,21 @@ class SceneTests(unittest.TestCase):
     def test_dimensions_come_resolved(self) -> None:
         scene = model_to_scene(parse_model("ladrillo 2x4 en 0,0,0"))
         pieza = scene["piezas"][0]
-        self.assertEqual((pieza["ancho"], pieza["fondo"], pieza["alto"]), (2, 4, 3))
+        self.assertEqual(
+            (pieza["ancho"], pieza["fondo"], pieza["alto"]),
+            (2 * STUD, 4 * STUD, LADRILLO),
+        )
 
     def test_rotation_swaps_width_and_depth_in_the_scene(self) -> None:
         scene = model_to_scene(parse_model("ladrillo 2x4 en 0,0,0 rot 90"))
         pieza = scene["piezas"][0]
-        self.assertEqual((pieza["ancho"], pieza["fondo"]), (4, 2))
+        self.assertEqual((pieza["ancho"], pieza["fondo"]), (4 * STUD, 2 * STUD))
 
     def test_plate_and_tile_are_one_unit_tall(self) -> None:
         scene = model_to_scene(
             parse_model("placa 2x4 en 0,0,0\nbaldosa 1x2 en 0,0,1")
         )
-        self.assertEqual([p["alto"] for p in scene["piezas"]], [1, 1])
+        self.assertEqual([p["alto"] for p in scene["piezas"]], [PLACA, PLACA])
 
     def test_tile_has_no_studs(self) -> None:
         scene = model_to_scene(
@@ -45,7 +49,10 @@ class SceneTests(unittest.TestCase):
     def test_position_is_the_minimum_corner(self) -> None:
         scene = model_to_scene(parse_model("ladrillo 2x4 en 3,4,6"))
         pieza = scene["piezas"][0]
-        self.assertEqual((pieza["x"], pieza["y"], pieza["z"]), (3, 4, 6))
+        self.assertEqual(
+            (pieza["x"], pieza["y"], pieza["z"]),
+            (3 * STUD, 4 * STUD, 6 * PLACA),
+        )
 
     def test_model_name_travels(self) -> None:
         scene = model_to_scene(parse_model('modelo "Torre"\nladrillo 1x1 en 0,0,0'))
@@ -100,7 +107,7 @@ class ExportTests(unittest.TestCase):
         ladrillo = next(
             i for i in recuperado.instances if i.part_id == "brick_2x4"
         )
-        self.assertEqual(ladrillo.position, GridPosition(1, 2, 3))
+        self.assertEqual(ladrillo.position, GridPosition(1 * STUD, 2 * STUD, 3 * PLACA))
         self.assertEqual(ladrillo.rotation, Rotation.DEG_90)
         self.assertEqual(ladrillo.color, "#457B9D")
         self.assertEqual(ladrillo.group, 2)
@@ -112,7 +119,7 @@ class ExportTests(unittest.TestCase):
     def test_exported_json_uses_the_engine_format(self) -> None:
         datos = json.loads(compile_json("ladrillo 1x1 en 0,0,0")["json"])
         self.assertEqual(datos["format"], "blockcad-remake")
-        self.assertEqual(datos["version"], 1)
+        self.assertEqual(datos["version"], 2)
 
     def test_export_reports_errors_instead_of_raising(self) -> None:
         resultado = compile_json("ladrillo 2x4 en 0,0,0\nladrillo 1x1 en 1,1,0")
@@ -258,6 +265,30 @@ class EditorTests(unittest.TestCase):
             with self.subTest(boton=boton):
                 manejador = self.html.split(f"getElementById('{boton}')")[1]
                 self.assertIn("puedoReemplazar()", manejador.split("});")[0])
+
+
+class ViewerUnitTests(unittest.TestCase):
+    """El visor recibe LDU y dibuja en studs. Esa división tiene que estar."""
+
+    def setUp(self) -> None:
+        self.html = (_WEB / "index.html").read_text(encoding="utf-8")
+
+    def test_the_viewer_converts_from_ldu(self) -> None:
+        self.assertIn("const LDU = 1 / 20", self.html)
+
+    def test_the_viewer_no_longer_scales_height_apart(self) -> None:
+        # Antes la altura iba a escala 0,4 porque z venía en placas. Con todo
+        # en LDU esa corrección sobra, y dejarla aplastaría el modelo.
+        construir = self.html.split("function construir(")[1].split("\n}")[0]
+        self.assertNotIn("PLACA", construir)
+        self.assertIn("p.alto * LDU", construir)
+
+    def test_studs_are_counted_not_taken_from_the_size(self) -> None:
+        # `ancho` ya no es "2 studs" sino "40 LDU": usarlo como contador
+        # dibujaría 40 studs sobre un ladrillo que tiene 2.
+        construir = self.html.split("function construir(")[1].split("\n}")[0]
+        self.assertIn("p.ancho / 20", construir)
+        self.assertIn("p.fondo / 20", construir)
 
 
 class OfflineTests(unittest.TestCase):

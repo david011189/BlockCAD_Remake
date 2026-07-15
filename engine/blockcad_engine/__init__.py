@@ -29,7 +29,18 @@ from .errors import (
     PartNotFoundError,
     TransactionError,
 )
-from .geometry import Bounds3D, Dimensions, GridPosition, Rotation
+from .geometry import (
+    LADRILLO,
+    LDU_MM,
+    MEDIO_MODULO,
+    MODULO_TECHNIC,
+    PLACA,
+    STUD,
+    Bounds3D,
+    Dimensions,
+    GridPosition,
+    Rotation,
+)
 from .history import CommandHistory
 from .model import BlockModel, PlacedPart
 from .parts import PartCatalog, PartDefinition
@@ -50,6 +61,12 @@ __all__ = [
     "InvalidPlacementError",
     "PartNotFoundError",
     "TransactionError",
+    "LDU_MM",
+    "STUD",
+    "PLACA",
+    "LADRILLO",
+    "MODULO_TECHNIC",
+    "MEDIO_MODULO",
     "Bounds3D",
     "Dimensions",
     "GridPosition",

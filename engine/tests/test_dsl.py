@@ -1,6 +1,7 @@
 import unittest
 
 from blockcad_engine import DslError, GridPosition, Rotation, parse_model
+from blockcad_engine.geometry import LADRILLO, PLACA, STUD
 
 
 class SyntaxTests(unittest.TestCase):
@@ -39,7 +40,7 @@ class SyntaxTests(unittest.TestCase):
             "ladrillo 2x4 en 1,2,3 rot 90 color azul grupo 2 paso 5 transparente"
         )
         part = model.instances[0]
-        self.assertEqual(part.position, GridPosition(1, 2, 3))
+        self.assertEqual(part.position, GridPosition(1 * STUD, 2 * STUD, 3 * PLACA))
         self.assertEqual(part.rotation, Rotation.DEG_90)
         self.assertEqual(part.color, "#457B9D")
         self.assertEqual(part.group, 2)
@@ -70,15 +71,15 @@ class RelativeTests(unittest.TestCase):
         model = parse_model(
             "ladrillo 2x4 en 0,0,0 color verde\nladrillo 2x4 encima color azul"
         )
-        self.assertEqual(model.instances[1].position, GridPosition(0, 0, 3))
+        self.assertEqual(model.instances[1].position, GridPosition(0, 0, LADRILLO))
 
     def test_the_height_comes_from_the_piece_below(self) -> None:
         # Una placa mide 1 y un ladrillo 3: la altura no puede estar fija.
         model = parse_model("placa 2x4 en 0,0,0\nladrillo 2x4 encima")
-        self.assertEqual(model.instances[1].position.z, 1)
+        self.assertEqual(model.instances[1].position.z, PLACA)
 
         model = parse_model("ladrillo 2x4 en 0,0,0\nplaca 2x4 encima")
-        self.assertEqual(model.instances[1].position.z, 3)
+        self.assertEqual(model.instances[1].position.z, LADRILLO)
 
     def test_encima_de_a_named_piece(self) -> None:
         model = parse_model(
@@ -87,14 +88,14 @@ class RelativeTests(unittest.TestCase):
             "ladrillo 2x4 encima de base color azul"
         )
         # Se apoya en la base, no en la pieza de la línea anterior.
-        self.assertEqual(model.instances[2].position, GridPosition(0, 0, 3))
+        self.assertEqual(model.instances[2].position, GridPosition(0, 0, LADRILLO))
 
     def test_desplazado_moves_it_sideways(self) -> None:
         model = parse_model(
             "ladrillo 2x4 en 0,0,0 llamado base\n"
             "ladrillo 1x1 encima de base desplazado 1,2"
         )
-        self.assertEqual(model.instances[1].position, GridPosition(1, 2, 3))
+        self.assertEqual(model.instances[1].position, GridPosition(1 * STUD, 2 * STUD, LADRILLO))
 
     def test_repeat_without_desplazando_stacks_a_tower(self) -> None:
         model = parse_model(
@@ -102,7 +103,7 @@ class RelativeTests(unittest.TestCase):
         )
         self.assertEqual(
             [item.position.z for item in model.instances],
-            [0, 3, 6, 9, 12],
+            [z * LADRILLO for z in (0, 1, 2, 3, 4)],
         )
 
     def test_repeat_offset_does_not_apply_to_encima(self) -> None:
@@ -113,7 +114,7 @@ class RelativeTests(unittest.TestCase):
             "repetir 2 desplazando 0,0,99:\n"
             "    ladrillo 2x2 encima"
         )
-        self.assertEqual([i.position.z for i in model.instances], [0, 3, 6])
+        self.assertEqual([i.position.z for i in model.instances], [0, LADRILLO, 2 * LADRILLO])
 
     def test_a_name_can_be_used_before_it_is_shadowed(self) -> None:
         model = parse_model(
@@ -121,7 +122,7 @@ class RelativeTests(unittest.TestCase):
             "ladrillo 2x4 encima de base llamado piso\n"
             "ladrillo 1x1 encima de piso"
         )
-        self.assertEqual(model.instances[2].position, GridPosition(0, 0, 6))
+        self.assertEqual(model.instances[2].position, GridPosition(0, 0, 2 * LADRILLO))
 
     def test_encima_without_a_previous_piece_explains_itself(self) -> None:
         with self.assertRaises(DslError) as capturado:
@@ -147,6 +148,75 @@ class RelativeTests(unittest.TestCase):
             "ladrillo 2x4 en 0,0,0\n" + "ladrillo 2x4 encima\n" * 10
         )
         self.assertEqual(len(model.instances), 11)
+
+
+class UnitTests(unittest.TestCase):
+    """El lenguaje cuenta en studs y placas; el motor, en LDU.
+
+    Esa frontera es lo que permitió cambiar el motor entero a LDU sin que
+    nadie tenga que reescribir su código.
+    """
+
+    def test_the_language_still_speaks_studs_and_plates(self) -> None:
+        # "en 1,2,3" = 1 stud, 2 studs, 3 placas. Es lo mismo que significaba
+        # antes del cambio a LDU: el código de un usuario no se toca.
+        model = parse_model("ladrillo 2x4 en 1,2,3")
+        self.assertEqual(
+            model.instances[0].position,
+            GridPosition(1 * STUD, 2 * STUD, 3 * PLACA),
+        )
+
+    def test_half_a_stud_is_allowed(self) -> None:
+        # Media distancia son 10 LDU: el paso real de la rejilla Technic, y
+        # justo lo que era imposible con coordenadas en studs enteros.
+        model = parse_model("ladrillo 1x1 en 0.5,0,0")
+        self.assertEqual(model.instances[0].position.x, STUD // 2)
+
+    def test_a_technic_module_is_two_and_a_half_plates(self) -> None:
+        # La razón de existir de todo este cambio.
+        model = parse_model("ladrillo 1x1 en 0,0,2.5")
+        self.assertEqual(model.instances[0].position.z, 20)
+
+    def test_decimals_work_in_repeat(self) -> None:
+        # Ojo con el desplazamiento: medio stud es 10 LDU y un ladrillo 1x1
+        # mide 20 de ancho, así que a media distancia chocaría consigo mismo.
+        # 1,5 studs lo separan sin solaparlo.
+        model = parse_model("repetir 2 desplazando 1.5,0,0:\n    ladrillo 1x1 en 0,0,0")
+        self.assertEqual(
+            [i.position.x for i in model.instances], [0, 30]
+        )
+
+    def test_half_a_stud_off_is_a_collision_for_a_1x1(self) -> None:
+        # No es un fallo: un ladrillo mide un stud entero, así que a media
+        # distancia se pisa con el de al lado. El motor lo dice con su línea.
+        with self.assertRaises(DslError) as capturado:
+            parse_model("ladrillo 1x1 en 0,0,0\nladrillo 1x1 en 0.5,0,0")
+        self.assertEqual(capturado.exception.line, 2)
+
+    def test_a_position_between_two_ldu_is_rejected(self) -> None:
+        # Redondear en silencio movería la pieza sin avisar.
+        with self.assertRaises(DslError) as capturado:
+            parse_model("ladrillo 1x1 en 0.33,0,0")
+        self.assertIn("LDU", capturado.exception.message)
+        self.assertEqual(capturado.exception.line, 1)
+
+    def test_the_error_says_where_it_lands(self) -> None:
+        with self.assertRaises(DslError) as capturado:
+            parse_model("ladrillo 1x1 en 0,0,0.1")
+        self.assertIn("0.80", capturado.exception.message)
+
+    def test_generated_code_comes_back_in_studs(self) -> None:
+        # El camino inverso: nadie quiere leer "en 40,0,24".
+        from blockcad_engine.dsl import model_to_source
+
+        codigo = model_to_source(parse_model("ladrillo 2x4 en 2,0,3"))
+        self.assertIn("en 2,0,3", codigo)
+
+    def test_generated_code_keeps_halves(self) -> None:
+        from blockcad_engine.dsl import model_to_source
+
+        codigo = model_to_source(parse_model("ladrillo 1x1 en 0.5,0,0"))
+        self.assertIn("en 0.5,0,0", codigo)
 
 
 class CommentTests(unittest.TestCase):
@@ -175,12 +245,12 @@ class RepeatTests(unittest.TestCase):
         )
         self.assertEqual(
             [item.position.z for item in model.instances],
-            [0, 3, 6],
+            [0, LADRILLO, 2 * LADRILLO],
         )
 
     def test_veces_is_optional(self) -> None:
         model = parse_model("repetir 2 desplazando 2,0,0:\n    ladrillo 1x1 en 0,0,0")
-        self.assertEqual([item.position.x for item in model.instances], [0, 2])
+        self.assertEqual([i.position.x for i in model.instances], [0, 2 * STUD])
 
     def test_repeat_can_hold_several_lines(self) -> None:
         model = parse_model(
@@ -200,7 +270,8 @@ class RepeatTests(unittest.TestCase):
         posiciones = {(i.position.x, i.position.z) for i in model.instances}
         self.assertEqual(
             posiciones,
-            {(0, 0), (2, 0), (0, 3), (2, 3), (0, 6), (2, 6)},
+            {(0, 0), (2 * STUD, 0), (0, LADRILLO), (2 * STUD, LADRILLO),
+             (0, 2 * LADRILLO), (2 * STUD, 2 * LADRILLO)},
         )
 
     def test_lines_after_a_repeat_block_are_not_repeated(self) -> None:
