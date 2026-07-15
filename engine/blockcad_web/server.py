@@ -44,7 +44,7 @@ def model_to_scene(model: BlockModel) -> dict:
     piezas = []
     for item in model.instances:
         definition = model.catalog.get(item.part_id)
-        dimensions = definition.dimensions.rotated(item.rotation)
+        dimensions = definition.dimensions.rotated(item.orientation)
         piezas.append(
             {
                 "x": item.position.x,
@@ -54,7 +54,10 @@ def model_to_scene(model: BlockModel) -> dict:
                 "fondo": dimensions.depth,
                 "alto": dimensions.height,
                 "color": item.color,
-                "studs": definition.has_top_studs,
+                # Los studs solo se dibujan si la pieza sigue de pie: en
+                # una viga tumbada mirarían de lado, y el visor todavía
+                # no sabe girarlos.
+                "studs": definition.has_top_studs and item.orientation.keeps_z_up,
                 "transparente": item.transparent,
                 "nombre": definition.name,
             }

@@ -1,6 +1,7 @@
 import unittest
+from dataclasses import replace
 
-from blockcad_engine import DslError, GridPosition, Rotation, parse_model
+from blockcad_engine import DslError, GridPosition, Orientation, parse_model
 from blockcad_engine.geometry import LADRILLO, PLACA, STUD
 
 
@@ -41,7 +42,7 @@ class SyntaxTests(unittest.TestCase):
         )
         part = model.instances[0]
         self.assertEqual(part.position, GridPosition(1 * STUD, 2 * STUD, 3 * PLACA))
-        self.assertEqual(part.rotation, Rotation.DEG_90)
+        self.assertEqual(part.orientation, Orientation.z(90))
         self.assertEqual(part.color, "#457B9D")
         self.assertEqual(part.group, 2)
         self.assertEqual(part.step, 5)
@@ -61,7 +62,7 @@ class SyntaxTests(unittest.TestCase):
 
     def test_rotado_is_a_synonym_of_rot(self) -> None:
         model = parse_model("ladrillo 2x4 en 0,0,0 rotado 270")
-        self.assertEqual(model.instances[0].rotation, Rotation.DEG_270)
+        self.assertEqual(model.instances[0].orientation, Orientation.z(270))
 
 
 class RelativeTests(unittest.TestCase):
@@ -217,6 +218,82 @@ class UnitTests(unittest.TestCase):
 
         codigo = model_to_source(parse_model("ladrillo 1x1 en 0.5,0,0"))
         self.assertIn("en 0.5,0,0", codigo)
+
+
+class RotationSyntaxTests(unittest.TestCase):
+    """`rot 90` significa lo de siempre; los otros ejes son lo nuevo."""
+
+    def _caja(self, codigo: str):
+        model = parse_model(codigo)
+        pieza = model.instances[0]
+        return model.catalog.get(pieza.part_id).dimensions.rotated(pieza.orientation)
+
+    def test_rot_alone_is_still_the_vertical_axis(self) -> None:
+        # Compatibilidad: el código escrito antes de los tres ejes vale igual.
+        model = parse_model("ladrillo 2x4 en 0,0,0 rot 90")
+        self.assertEqual(model.instances[0].orientation, Orientation.z(90))
+
+    def test_a_brick_can_be_stood_on_its_end(self) -> None:
+        caja = self._caja("ladrillo 2x4 en 0,0,0 rot x 90")
+        self.assertEqual((caja.width, caja.depth, caja.height), (40, 24, 80))
+
+    def test_each_axis_turns_a_different_way(self) -> None:
+        cajas = {
+            self._caja(f"ladrillo 2x4 en 0,0,0 rot {eje} 90") for eje in "xyz"
+        }
+        # Un 2x4 girado sobre cada eje da tres cajas distintas. Si dos
+        # coincidieran, dos ejes estarían haciendo lo mismo.
+        self.assertEqual(len(cajas), 3)
+
+    def test_rotations_chain(self) -> None:
+        model = parse_model("ladrillo 2x4 en 0,0,0 rot x 90 rot z 90")
+        esperado = Orientation.z(90).then(Orientation.around("x", 90))
+        self.assertEqual(model.instances[0].orientation, esperado)
+
+    def test_the_axis_is_case_insensitive(self) -> None:
+        self.assertEqual(
+            parse_model("ladrillo 1x1 en 0,0,0 rot X 90").instances[0].orientation,
+            Orientation.around("x", 90),
+        )
+
+    def test_a_bad_axis_is_reported(self) -> None:
+        with self.assertRaises(DslError) as capturado:
+            parse_model("ladrillo 1x1 en 0,0,0 rot w 90")
+        self.assertEqual(capturado.exception.line, 1)
+
+    def test_a_bad_angle_is_reported(self) -> None:
+        with self.assertRaises(DslError):
+            parse_model("ladrillo 1x1 en 0,0,0 rot x 45")
+
+    def test_every_orientation_survives_the_round_trip(self) -> None:
+        # Generar el código de vuelta tiene que reproducir la orientación
+        # exacta, o abrir un JSON giraría las piezas.
+        from blockcad_engine.dsl import _GIROS_POR_MATRIZ, model_to_source
+
+        self.assertEqual(len(_GIROS_POR_MATRIZ), 24)
+        for filas in _GIROS_POR_MATRIZ:
+            with self.subTest(filas=filas):
+                original = parse_model("ladrillo 2x4 en 0,0,0")
+                pieza = original.instances[0]
+                original._instances[pieza.instance_id] = replace(
+                    pieza, orientation=Orientation(filas)
+                )
+                vuelta = parse_model(model_to_source(original))
+                self.assertEqual(vuelta.instances[0].orientation.filas, filas)
+
+    def test_generated_code_says_rot_90_for_the_usual_turn(self) -> None:
+        from blockcad_engine.dsl import model_to_source
+
+        codigo = model_to_source(parse_model("ladrillo 2x4 en 0,0,0 rot 90"))
+        self.assertIn("rot 90", codigo)
+        self.assertNotIn("rot z 90", codigo)
+
+    def test_generated_code_never_repeats_a_turn(self) -> None:
+        # "rot x 270" y no "rot x 90 rot x 90 rot x 90".
+        from blockcad_engine.dsl import model_to_source
+
+        codigo = model_to_source(parse_model("ladrillo 2x4 en 0,0,0 rot x 270"))
+        self.assertEqual(codigo.count("rot"), 1)
 
 
 class CommentTests(unittest.TestCase):

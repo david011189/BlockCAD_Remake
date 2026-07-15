@@ -5,18 +5,25 @@ from pathlib import Path
 from typing import Any
 
 from .errors import InvalidFormatError
-from .geometry import PLACA, STUD, GridPosition, Rotation
+from .geometry import PLACA, STUD, GridPosition, Orientation
 from .model import DEFAULT_MODEL_NAME, BlockModel
 from .parts import PartCatalog
 
 
 FORMAT_NAME = "blockcad-remake"
 
-#: La versión 2 guarda las posiciones en LDU. La 1 las guardaba en studs y
-#: placas, y se sigue leyendo: hay archivos de usuarios por ahí.
-FORMAT_VERSION = 2
+#: Historia del formato, y por qué se siguen leyendo los viejos:
+#:
+#:   1 - posiciones en studs y placas, giro como un ángulo sobre Z.
+#:   2 - posiciones en LDU, giro como un ángulo sobre Z.
+#:   3 - orientación como matriz de 3x3: una pieza puede mirar a cualquier
+#:       lado, y un ángulo sobre Z ya no basta para decirlo.
+#:
+#: Un archivo de la 1 o la 2 se traduce al vuelo. Nadie debería perder lo que
+#: guardó porque el motor haya crecido.
+FORMAT_VERSION = 3
 
-VERSIONES_LEIBLES = (1, 2)
+VERSIONES_LEIBLES = (1, 2, 3)
 
 
 def model_to_dict(model: BlockModel) -> dict[str, Any]:
@@ -33,7 +40,9 @@ def model_to_dict(model: BlockModel) -> dict[str, Any]:
                     "y": item.position.y,
                     "z": item.position.z,
                 },
-                "rotation": int(item.rotation),
+                # Se guardan las tres filas de la matriz. Es más largo que un
+                # ángulo, pero un ángulo no sabe decir "esta viga está de pie".
+                "orientation": [list(fila) for fila in item.orientation.filas],
                 "color": item.color,
                 "group": item.group,
                 "step": item.step,
@@ -42,6 +51,21 @@ def model_to_dict(model: BlockModel) -> dict[str, Any]:
             for item in model.instances
         ],
     }
+
+
+def _leer_orientacion(data: dict[str, Any], version: int) -> Orientation:
+    """Saca la orientación de una pieza, venga del formato que venga.
+
+    Hasta la versión 2 el giro era un ángulo sobre el eje vertical, que es un
+    caso particular de la matriz de ahora.
+    """
+    if version < 3:
+        return Orientation.z(int(data.get("rotation", 0)))
+
+    filas = data.get("orientation")
+    if filas is None:
+        return Orientation()
+    return Orientation(tuple(tuple(int(v) for v in fila) for fila in filas))
 
 
 def model_from_dict(
@@ -79,7 +103,7 @@ def model_from_dict(
                     int(position_data["y"]) * escala[1],
                     int(position_data["z"]) * escala[2],
                 ),
-                "rotation": Rotation.normalize(int(data.get("rotation", 0))),
+                "orientation": _leer_orientacion(data, version),
                 "color": str(data.get("color", "#D62828")),
                 "group": int(data.get("group", 0)),
                 "step": int(data.get("step", 0)),

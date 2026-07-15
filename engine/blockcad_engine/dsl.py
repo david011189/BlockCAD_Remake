@@ -20,7 +20,7 @@ from __future__ import annotations
 import re
 
 from .errors import BlockCADError, DslError
-from .geometry import PLACA, STUD, GridPosition, Rotation
+from .geometry import PLACA, STUD, GridPosition, Orientation
 from .model import DEFAULT_MODEL_NAME, BlockModel, PlacedPart
 from .parts import PartCatalog, validate_color
 
@@ -163,11 +163,32 @@ def _parse_options(text: str, line: int) -> dict:
     while index < len(tokens):
         token = tokens[index]
         if token in ("rot", "rotado"):
-            raw = _value(token)
+            # `rot 90` es el giro de siempre, sobre el eje vertical, y sigue
+            # significando lo mismo. `rot x 90` gira sobre otro eje, y varios
+            # `rot` seguidos se encadenan: "rot x 90 rot z 180".
+            siguiente = _value(token)
+            if siguiente.lower() in ("x", "y", "z"):
+                eje = siguiente.lower()
+                raw = _value(f"rot {eje}")
+            else:
+                eje = "z"
+                raw = siguiente
+
             try:
-                options["rotation"] = Rotation.normalize(int(raw))
+                grados = int(raw)
             except ValueError as exc:
-                raise DslError(line, f"Rotación inválida: {raw!r}. {exc}") from exc
+                raise DslError(
+                    line, f"El giro espera grados, no {raw!r}."
+                ) from exc
+
+            try:
+                giro = Orientation.around(eje, grados)
+            except BlockCADError as exc:
+                raise DslError(line, str(exc)) from exc
+
+            options["orientation"] = giro.then(
+                options.get("orientation", Orientation())
+            )
         elif token == "color":
             options["color"] = _resolve_color(_value(token), line)
         elif token == "grupo":
@@ -433,6 +454,41 @@ def _part_phrase(part_id: str) -> str:
     return part_id
 
 
+def _tabla_de_giros() -> dict[tuple, list[tuple[str, int]]]:
+    """Para cada una de las 24 orientaciones, la forma más corta de llegar.
+
+    Generar el código de vuelta necesita el inverso de la matriz: qué `rot`
+    hay que escribir para conseguirla. Una búsqueda en anchura desde la
+    identidad da la secuencia más corta de cada una, así que el código
+    generado nunca dice "rot x 90 rot x 90 rot x 90" pudiendo decir
+    "rot x 270".
+    """
+    tabla: dict[tuple, list[tuple[str, int]]] = {Orientation().filas: []}
+    frontera = [Orientation()]
+    while frontera:
+        actual = frontera.pop(0)
+        for eje in ("x", "y", "z"):
+            for grados in (90, 180, 270):
+                siguiente = Orientation.around(eje, grados).then(actual)
+                if siguiente.filas in tabla:
+                    continue
+                tabla[siguiente.filas] = tabla[actual.filas] + [(eje, grados)]
+                frontera.append(siguiente)
+    return tabla
+
+
+_GIROS_POR_MATRIZ = _tabla_de_giros()
+
+
+def _giro_a_texto(orientation: Orientation) -> list[str]:
+    pasos = _GIROS_POR_MATRIZ[orientation.filas]
+    # Un giro sobre el eje vertical se escribe como siempre, sin nombrar el
+    # eje: es el caso habitual y así el código generado se lee igual que antes.
+    if len(pasos) == 1 and pasos[0][0] == "z":
+        return [f"rot {pasos[0][1]}"]
+    return [f"rot {eje} {grados}" for eje, grados in pasos]
+
+
 def _desde_ldu(ldu: int, unidad: int) -> str:
     """El camino inverso: de LDU a lo que lee una persona.
 
@@ -471,8 +527,7 @@ def model_to_source(model: BlockModel) -> str:
                 )
             ),
         ]
-        if item.rotation != Rotation.DEG_0:
-            partes.append(f"rot {int(item.rotation)}")
+        partes.extend(_giro_a_texto(item.orientation))
         partes.append(f"color {_COLOR_NAMES.get(item.color.upper(), item.color)}")
         if item.group:
             partes.append(f"grupo {item.group}")

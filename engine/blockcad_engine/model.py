@@ -8,7 +8,7 @@ from .errors import (
     DuplicateInstanceError,
     InstanceNotFoundError,
 )
-from .geometry import Bounds3D, GridPosition, Rotation
+from .geometry import Bounds3D, GridPosition, Orientation
 from .parts import PartCatalog, PartDefinition, validate_color
 
 #: Nombre de un modelo al que nadie ha puesto uno.
@@ -22,7 +22,7 @@ class PlacedPart:
     instance_id: str
     part_id: str
     position: GridPosition
-    rotation: Rotation = Rotation.DEG_0
+    orientation: Orientation = Orientation()
     color: str = "#D62828"
     group: int = 0
     step: int = 0
@@ -34,7 +34,7 @@ class PlacedPart:
         part_id: str,
         position: GridPosition,
         *,
-        rotation: Rotation = Rotation.DEG_0,
+        orientation: Orientation = Orientation(),
         color: str = "#D62828",
         group: int = 0,
         step: int = 0,
@@ -45,7 +45,7 @@ class PlacedPart:
             instance_id=instance_id or str(uuid4()),
             part_id=part_id,
             position=position,
-            rotation=rotation,
+            orientation=orientation,
             color=color,
             group=group,
             step=step,
@@ -53,7 +53,7 @@ class PlacedPart:
         )
 
     def bounds(self, definition: PartDefinition) -> Bounds3D:
-        dimensions = definition.dimensions.rotated(self.rotation)
+        dimensions = definition.dimensions.rotated(self.orientation)
         return Bounds3D.from_position_and_dimensions(self.position, dimensions)
 
 
@@ -94,7 +94,7 @@ class BlockModel:
         part_id: str,
         position: GridPosition,
         *,
-        rotation: Rotation = Rotation.DEG_0,
+        orientation: Orientation = Orientation(),
         color: str | None = None,
         group: int = 0,
         step: int = 0,
@@ -106,7 +106,7 @@ class BlockModel:
         candidate = PlacedPart.create(
             part_id=part_id,
             position=position,
-            rotation=rotation,
+            orientation=orientation,
             color=color or definition.default_color,
             group=group,
             step=step,
@@ -196,15 +196,16 @@ class BlockModel:
             check_collision=check_collision,
         )
 
-    def set_rotation(
+    def set_orientation(
         self,
         instance_id: str,
-        rotation: Rotation | int,
+        orientation: Orientation,
         *,
         check_collision: bool = True,
     ) -> PlacedPart:
+        """Fija la orientación absoluta de una pieza."""
         current = self.get(instance_id)
-        candidate = replace(current, rotation=Rotation.normalize(int(rotation)))
+        candidate = replace(current, orientation=orientation)
         self._validate_instance(
             candidate,
             ignore_instance_id=instance_id,
@@ -213,18 +214,30 @@ class BlockModel:
         self._instances[instance_id] = candidate
         return candidate
 
+    def rotate(
+        self,
+        instance_id: str,
+        eje: str,
+        grados: int,
+        *,
+        check_collision: bool = True,
+    ) -> PlacedPart:
+        """Gira una pieza sobre un eje, encadenando el giro al que ya tenía."""
+        current = self.get(instance_id)
+        return self.set_orientation(
+            instance_id,
+            Orientation.around(eje, grados).then(current.orientation),
+            check_collision=check_collision,
+        )
+
     def rotate_clockwise(
         self,
         instance_id: str,
         *,
         check_collision: bool = True,
     ) -> PlacedPart:
-        current = self.get(instance_id)
-        return self.set_rotation(
-            instance_id,
-            current.rotation.clockwise(),
-            check_collision=check_collision,
-        )
+        """Gira 90 grados sobre el eje vertical: el giro de toda la vida."""
+        return self.rotate(instance_id, "z", 90, check_collision=check_collision)
 
     def recolor(self, instance_id: str, color: str) -> PlacedPart:
         normalized = validate_color(color)

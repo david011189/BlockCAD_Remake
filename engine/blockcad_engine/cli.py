@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from .editor import BlockEditor
-from .geometry import GridPosition, Rotation
+from .geometry import GridPosition, Orientation
 from .model import BlockModel
 from .serialization import load_model
 
@@ -14,7 +14,7 @@ def print_model(model: BlockModel) -> None:
         print(
             f"- {definition.name:<16} "
             f"pos=({item.position.x}, {item.position.y}, {item.position.z}) "
-            f"rot={int(item.rotation):>3}° color={item.color}"
+            f"color={item.color}"
         )
 
 
@@ -34,7 +34,7 @@ def main() -> None:
     upper = editor.add(
         "brick_2x2",
         GridPosition(1, 1, 3),
-        rotation=Rotation.DEG_90,
+        orientation=Orientation.z(90),
         color="#457B9D",
     )
     editor.add("tile_1x2", GridPosition(1, 1, 6), color="#F1FAEE")

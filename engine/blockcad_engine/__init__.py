@@ -8,7 +8,8 @@ from .commands import (
     RecolorPartCommand,
     RemovePartCommand,
     RotateClockwiseCommand,
-    SetRotationCommand,
+    RotateCommand,
+    SetOrientationCommand,
     TranslatePartCommand,
 )
 from .editor import BlockEditor
@@ -39,6 +40,7 @@ from .geometry import (
     Bounds3D,
     Dimensions,
     GridPosition,
+    Orientation,
     Rotation,
 )
 from .history import CommandHistory
@@ -71,6 +73,7 @@ __all__ = [
     "Dimensions",
     "GridPosition",
     "Rotation",
+    "Orientation",
     "BlockModel",
     "PlacedPart",
     "PartCatalog",
@@ -83,7 +86,8 @@ __all__ = [
     "RemovePartCommand",
     "MovePartCommand",
     "TranslatePartCommand",
-    "SetRotationCommand",
+    "SetOrientationCommand",
+    "RotateCommand",
     "RotateClockwiseCommand",
     "RecolorPartCommand",
     "MacroCommand",

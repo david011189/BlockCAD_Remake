@@ -183,7 +183,26 @@ En el **lenguaje** cuentas como siempre:
 - `y`: adelante/atrás, en studs.
 - `z`: altura, en placas. Una placa es `1`; un ladrillo, `3`.
 - Se admiten decimales: `0.5` studs es media distancia.
-- La rotación es `0`, `90`, `180` o `270` grados.
+- Los giros son de `0`, `90`, `180` o `270` grados.
+
+### Girar
+
+`rot 90` gira sobre el eje vertical, como siempre. Para los otros dos ejes se
+nombra el eje, y varios giros se encadenan:
+
+```
+ladrillo 2x4 en 0,0,0 rot 90          // el giro de toda la vida
+ladrillo 2x4 en 3,0,0 rot x 90        // de pie
+ladrillo 2x4 en 6,0,0 rot x 90 rot z 90
+```
+
+Por dentro una orientación es una **matriz de 3×3 de enteros**, igual que en
+LDraw. Con ángulos sueltos por eje habría que fijar un orden de aplicación y
+una misma orientación tendría varias escrituras; con la matriz cada una de
+las **24 orientaciones de un cubo** es única, y componer giros es multiplicar.
+Solo hay 90 grados, así que las cuentas son exactas y sin coma flotante.
+
+Una pieza tumbada todavía no dibuja sus studs: el visor no sabe girarlos.
 
 Por dentro, el **motor mide en LDU** (1 LDU = 0,4 mm, la unidad de LDraw):
 

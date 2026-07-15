@@ -11,10 +11,11 @@ from .commands import (
     RecolorPartCommand,
     RemovePartCommand,
     RotateClockwiseCommand,
-    SetRotationCommand,
+    RotateCommand,
+    SetOrientationCommand,
     TranslatePartCommand,
 )
-from .geometry import GridPosition, Rotation
+from .geometry import GridPosition, Orientation
 from .history import CommandHistory
 from .model import BlockModel, PlacedPart
 from .parts import PartCatalog
@@ -71,7 +72,7 @@ class BlockEditor:
         part_id: str,
         position: GridPosition,
         *,
-        rotation: Rotation = Rotation.DEG_0,
+        orientation: Orientation = Orientation(),
         color: str | None = None,
         group: int = 0,
         step: int = 0,
@@ -81,7 +82,7 @@ class BlockEditor:
         command = AddPartCommand(
             part_id,
             position,
-            rotation=rotation,
+            orientation=orientation,
             color=color,
             group=group,
             step=step,
@@ -112,8 +113,15 @@ class BlockEditor:
         self.history.execute(RotateClockwiseCommand(instance_id))
         return self.model.get(instance_id)
 
-    def set_rotation(self, instance_id: str, rotation: Rotation | int) -> PlacedPart:
-        self.history.execute(SetRotationCommand(instance_id, rotation))
+    def set_orientation(
+        self, instance_id: str, orientation: Orientation
+    ) -> PlacedPart:
+        self.history.execute(SetOrientationCommand(instance_id, orientation))
+        return self.model.get(instance_id)
+
+    def rotate(self, instance_id: str, eje: str, grados: int) -> PlacedPart:
+        """Gira sobre cualquiera de los tres ejes."""
+        self.history.execute(RotateCommand(instance_id, eje, grados))
         return self.model.get(instance_id)
 
     def recolor(self, instance_id: str, color: str) -> PlacedPart:

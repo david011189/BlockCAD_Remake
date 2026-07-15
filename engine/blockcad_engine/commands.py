@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from uuid import uuid4
 
 from .errors import CommandError
-from .geometry import GridPosition, Rotation
+from .geometry import GridPosition, Orientation
 from .model import BlockModel, PlacedPart
 
 
@@ -38,7 +38,7 @@ class AddPartCommand(Command):
         part_id: str,
         position: GridPosition,
         *,
-        rotation: Rotation = Rotation.DEG_0,
+        orientation: Orientation = Orientation(),
         color: str | None = None,
         group: int = 0,
         step: int = 0,
@@ -47,7 +47,7 @@ class AddPartCommand(Command):
     ) -> None:
         self.part_id = part_id
         self.position = position
-        self.rotation = rotation
+        self.orientation = orientation
         self.color = color
         self.group = group
         self.step = step
@@ -70,7 +70,7 @@ class AddPartCommand(Command):
             self._instance = PlacedPart.create(
                 part_id=self.part_id,
                 position=self.position,
-                rotation=self.rotation,
+                orientation=self.orientation,
                 color=self.color or definition.default_color,
                 group=self.group,
                 step=self.step,
@@ -144,38 +144,52 @@ class TranslatePartCommand(MovePartCommand):
         model.move(self.instance_id, self.position)
 
 
-class SetRotationCommand(Command):
-    """Fija la rotación absoluta de una pieza."""
+class SetOrientationCommand(Command):
+    """Fija la orientación absoluta de una pieza."""
 
-    def __init__(self, instance_id: str, rotation: Rotation | int) -> None:
+    def __init__(self, instance_id: str, orientation: Orientation) -> None:
         self.instance_id = instance_id
-        self.rotation = Rotation.normalize(int(rotation))
-        self.label = f"Rotar a {int(self.rotation)}°"
-        self._previous: Rotation | None = None
+        self.orientation = orientation
+        self.label = "Orientar pieza"
+        self._previous: Orientation | None = None
 
     def execute(self, model: BlockModel) -> None:
-        self._previous = model.get(self.instance_id).rotation
-        model.set_rotation(self.instance_id, self.rotation)
+        self._previous = model.get(self.instance_id).orientation
+        model.set_orientation(self.instance_id, self.orientation)
 
     def undo(self, model: BlockModel) -> None:
         if self._previous is None:
             raise CommandError("El comando todavía no se ha ejecutado.")
-        model.set_rotation(self.instance_id, self._previous)
+        model.set_orientation(self.instance_id, self._previous)
 
 
-class RotateClockwiseCommand(SetRotationCommand):
-    """Rota una pieza 90 grados en sentido horario."""
+class RotateCommand(SetOrientationCommand):
+    """Gira una pieza sobre un eje, encadenando al giro que ya tenía."""
 
-    def __init__(self, instance_id: str) -> None:
+    def __init__(self, instance_id: str, eje: str, grados: int) -> None:
         self.instance_id = instance_id
-        self.label = "Rotar 90° horario"
-        self._previous: Rotation | None = None
+        self.eje = eje
+        self.grados = grados
+        self.label = f"Girar {grados}° sobre {eje.upper()}"
+        self._previous: Orientation | None = None
 
     def execute(self, model: BlockModel) -> None:
-        current = model.get(self.instance_id).rotation
+        # Se recalcula en cada ejecución a partir del estado actual, pero
+        # deshacer restaura la orientación exacta que había: encadenar el giro
+        # inverso daría lo mismo aquí y sería frágil el día que un giro no
+        # tenga inverso limpio.
+        current = model.get(self.instance_id).orientation
         self._previous = current
-        self.rotation = current.clockwise()
-        model.set_rotation(self.instance_id, self.rotation)
+        self.orientation = Orientation.around(self.eje, self.grados).then(current)
+        model.set_orientation(self.instance_id, self.orientation)
+
+
+class RotateClockwiseCommand(RotateCommand):
+    """Gira 90 grados sobre el eje vertical: el giro de toda la vida."""
+
+    def __init__(self, instance_id: str) -> None:
+        super().__init__(instance_id, "z", 90)
+        self.label = "Rotar 90° horario"
 
 
 class RecolorPartCommand(Command):

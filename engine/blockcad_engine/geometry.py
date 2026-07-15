@@ -74,6 +74,107 @@ class Rotation(IntEnum):
         return Rotation.normalize(int(self) + 90)
 
 
+#: Las tres matrices de giro de 90° a derechas, con Z hacia arriba.
+_GIROS_90 = {
+    "x": ((1, 0, 0), (0, 0, -1), (0, 1, 0)),
+    "y": ((0, 0, 1), (0, 1, 0), (-1, 0, 0)),
+    "z": ((0, -1, 0), (1, 0, 0), (0, 0, 1)),
+}
+
+
+@dataclass(frozen=True, slots=True)
+class Orientation:
+    """Cómo está girada una pieza: una de las 24 orientaciones de un cubo.
+
+    Se guarda como una matriz de 3x3 de enteros, igual que LDraw. Con ángulos
+    sueltos por eje habría que fijar un orden de aplicación y una misma
+    orientación tendría varias escrituras; con la matriz cada orientación es
+    una y solo una, y componer dos giros es multiplicar.
+
+    Solo se admiten giros de 90°, así que las casillas son -1, 0 o 1 y las
+    cuentas salen exactas: nada de coma flotante.
+    """
+
+    filas: tuple[tuple[int, int, int], ...] = ((1, 0, 0), (0, 1, 0), (0, 0, 1))
+
+    def __post_init__(self) -> None:
+        if len(self.filas) != 3 or any(len(f) != 3 for f in self.filas):
+            raise InvalidGeometryError("Una orientación es una matriz de 3x3.")
+        if any(v not in (-1, 0, 1) for fila in self.filas for v in fila):
+            raise InvalidGeometryError(
+                "Una orientación solo admite giros de 90 grados."
+            )
+        # Una matriz de giro tiene un único valor por fila y por columna, y su
+        # determinante es +1. Con -1 sería un espejo, y una pieza reflejada no
+        # existe.
+        if any(sum(abs(v) for v in fila) != 1 for fila in self.filas):
+            raise InvalidGeometryError("La orientación no es un giro válido.")
+        if any(
+            sum(abs(self.filas[f][c]) for f in range(3)) != 1 for c in range(3)
+        ):
+            raise InvalidGeometryError("La orientación no es un giro válido.")
+        if self._determinante() != 1:
+            raise InvalidGeometryError(
+                "Esa orientación refleja la pieza en vez de girarla."
+            )
+
+    def _determinante(self) -> int:
+        (a, b, c), (d, e, f), (g, h, i) = self.filas
+        return a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g)
+
+    @classmethod
+    def around(cls, eje: str, grados: int) -> "Orientation":
+        """Giro alrededor de un eje, en pasos de 90 grados."""
+        clave = eje.lower()
+        if clave not in _GIROS_90:
+            raise InvalidGeometryError(
+                f"El eje debe ser x, y o z, no {eje!r}."
+            )
+        vueltas = (grados // 90) % 4
+        if grados % 90:
+            raise InvalidGeometryError("El giro debe ser múltiplo de 90 grados.")
+
+        resultado = cls()
+        paso = cls(_GIROS_90[clave])
+        for _ in range(vueltas):
+            resultado = paso.then(resultado)
+        return resultado
+
+    @classmethod
+    def z(cls, grados: int) -> "Orientation":
+        """Atajo para el giro de siempre, el del eje vertical."""
+        return cls.around("z", grados)
+
+    def then(self, otra: "Orientation") -> "Orientation":
+        """Aplica primero `otra` y luego esta."""
+        return Orientation(
+            tuple(
+                tuple(
+                    sum(self.filas[f][k] * otra.filas[k][c] for k in range(3))
+                    for c in range(3)
+                )
+                for f in range(3)
+            )
+        )
+
+    def apply(self, x: int, y: int, z: int) -> tuple[int, int, int]:
+        return tuple(
+            fila[0] * x + fila[1] * y + fila[2] * z for fila in self.filas
+        )
+
+    @property
+    def is_identity(self) -> bool:
+        return self.filas == ((1, 0, 0), (0, 1, 0), (0, 0, 1))
+
+    @property
+    def keeps_z_up(self) -> bool:
+        """True si la pieza sigue de pie, aunque esté girada sobre sí misma.
+
+        Sirve para saber si sus studs siguen mirando hacia arriba.
+        """
+        return self.filas[2][2] == 1
+
+
 @dataclass(frozen=True, slots=True)
 class GridPosition:
     """Posición de la esquina mínima de una pieza, en LDU.
@@ -120,10 +221,20 @@ class Dimensions:
                 "Todas las dimensiones deben ser mayores que cero."
             )
 
-    def rotated(self, rotation: Rotation) -> "Dimensions":
-        if rotation in (Rotation.DEG_90, Rotation.DEG_270):
-            return Dimensions(self.depth, self.width, self.height)
-        return self
+    def rotated(self, orientation: "Orientation") -> "Dimensions":
+        """El tamaño de la caja una vez girada.
+
+        Girar permuta las tres medidas; nunca las cambia. Se toma el valor
+        absoluto de la matriz porque a una caja le da igual mirar hacia +x o
+        hacia -x: ocupa lo mismo.
+        """
+        medidas = (self.width, self.depth, self.height)
+        return Dimensions(
+            *(
+                sum(abs(fila[k]) * medidas[k] for k in range(3))
+                for fila in orientation.filas
+            )
+        )
 
 
 @dataclass(frozen=True, slots=True)

@@ -3,10 +3,10 @@ import unittest
 from blockcad_engine.geometry import LADRILLO, PLACA, STUD
 from blockcad_engine import (
     BlockEditor,
+    Orientation,
     CollisionError,
     GridPosition,
     MacroCommand,
-    Rotation,
     TransactionError,
 )
 
@@ -49,13 +49,17 @@ class HistoryTests(unittest.TestCase):
         part = self.editor.add(
             "brick_2x4",
             GridPosition(0, 0, 0),
-            rotation=Rotation.DEG_180,
+            orientation=Orientation.z(180),
         )
         self.editor.rotate_clockwise(part.instance_id)
-        self.assertEqual(self.editor.get(part.instance_id).rotation, Rotation.DEG_270)
+        self.assertEqual(
+            self.editor.get(part.instance_id).orientation, Orientation.z(270)
+        )
 
         self.editor.undo()
-        self.assertEqual(self.editor.get(part.instance_id).rotation, Rotation.DEG_180)
+        self.assertEqual(
+            self.editor.get(part.instance_id).orientation, Orientation.z(180)
+        )
 
     def test_undo_translate_restores_previous_position(self) -> None:
         part = self.editor.add("brick_2x4", GridPosition(0, 0, 0))

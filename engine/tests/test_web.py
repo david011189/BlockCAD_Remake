@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 import blockcad_web
-from blockcad_engine import GridPosition, Rotation, load_model, parse_model
+from blockcad_engine import GridPosition, Orientation, load_model, parse_model
 from blockcad_engine.geometry import LADRILLO, PLACA, STUD
 from blockcad_web.server import (
     EJEMPLO,
@@ -108,7 +108,7 @@ class ExportTests(unittest.TestCase):
             i for i in recuperado.instances if i.part_id == "brick_2x4"
         )
         self.assertEqual(ladrillo.position, GridPosition(1 * STUD, 2 * STUD, 3 * PLACA))
-        self.assertEqual(ladrillo.rotation, Rotation.DEG_90)
+        self.assertEqual(ladrillo.orientation, Orientation.z(90))
         self.assertEqual(ladrillo.color, "#457B9D")
         self.assertEqual(ladrillo.group, 2)
         self.assertEqual(ladrillo.step, 5)
@@ -119,7 +119,7 @@ class ExportTests(unittest.TestCase):
     def test_exported_json_uses_the_engine_format(self) -> None:
         datos = json.loads(compile_json("ladrillo 1x1 en 0,0,0")["json"])
         self.assertEqual(datos["format"], "blockcad-remake")
-        self.assertEqual(datos["version"], 2)
+        self.assertEqual(datos["version"], 3)
 
     def test_export_reports_errors_instead_of_raising(self) -> None:
         resultado = compile_json("ladrillo 2x4 en 0,0,0\nladrillo 1x1 en 1,1,0")
