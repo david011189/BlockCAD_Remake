@@ -6,8 +6,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from blockcad_engine import BlockCADError, BlockModel, DslError, parse_model
+from blockcad_engine.dsl import model_to_source
 from blockcad_engine.parts import PartCatalog
-from blockcad_engine.serialization import model_to_dict
+from blockcad_engine.serialization import model_from_dict, model_to_dict
 
 _HTML = Path(__file__).with_name("index.html")
 _VENDOR = Path(__file__).with_name("vendor")
@@ -95,6 +96,28 @@ def compile_json(source: str) -> dict:
     }
 
 
+def import_json(texto: str) -> dict:
+    """Convierte un modelo en JSON a código, para poder abrirlo en el editor.
+
+    Sin esto, el JSON que exporta el propio editor no se podría volver a
+    abrir con él.
+    """
+    try:
+        payload = json.loads(texto)
+    except json.JSONDecodeError as error:
+        return {"ok": False, "mensaje": f"El archivo no es JSON válido: {error}"}
+
+    if not isinstance(payload, dict):
+        return {"ok": False, "mensaje": "El archivo no es un modelo BlockCAD."}
+
+    try:
+        model = model_from_dict(payload)
+    except BlockCADError as error:
+        return {"ok": False, "mensaje": str(error)}
+
+    return {"ok": True, "codigo": model_to_source(model)}
+
+
 def catalog_summary() -> list[dict]:
     catalogo = PartCatalog.with_basic_parts()
     return [
@@ -157,17 +180,18 @@ class _Handler(BaseHTTPRequestHandler):
             self._send(404, b"No encontrado", "text/plain; charset=utf-8")
 
     def do_POST(self) -> None:
-        if self.path not in ("/api/modelo", "/api/json"):
+        rutas = {
+            "/api/modelo": compile_source,
+            "/api/json": compile_json,
+            "/api/importar": import_json,
+        }
+        accion = rutas.get(self.path)
+        if accion is None:
             self._send(404, b"No encontrado", "text/plain; charset=utf-8")
             return
 
         length = int(self.headers.get("Content-Length", 0))
-        source = self.rfile.read(length).decode("utf-8")
-
-        if self.path == "/api/modelo":
-            self._send_json(compile_source(source))
-        else:
-            self._send_json(compile_json(source))
+        self._send_json(accion(self.rfile.read(length).decode("utf-8")))
 
 
 def serve(port: int = 8765, *, open_browser: bool = True) -> None:

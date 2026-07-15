@@ -21,7 +21,7 @@ import re
 
 from .errors import BlockCADError, DslError
 from .geometry import GridPosition, Rotation
-from .model import BlockModel, PlacedPart
+from .model import DEFAULT_MODEL_NAME, BlockModel, PlacedPart
 from .parts import PartCatalog, validate_color
 
 #: Nombre en el lenguaje -> prefijo del identificador en el catálogo.
@@ -46,6 +46,12 @@ NAMED_COLORS = {
     "rosa": "#E5989B",
     "morado": "#7B2CBF",
 }
+
+#: Los inversos, para generar código a partir de un modelo.
+_PREFIX_NAMES = {prefijo: nombre for nombre, prefijo in PART_PREFIXES.items()}
+_COLOR_NAMES = {valor: nombre for nombre, valor in NAMED_COLORS.items()}
+
+_PART_ID_RE = re.compile(r"^(?P<prefijo>[a-z]+)_(?P<medida>\d+x\d+)$")
 
 _NAME_RE = re.compile(r'^modelo\s+"(?P<nombre>[^"]*)"\s*$')
 
@@ -279,12 +285,61 @@ def _run_block(
         index = body_end
 
 
+def _part_phrase(part_id: str) -> str:
+    match = _PART_ID_RE.match(part_id)
+    if match and match.group("prefijo") in _PREFIX_NAMES:
+        return f"{_PREFIX_NAMES[match.group('prefijo')]} {match.group('medida')}"
+    # Una pieza que no siga el patrón se escribe con su identificador tal cual;
+    # el lenguaje también los acepta.
+    return part_id
+
+
+def model_to_source(model: BlockModel) -> str:
+    """Genera código BlockCAD a partir de un modelo.
+
+    Es el camino de vuelta de `parse_model`, y permite abrir en el editor un
+    modelo guardado en JSON. Los identificadores de instancia no se escriben:
+    el código es la fuente, y el motor los vuelve a asignar al leerlo.
+    """
+    lines: list[str] = []
+
+    if model.name and model.name != DEFAULT_MODEL_NAME:
+        # El lenguaje no tiene escapes, así que unas comillas dentro del nombre
+        # romperían el código generado.
+        lines.append(f'modelo "{model.name.replace(chr(34), chr(39))}"')
+        lines.append("")
+
+    for item in model.instances:
+        partes = [
+            _part_phrase(item.part_id),
+            f"en {item.position.x},{item.position.y},{item.position.z}",
+        ]
+        if item.rotation != Rotation.DEG_0:
+            partes.append(f"rot {int(item.rotation)}")
+        partes.append(f"color {_COLOR_NAMES.get(item.color.upper(), item.color)}")
+        if item.group:
+            partes.append(f"grupo {item.group}")
+        if item.step:
+            partes.append(f"paso {item.step}")
+        if item.transparent:
+            partes.append("transparente")
+        lines.append(" ".join(partes))
+
+    return "\n".join(lines) + "\n"
+
+
 def parse_model(source: str, *, catalog: PartCatalog | None = None) -> BlockModel:
     """Traduce código BlockCAD a un modelo validado.
 
     Lanza `DslError` indicando la línea cuando el código no es válido o
     cuando el motor rechaza una pieza.
     """
+    if source.lstrip().startswith("{"):
+        raise DslError(
+            1,
+            "Esto parece un modelo guardado en JSON, no código BlockCAD.",
+        )
+
     lines = _read_lines(source)
     model = BlockModel(catalog=catalog)
 

@@ -6,7 +6,7 @@ from typing import Any
 
 from .errors import InvalidFormatError
 from .geometry import GridPosition, Rotation
-from .model import BlockModel
+from .model import DEFAULT_MODEL_NAME, BlockModel
 from .parts import PartCatalog
 
 
@@ -53,7 +53,7 @@ def model_from_dict(
 
     model = BlockModel(
         catalog=catalog or PartCatalog.with_basic_parts(),
-        name=str(payload.get("name", "Modelo sin título")),
+        name=str(payload.get("name", DEFAULT_MODEL_NAME)),
     )
 
     for data in payload.get("parts", []):

@@ -10,6 +10,7 @@ from blockcad_web.server import (
     EJEMPLO,
     compile_json,
     compile_source,
+    import_json,
     model_to_scene,
 )
 
@@ -129,6 +130,53 @@ class ExportTests(unittest.TestCase):
         self.assertEqual(len(json.loads(resultado["json"])["parts"]), 21)
 
 
+class ImportTests(unittest.TestCase):
+    """Abrir debe entender lo que este mismo editor escribe."""
+
+    def test_exported_json_can_be_opened_again(self) -> None:
+        # El recorrido que falla sin esto: Exportar JSON -> Nuevo -> Abrir.
+        exportado = compile_json(EJEMPLO)["json"]
+        importado = import_json(exportado)
+
+        self.assertTrue(importado["ok"], importado.get("mensaje"))
+        recuperado = compile_source(importado["codigo"])
+        self.assertTrue(recuperado["ok"], recuperado.get("mensaje"))
+        self.assertEqual(len(recuperado["piezas"]), 21)
+
+    def test_the_whole_round_trip_preserves_every_piece(self) -> None:
+        fuente = (
+            'modelo "Todo junto"\n'
+            "ladrillo 2x4 en 1,2,3 rot 90 color azul grupo 2 paso 5\n"
+            "baldosa 1x2 en 0,0,0 color #123456 transparente\n"
+            "placa 2x4 en 5,0,0 rot 180"
+        )
+        original = model_to_scene(parse_model(fuente))["piezas"]
+        vuelta = model_to_scene(
+            parse_model(import_json(compile_json(fuente)["json"])["codigo"])
+        )["piezas"]
+        self.assertEqual(original, vuelta)
+
+    def test_generated_code_keeps_the_model_name(self) -> None:
+        codigo = import_json(compile_json('modelo "Torre"\nladrillo 1x1 en 0,0,0')["json"])
+        self.assertIn('modelo "Torre"', codigo["codigo"])
+
+    def test_generated_code_uses_readable_names(self) -> None:
+        codigo = import_json(compile_json("ladrillo 2x4 en 0,0,0 color rojo")["json"])
+        self.assertIn("ladrillo 2x4 en 0,0,0 color rojo", codigo["codigo"])
+
+    def test_broken_json_is_reported_not_raised(self) -> None:
+        for basura in ("{esto no es json", "[]", '{"format": "otro"}', ""):
+            with self.subTest(basura=basura):
+                resultado = import_json(basura)
+                self.assertFalse(resultado["ok"])
+                self.assertIn("mensaje", resultado)
+
+    def test_pasting_json_as_code_explains_itself(self) -> None:
+        resultado = compile_source(compile_json("ladrillo 1x1 en 0,0,0")["json"])
+        self.assertFalse(resultado["ok"])
+        self.assertIn("JSON", resultado["mensaje"])
+
+
 class EditorTests(unittest.TestCase):
     """El editor no debe perder el trabajo del usuario."""
 
@@ -156,6 +204,15 @@ class EditorTests(unittest.TestCase):
         arrancar = self.html.split("async function arrancar()")[1]
         self.assertIn("guardado !== null", arrancar)
         self.assertNotIn("guardado.trim()", arrancar)
+
+    def test_opening_detects_json_and_converts_it(self) -> None:
+        manejador = self.html.split("entradaArchivo.addEventListener('change'")[1]
+        self.assertIn("startsWith('{')", manejador)
+        self.assertIn("/api/importar", manejador)
+
+    def test_the_file_picker_offers_json(self) -> None:
+        entrada = self.html.split('id="archivo"')[1].split(">")[0]
+        self.assertIn(".json", entrada)
 
     def test_replacing_the_code_asks_first(self) -> None:
         for boton in ("nuevo", "abrir", "ejemplo"):

@@ -125,14 +125,14 @@
   <div class="acciones">
     <span class="guardado" id="guardado">guardado</span>
     <button id="nuevo" title="Vaciar el editor para empezar un modelo nuevo">Nuevo</button>
-    <button id="abrir" title="Abrir un archivo .blockcad">Abrir</button>
+    <button id="abrir" title="Abrir un archivo .blockcad o un modelo .json">Abrir</button>
     <button id="guardar" title="Descargar el código como archivo .blockcad">Guardar</button>
     <button id="exportar" title="Descargar el modelo en el formato JSON del motor">Exportar JSON</button>
     <span class="separador"></span>
     <button id="ejemplo">Ejemplo</button>
     <button id="centrar">Centrar</button>
   </div>
-  <input type="file" id="archivo" accept=".blockcad,.txt" hidden>
+  <input type="file" id="archivo" accept=".blockcad,.json,.txt" hidden>
 </header>
 
 <main>
@@ -410,8 +410,22 @@ document.getElementById('abrir').addEventListener('click', () => {
 entradaArchivo.addEventListener('change', async () => {
   const archivo = entradaArchivo.files[0];
   if (!archivo) return;
-  const texto = await archivo.text();
+  let texto = await archivo.text();
   entradaArchivo.value = '';   // permite reabrir el mismo archivo
+
+  // Abrir debe entender lo que este mismo editor escribe, y eso incluye el
+  // JSON de "Exportar JSON". El servidor lo convierte de vuelta a código.
+  if (texto.trimStart().startsWith('{')) {
+    const respuesta = await fetch('/api/importar', { method: 'POST', body: texto });
+    const datos = await respuesta.json();
+    if (!datos.ok) {
+      estado.className = 'fallo';
+      estado.textContent = `No se pudo abrir ${archivo.name}: ${datos.mensaje}`;
+      return;
+    }
+    texto = datos.codigo;
+  }
+
   reemplazar(texto);
 });
 

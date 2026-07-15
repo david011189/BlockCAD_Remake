@@ -11,6 +11,9 @@ from .errors import (
 from .geometry import Bounds3D, GridPosition, Rotation
 from .parts import PartCatalog, PartDefinition, validate_color
 
+#: Nombre de un modelo al que nadie ha puesto uno.
+DEFAULT_MODEL_NAME = "Modelo sin título"
+
 
 @dataclass(frozen=True, slots=True)
 class PlacedPart:
@@ -61,7 +64,7 @@ class BlockModel:
         self,
         catalog: PartCatalog | None = None,
         *,
-        name: str = "Modelo sin título",
+        name: str = DEFAULT_MODEL_NAME,
     ) -> None:
         self.catalog = catalog or PartCatalog.with_basic_parts()
         self.name = name

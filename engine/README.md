@@ -42,7 +42,7 @@ vez; si vacías el editor con **Nuevo**, sigue vacío al volver.
 | Botón | Qué hace |
 |---|---|
 | **Nuevo** | Vacía el editor para empezar de cero. Pregunta antes de borrar. |
-| **Abrir** | Carga un archivo `.blockcad` desde tu disco. |
+| **Abrir** | Carga un `.blockcad` o un `.json` del motor. El JSON se convierte a código. |
 | **Guardar** | Descarga el código como `.blockcad`, con el nombre del modelo. |
 | **Exportar JSON** | Descarga el modelo en el formato del motor, el mismo que lee `load_model`. |
 | **Ejemplo** | Vuelve a cargar la casa de muestra. |
@@ -50,6 +50,11 @@ vez; si vacías el editor con **Nuevo**, sigue vacío al volver.
 
 El guardado automático vive en este navegador y en este equipo. Para
 conservar algo de verdad, usa **Guardar**.
+
+**Abrir** entiende los dos formatos que escribe el editor. Al abrir un JSON,
+el motor lo convierte de vuelta a código con `model_to_source`. Ojo: el JSON
+guarda piezas, no bucles, así que un `repetir` vuelve expandido en líneas
+sueltas; el modelo es el mismo, el código no.
 
 ## El lenguaje
 
