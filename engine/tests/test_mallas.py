@@ -128,6 +128,11 @@ class EncajeTests(unittest.TestCase):
             'catalogo "wedo"\nviga 7 en 0,0,0',
             'catalogo "wedo"\nviga 7 en 0,0,0 rot x 90',
             'catalogo "wedo"\n19071 en 0,0,0 rot z 180',
+            # Piezas enderezadas al cargar: su malla lleva un giro propio que
+            # se compone con el del constructor, y ahí es donde se falla.
+            'catalogo "wedo"\nladrillo 2x4 en 0,0,0',
+            'catalogo "wedo"\nladrillo 2x4 en 0,0,0 rot 90',
+            'catalogo "wedo"\nplaca 1x6 en 0,0,0 rot x 90',
         ):
             with self.subTest(codigo=codigo.splitlines()[-1]):
                 self.assertEqual(self._vertices_fuera(codigo), 0)

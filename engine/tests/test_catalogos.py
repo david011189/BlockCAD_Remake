@@ -56,6 +56,8 @@ class MeasurementTests(unittest.TestCase):
         cls.catalogo = cargar("wedo")
 
     def test_a_brick_is_a_brick(self) -> None:
+        # El nombre manda: "Brick 2 x 4" son 2 studs de ancho en X, aunque
+        # LDraw lo dibuje acostado. Igual que brick_2x4 en el catálogo básico.
         ladrillo = self.catalogo.get("3001")
         self.assertEqual(
             (
@@ -63,7 +65,7 @@ class MeasurementTests(unittest.TestCase):
                 ladrillo.dimensions.depth,
                 ladrillo.dimensions.height,
             ),
-            (4 * STUD, 2 * STUD, LADRILLO),
+            (2 * STUD, 4 * STUD, LADRILLO),
         )
 
     def test_the_studs_are_not_counted(self) -> None:
@@ -97,6 +99,72 @@ class MeasurementTests(unittest.TestCase):
                 self.assertGreater(definicion.dimensions.width, 0)
                 self.assertGreater(definicion.dimensions.depth, 0)
                 self.assertGreater(definicion.dimensions.height, 0)
+
+
+class ConventionTests(unittest.TestCase):
+    """El nombre manda: `brick_2x4` mide lo mismo en cualquier catálogo.
+
+    LDraw dibuja el lado largo en X y el catálogo del set hereda esa
+    orientación, así que sin la convención el mismo código colocaría las
+    piezas giradas según el catálogo elegido.
+    """
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.wedo = cargar("wedo")
+        cls.basico = PartCatalog.with_basic_parts()
+
+    def test_shared_aliases_measure_the_same(self) -> None:
+        compartidas = [
+            basica
+            for basica in self.basico.all()
+            if self.wedo.contains(basica.part_id)
+        ]
+        # Si el set dejara de traer piezas con nombre corto, esta prueba
+        # pasaría sin comprobar nada y nadie se enteraría.
+        self.assertGreaterEqual(len(compartidas), 4)
+        for basica in compartidas:
+            with self.subTest(pieza=basica.part_id):
+                real = self.wedo.get(basica.part_id)
+                self.assertEqual(real.dimensions, basica.dimensions)
+
+    def test_the_turned_studs_land_on_the_2x4_grid(self) -> None:
+        # Girar la caja sin girar las conexiones dejaría los studs fuera de
+        # la pieza. Esta es la malla de studs de un 2x4 de verdad.
+        ladrillo = self.wedo.get("brick_2x4")
+        studs = sorted(
+            c.punto for c in ladrillo.connections if c.tipo == "stud"
+        )
+        self.assertEqual(
+            studs,
+            [
+                (x, y, LADRILLO)
+                for x in (10, 30)
+                for y in (10, 30, 50, 70)
+            ],
+        )
+
+    def test_every_named_part_keeps_its_points_inside(self) -> None:
+        for definicion in self.wedo.all():
+            if definicion.category not in ("brick", "plate", "tile"):
+                continue
+            caja = definicion.dimensions
+            for conexion in definicion.connections:
+                with self.subTest(pieza=definicion.part_id, punto=conexion.punto):
+                    x, y, z = conexion.punto
+                    self.assertTrue(0 <= x <= caja.width)
+                    self.assertTrue(0 <= y <= caja.depth)
+                    self.assertTrue(0 <= z <= caja.height)
+
+    def test_the_base_of_the_house_builds_in_both_catalogs(self) -> None:
+        # Las dos primeras líneas del ejemplo del editor: dos ladrillos 2x4
+        # que se tocan sin chocar. Antes de la convención, en el catálogo
+        # wedo chocaban.
+        base = "ladrillo 2x4 en 0,0,0\nladrillo 2x4 en 2,0,0"
+        for encabezado in ("", 'catalogo "wedo"\n'):
+            with self.subTest(catalogo=encabezado.strip() or "basico"):
+                modelo = parse_model(encabezado + base)
+                self.assertEqual(len(modelo.instances), 2)
 
 
 class NamingTests(unittest.TestCase):

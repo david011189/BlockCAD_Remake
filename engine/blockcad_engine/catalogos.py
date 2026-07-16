@@ -19,7 +19,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from .errors import InvalidFormatError
-from .geometry import Connection, Dimensions
+from .geometry import STUD, Connection, Dimensions
 from .parts import PartCatalog, PartDefinition
 
 _DATOS = Path(__file__).parent / "datos"
@@ -68,17 +68,54 @@ _COLORES = {
 _GRIS_POR_DEFECTO = "#9BA19D"
 
 
-def _alias_y_categoria(nombre_ldraw: str) -> tuple[list[str], str]:
+def _alias_y_categoria(
+    nombre_ldraw: str,
+) -> tuple[list[str], str, tuple[int, ...]]:
     limpio = re.sub(r"\s+", " ", nombre_ldraw).strip()
     for patron, plantilla, categoria in _FAMILIAS:
         encontrado = patron.match(limpio)
         if encontrado:
-            return [plantilla.format(*encontrado.groups())], categoria
+            medidas = tuple(int(g) for g in encontrado.groups())
+            return [plantilla.format(*encontrado.groups())], categoria, medidas
     if limpio.startswith("Technic"):
-        return [], "technic"
+        return [], "technic", ()
     if limpio.startswith("Electric Power Functions"):
-        return [], "electronica"
-    return [], "otros"
+        return [], "electronica", ()
+    return [], "otros", ()
+
+
+def _viene_acostada(
+    medidas: tuple[int, ...], ancho: float, fondo: float
+) -> bool:
+    """True si la caja contradice al nombre: "2 x 4" con 4 studs en X.
+
+    LDraw dibuja el lado largo en X, así que un "Brick 2 x 4" llega midiendo
+    80x40. Pero el nombre manda: en un alias `brick_2x4`, el 2 es el ancho
+    en X, igual que en el catálogo básico. Si no, el mismo código colocaría
+    las piezas giradas según el catálogo elegido.
+    """
+    if len(medidas) != 2:
+        return False
+    n, m = medidas
+    return n != m and (ancho, fondo) == (m * STUD, n * STUD)
+
+
+def _giradas_90(conexiones, fondo: float) -> list[dict]:
+    """Las conexiones tras girar su pieza 90° sobre Z y reanclarla.
+
+    El mismo giro y el mismo reanclaje que hace el motor al girar una pieza
+    colocada: el punto (x, y) pasa a (fondo - y, x). La recta solo se gira;
+    una dirección no está en ningún sitio, así que no se reancla.
+    """
+    giradas = []
+    for c in conexiones:
+        x, y, z = c["punto"]
+        ax, ay, az = c.get("eje", (0.0, 0.0, 0.0))
+        girada = dict(c)
+        girada["punto"] = [fondo - y, x, z]
+        girada["eje"] = [-ay, ax, az]
+        giradas.append(girada)
+    return giradas
 
 
 def _color(colores: list[str]) -> str:
@@ -90,7 +127,18 @@ def _color(colores: list[str]) -> str:
 
 def _definicion(pieza: dict) -> PartDefinition:
     ancho, fondo, alto = pieza["caja_motor_ldu"]
-    aliases, categoria = _alias_y_categoria(pieza["nombre_ldraw"])
+    aliases, categoria, medidas = _alias_y_categoria(pieza["nombre_ldraw"])
+    conexiones = pieza.get("conexiones_motor", ())
+
+    # El nombre manda. Una pieza que LDraw dibuja acostada se endereza al
+    # cargarla —caja y conexiones a la vez, o los studs quedarían fuera— y se
+    # apunta el giro para que el visor gire su malla igual. El JSON no se
+    # toca: es LDraw tal cual, y quien lo regenere no tiene que saber esto.
+    malla_giro = {}
+    if _viene_acostada(medidas, ancho, fondo):
+        conexiones = _giradas_90(conexiones, fondo)
+        ancho, fondo = fondo, ancho
+        malla_giro = {"malla_giro": "90"}
 
     return PartDefinition(
         # El identificador es el número de molde de LEGO, que es el que sale
@@ -109,6 +157,7 @@ def _definicion(pieza: dict) -> PartDefinition:
             "ldraw": pieza["ldraw"],
             "nombre_lego": pieza.get("nombre_lego", ""),
             "cantidad_en_el_set": str(pieza.get("cantidad", 0)),
+            **malla_giro,
         },
         aliases=tuple(aliases),
         connections=tuple(
@@ -117,7 +166,7 @@ def _definicion(pieza: dict) -> PartDefinition:
                 tuple(round(v) for v in c["punto"]),
                 tuple(float(v) for v in c.get("eje", (0.0, 0.0, 0.0))),
             )
-            for c in pieza.get("conexiones_motor", ())
+            for c in conexiones
         ),
     )
 
