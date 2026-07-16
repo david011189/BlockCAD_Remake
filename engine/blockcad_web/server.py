@@ -285,7 +285,21 @@ class _Handler(BaseHTTPRequestHandler):
             return
 
         length = int(self.headers.get("Content-Length", 0))
-        self._send_json(accion(self.rfile.read(length).decode("utf-8")))
+        try:
+            texto = self.rfile.read(length).decode("utf-8")
+        except UnicodeDecodeError:
+            # Un cuerpo que no es UTF-8 —un archivo guardado con otra
+            # codificación, un cliente mal configurado— no puede tirar la
+            # petición sin respuesta: eso deja al navegador esperando y al
+            # usuario sin saber qué pasó.
+            self._send_json({
+                "ok": False,
+                "linea": None,
+                "mensaje": "El texto no llegó en UTF-8. Si es un archivo, "
+                "guárdalo con esa codificación y vuelve a abrirlo.",
+            })
+            return
+        self._send_json(accion(texto))
 
 
 def serve(port: int = 8765, *, open_browser: bool = True) -> None:

@@ -77,6 +77,29 @@ class CompileTests(unittest.TestCase):
         self.assertTrue(resultado["ok"], resultado.get("mensaje"))
         self.assertEqual(len(resultado["piezas"]), 21)
 
+    def test_a_non_utf8_body_gets_an_answer_not_a_crash(self) -> None:
+        """Un cuerpo mal codificado debe responder, no reventar la petición.
+
+        Lo encontró un acento: «Transmisión» enviado en latin-1 tiraba el
+        hilo con un UnicodeDecodeError y el navegador se quedaba esperando
+        una respuesta que nunca llegaba.
+        """
+        import io
+
+        from blockcad_web.server import _Handler
+
+        handler = _Handler.__new__(_Handler)
+        handler.path = "/api/modelo"
+        handler.headers = {"Content-Length": "5"}
+        handler.rfile = io.BytesIO("adiós".encode("latin-1"))
+        respuestas = []
+        handler._send_json = respuestas.append
+        handler.do_POST()
+        self.assertEqual(len(respuestas), 1)
+        self.assertFalse(respuestas[0]["ok"])
+        self.assertIn("UTF-8", respuestas[0]["mensaje"])
+
+
 
 class SeleccionTests(unittest.TestCase):
     """Pinchar una pieza tiene que llevar a su línea de código.
