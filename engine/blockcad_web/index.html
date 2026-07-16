@@ -240,7 +240,7 @@ ladrillo 2x4 en 2,0,0 color amarillo'></textarea>
   <section class="visor">
     <canvas id="lienzo"></canvas>
     <div id="paleta" hidden></div>
-    <div class="pista">Arrastra para girar · rueda para acercar · clic en una pieza para ver su línea · clic derecho la quita · arrastrar con el derecho desplaza</div>
+    <div class="pista">Arrastra para girar · rueda para acercar · clic en una pieza para ver su línea · clic derecho: girar o desconectar · arrastrar con el derecho desplaza</div>
   </section>
 </main>
 
@@ -685,8 +685,9 @@ lienzo.addEventListener('pointermove', (evento) => {
 });
 
 addEventListener('keydown', (evento) => {
-  if (evento.key === 'Escape' && (armada || modoQuitar)) {
-    desarmar(); modoQuitar = false; decir('');
+  if (evento.key === 'Escape') {
+    cerrarMenu();
+    if (armada || modoQuitar) { desarmar(); modoQuitar = false; decir(''); }
   }
 });
 
@@ -695,6 +696,63 @@ addEventListener('keydown', (evento) => {
 let apretado = null;
 
 lienzo.addEventListener('contextmenu', (evento) => evento.preventDefault());
+
+// El menu del clic derecho: dos verbos sobre la pieza pinchada. Vive en el
+// DOM normal y las opciones EDITAN EL CODIGO, como todo lo demas.
+const menuCtx = document.createElement('div');
+menuCtx.style.cssText = 'position:fixed;z-index:10;display:none;background:#171a21;' +
+  'border:1px solid #2a3040;border-radius:8px;padding:4px;min-width:150px;';
+const opcionGirar = document.createElement('button');
+opcionGirar.textContent = 'girar 90°';
+const opcionQuitar = document.createElement('button');
+opcionQuitar.textContent = 'desconectar';
+for (const b of [opcionGirar, opcionQuitar]) {
+  b.style.cssText = 'display:block;width:100%;text-align:left;margin:2px 0;';
+  menuCtx.append(b);
+}
+document.body.append(menuCtx);
+let piezaDelMenu = null;
+
+function cerrarMenu() { menuCtx.style.display = 'none'; piezaDelMenu = null; }
+
+opcionQuitar.addEventListener('click', () => {
+  if (piezaDelMenu) borrar(String(piezaDelMenu.linea));
+  cerrarMenu();
+});
+
+opcionGirar.addEventListener('click', async () => {
+  if (!piezaDelMenu) return cerrarMenu();
+  const numero = piezaDelMenu.linea;
+  cerrarMenu();
+  const lineas = areaCodigo.value.split('\n');
+  const vieja = lineas[numero - 1];
+  // Si la linea acaba en un giro de siempre (sobre z), se avanza el angulo
+  // en vez de encadenar `rot 90` tras `rot 90`: el codigo queda legible.
+  const acaba = vieja.match(/^(.*?)\s+rot\s+(90|180|270)\s*$/);
+  let nueva;
+  if (acaba) {
+    const grados = (parseInt(acaba[2], 10) + 90) % 360;
+    nueva = grados ? `${acaba[1]} rot ${grados}` : acaba[1];
+  } else {
+    nueva = `${vieja} rot 90`;
+  }
+  lineas[numero - 1] = nueva;
+  const propuesta = lineas.join('\n');
+  // Validar antes de tocar: si girada choca, el codigo queda intacto.
+  const respuesta = await fetch('/api/modelo', { method: 'POST', body: propuesta });
+  const datos = await respuesta.json();
+  if (!datos.ok) {
+    decir(`Girada choca: ${datos.mensaje}`, 'fallo');
+    return;
+  }
+  registrar();
+  aplicar(propuesta);
+  decir(`Girada la pieza de la línea ${numero}.`, 'hecho');
+});
+
+addEventListener('pointerdown', (evento) => {
+  if (!menuCtx.contains(evento.target)) cerrarMenu();
+});
 
 lienzo.addEventListener('pointerdown', (evento) => {
   apretado = { x: evento.clientX, y: evento.clientY };
@@ -715,7 +773,12 @@ lienzo.addEventListener('pointerup', (evento) => {
     rayo.setFromCamera(puntero, camara);
     const tocada = rayo.intersectObjects(dibujadas.map((d) => d.cuerpo), false)[0];
     const cual = tocada ? dibujadas[tocada.object.userData.pieza] : null;
-    if (cual && cual.linea != null) borrar(String(cual.linea));
+    if (cual && cual.linea != null) {
+      piezaDelMenu = cual;
+      menuCtx.style.left = evento.clientX + 'px';
+      menuCtx.style.top = evento.clientY + 'px';
+      menuCtx.style.display = 'block';
+    }
     return;
   }
 

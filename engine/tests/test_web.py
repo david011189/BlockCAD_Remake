@@ -133,8 +133,9 @@ class PaletaTests(unittest.TestCase):
 
     def test_escape_disarms(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
-        # Esc cancela tanto el soltado como el modo quitar.
-        self.assertIn("evento.key === 'Escape' && (armada || modoQuitar)", html)
+        # Esc cancela el soltado, el modo quitar y el menú contextual.
+        self.assertIn("if (evento.key === 'Escape') {", html)
+        self.assertIn("cerrarMenu();", html)
 
 class InventarioTests(unittest.TestCase):
     """Usar más copias de un molde que la caja se avisa, no se rechaza."""
@@ -171,13 +172,21 @@ class InventarioTests(unittest.TestCase):
         quitar = html.split("if (modoQuitar) {")[1].split("return;")[0]
         self.assertIn("borrar(String(pieza.linea))", quitar)
 
-    def test_right_click_removes_through_the_console(self) -> None:
-        # Clic derecho quieto = quitar la pieza (su linea, con deshacer);
-        # arrastrar con el derecho sigue desplazando la camara.
+    def test_right_click_opens_the_menu(self) -> None:
+        # Clic derecho quieto abre el menu de la pieza; arrastrar con el
+        # derecho sigue desplazando la camara.
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         rama = html.split("if (evento.button === 2) {")[1].split("return;")[0]
-        self.assertIn("borrar(String(cual.linea))", rama)
+        self.assertIn("piezaDelMenu = cual", rama)
         self.assertIn("contextmenu", html)
+
+    def test_the_menu_options_edit_the_code(self) -> None:
+        # Desconectar borra la linea por la consola; girar valida la linea
+        # girada ANTES de aplicarla: si choca, el codigo queda intacto.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        girar = html.split("opcionGirar.addEventListener")[1].split("addEventListener('pointerdown'")[0]
+        self.assertIn("borrar(String(piezaDelMenu.linea))", html)
+        self.assertLess(girar.index("fetch('/api/modelo'"), girar.index("aplicar(propuesta)"))
 
     def test_the_footer_reports_it(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
