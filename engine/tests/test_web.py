@@ -135,6 +135,32 @@ class PaletaTests(unittest.TestCase):
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn("evento.key === 'Escape' && armada", html)
 
+class InventarioTests(unittest.TestCase):
+    """Usar más copias de un molde que la caja se avisa, no se rechaza."""
+
+    def test_two_motors_overdraw_the_box(self) -> None:
+        escena = compile_source('catalogo "wedo"\n21980 en 0,0,0\n21980 en 5,0,0')
+        self.assertEqual(
+            escena["agotadas"],
+            [{"pieza": "21980",
+              "nombre": "Electric Power Functions 2.0 Medium Motor",
+              "usadas": 2, "hay": 1}],
+        )
+
+    def test_within_the_box_nothing_is_said(self) -> None:
+        escena = compile_source('catalogo "wedo"\n21980 en 0,0,0')
+        self.assertEqual(escena["agotadas"], [])
+
+    def test_the_basic_catalog_has_no_inventory(self) -> None:
+        # Las siete piezas idealizadas no vienen de ninguna caja.
+        escena = compile_source("ladrillo 2x4 en 0,0,0")
+        self.assertEqual(escena["agotadas"], [])
+
+    def test_the_footer_reports_it(self) -> None:
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("datos.agotadas", html)
+        self.assertIn("la caja trae", html)
+
 
 class SeleccionTests(unittest.TestCase):
     """Pinchar una pieza tiene que llevar a su línea de código.

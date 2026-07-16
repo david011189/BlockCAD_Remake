@@ -589,7 +589,8 @@ async function abrirPaleta() {
   const datos = await respuesta.json();
   paleta.replaceChildren(...datos.piezas.map((pieza) => {
     const boton = document.createElement('button');
-    boton.textContent = pieza.escritura;
+    boton.textContent = pieza.cantidad
+      ? `${pieza.escritura}  ×${pieza.cantidad}` : pieza.escritura;
     boton.title = pieza.nombre;
     boton.addEventListener('click', () => armar(pieza, boton));
     return boton;
@@ -790,7 +791,12 @@ async function compilar() {
     const f = datos.flotantes;
     texto += ` · ${f} ${f === 1 ? 'pieza' : 'piezas'} en el aire`;
   }
-  estado.className = datos.flotantes ? 'aviso' : '';
+  // El inventario real: usar mas copias de un molde de las que trae la caja
+  // se avisa —quiza hay dos cajas— pero no se calla.
+  for (const a of datos.agotadas || []) {
+    texto += ` · ${a.pieza}: usas ${a.usadas} y la caja trae ${a.hay}`;
+  }
+  estado.className = (datos.flotantes || (datos.agotadas || []).length) ? 'aviso' : '';
   estado.textContent = texto;
 
   if (primeraVez && n) {

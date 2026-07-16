@@ -151,7 +151,30 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
         "nombre": model.name,
         "piezas": piezas,
         "flotantes": len(flotantes),
+        # Se avisa, no se rechaza: quizá hay dos cajas. Solo cuentan las
+        # piezas cuyo catálogo declara cuántas trae el set.
+        "agotadas": _sobreuso(model),
     }
+
+
+def _sobreuso(model: BlockModel) -> list[dict]:
+    """Qué moldes usa el modelo por encima de lo que trae la caja."""
+    usadas: dict[str, int] = {}
+    for item in model.instances:
+        usadas[item.part_id] = usadas.get(item.part_id, 0) + 1
+
+    agotadas = []
+    for part_id, cuantas in sorted(usadas.items()):
+        definicion = model.catalog.get(part_id)
+        hay = definicion.metadata.get("cantidad_en_el_set")
+        if hay and cuantas > int(hay):
+            agotadas.append({
+                "pieza": part_id,
+                "nombre": definicion.name,
+                "usadas": cuantas,
+                "hay": int(hay),
+            })
+    return agotadas
 
 
 def compile_source(source: str) -> dict:
@@ -221,6 +244,7 @@ def piezas_para_soltar(texto: str) -> dict:
             "fondo": definicion.dimensions.depth,
             "alto": definicion.dimensions.height,
             "color": definicion.default_color,
+            "cantidad": int(definicion.metadata.get("cantidad_en_el_set", 0)),
         })
     piezas.sort(key=lambda p: (p["categoria"], p["escritura"]))
     return {"piezas": piezas}
