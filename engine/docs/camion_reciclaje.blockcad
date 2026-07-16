@@ -1,0 +1,91 @@
+catalogo "wedo"
+modelo "Camion de reciclaje"
+
+// Transcripcion de las instrucciones oficiales de LEGO Education (36 laminas).
+// Se construye lo que el motor sabe representar; lo que no, queda anotado
+// donde va, con su pieza y su porque.
+
+// ---------- La cabina motorizada (pasos 1 a 15) ----------
+
+// Paso 1: la base naranja con el ladrillo de agujeros encima.
+3001 en 0,0,0 rot 90 color naranja llamado base
+3701 en 0,0,3 rot 90 color verde llamado soporte
+
+// Paso 2: dos pines con friccion, metidos en los agujeros de los extremos.
+// El paso que descubrio las inserciones: para el motor de entonces, esto
+// era un choque.
+2780 en el agujero 1 de soporte color negro
+2780 en el agujero 3 de soporte color negro
+
+// Paso 3: el ladrillo-guia bajo la cola del motor, y el motor encima.
+3700 en 0,1,3 rot 90 color verde llamado guia
+21980 en -1.5,-1,6 rot 270 color blanco llamado motor
+
+// Paso 4: el eje con tope entra por la boca del motor (agujero 3, de cruz)
+// y la rueda de 8 dientes se encaja en la punta que asoma.
+87083 en el agujero 3 de motor desplazado -2 llamado eje_motor
+10928 en el eje de eje_motor desplazado -2 color gris llamado pinon
+
+// Paso 5: el primer ladrillo negro sobre los studs del motor.
+3003 en -1.5,-0.5,13 color negro
+
+// Paso 8: el segundo ladrillo de agujeros, cruzado delante del morro. No
+// se apoya en nada: cuelga del eje del motor, que pasa por su agujero 1.
+3701 en -2.5,-0.5,8 color verde llamado torre
+
+// PARED (pasos 6, 7, 9 y 10): el tren de volcado no se puede representar.
+//  - 24505, la rueda de 24 dientes: LDraw no declara su agujero de eje, asi
+//    que el catalogo la carga sin conexiones. No puede recibir su eje ni
+//    demostrar que muerde con el pinon (8+24 a dos modulos, pareja legal).
+//  - Sin la de 24, el eje largo (3737), los conectores angulares turquesa
+//    (42127), los ejes 3 y los medios bujes (42136) que cuelgan de el se
+//    quedan sin donde ir.
+
+// Paso 13: la placa Technic naranja de remate, sobre el ladrillo negro.
+3709 en -1.5,-0.5,16 rot 90 color naranja llamado remate
+
+// Pasos 11-15: el hub se conecta y se monta atras, sobre el motor.
+19071 en -1.5,-1,17 rot 270 color blanco llamado hub
+
+// PARED (pasos 16 a 19): los ganchos de remolque.
+//  - 57909 (ladrillo con bola) y 92013 (ladrillo con cazoleta): LDraw solo
+//    declara sus studs. La bola y la cazoleta no existen como conexiones,
+//    asi que encajarlos seria un solape ilegal para el motor.
+//  - Los ojos (16424) y la teja curva si se podrian poner; van sobre las
+//    piezas anteriores, asi que caen con ellas.
+
+// ---------- El bastidor volcador (pasos 22 a 31) ----------
+// Un marco en U que se arrastra por el suelo. Se construye aparte, a la
+// izquierda del camion (x negativa, lejos de la cabina).
+
+// Pasos 24 y 27: cada riel es un 1x8 y un 1x16 en linea, sobre el suelo.
+3702 en -20,0,0 color verde llamado riel_izq_corto
+3703 en -20,8,0 color verde llamado riel_izq_largo
+3702 en -13,0,0 color verde llamado riel_der_corto
+3703 en -13,8,0 color verde llamado riel_der_largo
+
+// Paso 22: la placa Technic 2x8 puentea los extremos de los rieles, y el
+// ladrillo naranja va cruzado encima.
+3738 en -20,0,3 rot 90 color verde llamado travesano
+3001 en -17,-0.5,4 color naranja llamado tope
+
+// Paso 23: los dos ladrillos-palanca en los extremos, con su cruz mirando
+// por los rieles. Son la bisagra: en plastico, por aqui entra el brazo.
+31493 en -20,0,4 rot 90 color verde llamado bisagra_izq
+31493 en -14,0,4 rot 90 color verde llamado bisagra_der
+
+// Paso 26: las placas blancas cosen la junta de cada riel.
+3666 en -20,5,3 color blanco
+3666 en -13,5,3 color blanco
+
+// Paso 25: la barra gris cruzada sobre el tope naranja, con la baldosa
+// redonda de pivote. En ella se anudan las cadenas.
+4282 en -20.5,-0.5,7 rot 90 color gris llamado barra
+15535 en -12.5,-1,8 color blanco llamado pivote
+
+// Paso 31: los cuatro platos redondos van POR DEBAJO de las esquinas, como
+// patines. El motor no sabe pegar nada boca abajo: quedan pendientes.
+
+// PARED (pasos 32 y 33): las dos cadenas con bola que unen el bastidor a
+// las cazoletas del camion. La cadena no tiene forma fija: es la exclusion
+// mas vieja del catalogo (277 de 280), y no va a cambiar.

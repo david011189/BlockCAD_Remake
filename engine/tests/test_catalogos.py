@@ -186,7 +186,10 @@ class ConventionTests(unittest.TestCase):
             (ladrillo.dimensions.width, ladrillo.dimensions.depth),
             (1 * STUD, 4 * STUD),
         )
-        for numero in ("3700", "3701", "3702", "3703", "3895", "31493"):
+        for numero in (
+            "3700", "3701", "3702", "3703", "3895", "31493",  # ladrillos
+            "3709", "3738", "32001",  # placas Technic, también NxM
+        ):
             with self.subTest(pieza=numero):
                 pieza = self.wedo.get(numero)
                 self.assertLess(pieza.dimensions.width, pieza.dimensions.depth)

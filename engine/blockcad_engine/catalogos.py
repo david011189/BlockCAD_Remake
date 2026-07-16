@@ -68,11 +68,12 @@ _COLORES = {
 _GRIS_POR_DEFECTO = "#9BA19D"
 
 
-#: Ladrillos Technic con nombre NxM. No ganan alias —se escriben por su
-#: número de molde, como en las instrucciones—, pero su postura también la
-#: manda el nombre: un "Technic Brick 1 x 4" tiene 1 stud de ancho en X.
+#: Ladrillos y placas Technic con nombre NxM. No ganan alias —se escriben
+#: por su número de molde, como en las instrucciones—, pero su postura
+#: también la manda el nombre: un "Technic Brick 1 x 4" tiene 1 stud de
+#: ancho en X.
 _LADRILLO_TECHNIC = re.compile(
-    r"^Technic Brick (\d+) x (\d+) with (?:Holes?|Axlehole)"
+    r"^Technic (?:Brick|Plate) (\d+) x (\d+) with (?:Holes?|Axlehole)"
 )
 
 
