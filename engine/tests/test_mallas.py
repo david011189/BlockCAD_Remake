@@ -180,6 +180,25 @@ class VisorTests(unittest.TestCase):
         limpiar = self.html.split("function limpiar(")[1].split("\n}")[0]
         self.assertIn("userData.compartida", limpiar)
 
+    def test_the_pieces_have_edges(self) -> None:
+        """Sin bordes, una pared de ladrillos se ve como un bloque liso.
+
+        Dos piezas del mismo color pegadas son caras coplanares con la misma
+        luz: nada las separa. El sombreado no basta, por muy real que sea la
+        malla.
+        """
+        self.assertIn("new THREE.EdgesGeometry(geometria, 30)", self.html)
+
+    def test_the_edges_are_computed_once_per_part(self) -> None:
+        # Un hub tiene 6.348 triángulos: calcular sus aristas por cada copia
+        # sería tirar el tiempo. Van con la malla, que ya se cachea.
+        pedir = self.html.split("async function pedirMallas(")[1].split("\n}")[0]
+        self.assertIn("EdgesGeometry", pedir)
+
+    def test_the_edges_adapt_to_the_piece(self) -> None:
+        # Un borde negro sobre una pieza negra no dibuja nada.
+        self.assertIn("oscura ? 0xaab3c4", self.html)
+
     def test_both_faces_are_drawn(self) -> None:
         """Sin esto las piezas se ven huecas, como tubos rotos.
 

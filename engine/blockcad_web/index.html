@@ -307,7 +307,16 @@ async function pedirMallas(nombres) {
     );
     // LDraw no trae normales; se calculan una vez por pieza, no por copia.
     geometria.computeVertexNormals();
-    mallas.set(nombre, geometria);
+
+    // Los bordes, para que dos piezas del mismo color pegadas no parezcan una
+    // sola. El umbral de 30 grados deja fuera los tramos de un cilindro
+    // —los studs se tesela en trozos de unos 22 grados— y se queda con las
+    // aristas de verdad. Se calcula una vez por pieza, no por copia: en un
+    // hub son 6.348 triángulos.
+    mallas.set(nombre, {
+      cuerpo: geometria,
+      bordes: new THREE.EdgesGeometry(geometria, 30),
+    });
   }
 }
 
@@ -354,26 +363,35 @@ function construir(piezas) {
       side: THREE.DoubleSide,
     });
 
-    const geometria = mallas.get(p.malla);
-    if (geometria) {
+    const malla = mallas.get(p.malla);
+    if (malla) {
       // La pieza de verdad. El servidor manda la matriz y el origen ya
       // compuestos, así que aquí solo hay que aplicarlos.
-      const cuerpo = new THREE.Mesh(geometria, material);
-      cuerpo.userData.compartida = true;
-      cuerpo.matrixAutoUpdate = false;
-      const m = p.matriz;
-      const o = p.origen;
-      cuerpo.matrix.set(
-        m[0][0], m[0][1], m[0][2], o[0],
-        m[1][0], m[1][1], m[1][2], o[1],
-        m[2][0], m[2][1], m[2][2], o[2],
-        0, 0, 0, 1,
-      );
-      modelo.add(cuerpo);
+      const colocar = (objeto) => {
+        objeto.userData.compartida = true;
+        objeto.matrixAutoUpdate = false;
+        const m = p.matriz;
+        const o = p.origen;
+        objeto.matrix.set(
+          m[0][0], m[0][1], m[0][2], o[0],
+          m[1][0], m[1][1], m[1][2], o[1],
+          m[2][0], m[2][1], m[2][2], o[2],
+          0, 0, 0, 1,
+        );
+        modelo.add(objeto);
+      };
 
-      // Una malla con sus studs y su sombreado ya se distingue sola, así que
-      // el contorno se reserva para lo que hay que señalar.
-      if (p.flotante) marcarEnElAire(p);
+      colocar(new THREE.Mesh(malla.cuerpo, material));
+
+      // Los bordes no son adorno: dos piezas del mismo color pegadas son
+      // caras coplanares con la misma luz, así que sin ellos una pared de
+      // ladrillos se ve como un bloque liso. Y son también lo que hace que
+      // una pieza oscura se despegue del fondo.
+      colocar(new THREE.LineSegments(malla.bordes, new THREE.LineBasicMaterial({
+        color: p.flotante ? 0xe0a458 : (oscura ? 0xaab3c4 : 0x1a1d24),
+        transparent: true,
+        opacity: p.flotante ? 0.95 : (oscura ? 0.5 : 0.35),
+      })));
       continue;
     }
 
@@ -396,17 +414,6 @@ function construir(piezas) {
   }
 }
 
-// Una pieza en el aire se rodea de ámbar. No es un error, así que no va en
-// rojo: se avisa y se deja construir.
-function marcarEnElAire(p) {
-  const caja = new THREE.BoxGeometry(p.ancho, p.fondo, p.alto);
-  const marca = new THREE.LineSegments(
-    new THREE.EdgesGeometry(caja),
-    new THREE.LineBasicMaterial({ color: 0xe0a458, transparent: true, opacity: 0.95 }),
-  );
-  marca.position.set(p.x + p.ancho / 2, p.y + p.fondo / 2, p.z + p.alto / 2);
-  modelo.add(marca);
-}
 
 function centrar() {
   if (!modelo.children.length) return;
