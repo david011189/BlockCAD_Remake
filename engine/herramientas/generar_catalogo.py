@@ -174,12 +174,35 @@ def conexiones_en_ejes_del_motor(pieza) -> list[dict]:
         )
         # Un punto por encima del techo es el propio stud sobresaliendo: no
         # es una conexión más, es el mismo sitio visto desde fuera.
-        vistos[(conexion.tipo, punto)] = None
+        vistos[(conexion.tipo, punto, _eje_en_ejes_del_motor(conexion.eje))] = None
 
     return [
-        {"tipo": tipo, "punto": list(punto)}
-        for tipo, punto in sorted(vistos, key=lambda v: (v[0], v[1]))
+        {"tipo": tipo, "punto": list(punto), "eje": list(eje)}
+        for tipo, punto, eje in sorted(vistos, key=lambda v: (v[0], v[1], v[2]))
     ]
+
+
+def _eje_en_ejes_del_motor(eje) -> tuple[float, float, float]:
+    """La dirección de LDraw pasada a los ejes del motor, y sin sentido.
+
+    El cambio de ejes es el mismo que el de los puntos: LDraw mide la vertical
+    en Y hacia abajo y el motor en Z hacia arriba, así que (x, y, z) de LDraw
+    es (x, z, -y) aquí.
+
+    El sentido se descarta a propósito: lo que hace falta es la RECTA, no la
+    flecha. Un pin es una sola conexión aunque LDraw lo dibuje con dos mitades
+    que miran a lados opuestos, y meterlo por un lado o por el otro es la misma
+    inserción. Se elige un sentido canónico —el primer componente no nulo,
+    positivo— para que las dos mitades se reconozcan como lo que son: una.
+    """
+    x, y, z = round(eje.x, 4), round(eje.z, 4), round(-eje.y, 4)
+    for componente in (x, y, z):
+        if abs(componente) > 1e-6:
+            if componente < 0:
+                x, y, z = -x, -y, -z
+            break
+    # El `+ 0.0` evita que quede un -0.0, que se imprime distinto y compara igual.
+    return (round(x + 0.0, 4), round(y + 0.0, 4), round(z + 0.0, 4))
 
 
 def describir(biblioteca: Biblioteca, numero: str) -> dict | None:

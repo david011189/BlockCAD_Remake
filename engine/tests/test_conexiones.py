@@ -21,9 +21,9 @@ class WorldConnectionTests(unittest.TestCase):
     def _puntos(self, pieza, tipo=None):
         definicion = self.model.catalog.get(pieza.part_id)
         return sorted(
-            punto
-            for t, punto in pieza.world_connections(definicion)
-            if tipo is None or t == tipo
+            c.punto
+            for c in pieza.world_connections(definicion)
+            if tipo is None or c.tipo == tipo
         )
 
     def test_a_brick_has_its_studs_on_top(self) -> None:
@@ -50,10 +50,10 @@ class WorldConnectionTests(unittest.TestCase):
                 )
                 definicion = modelo.catalog.get("32524")
                 caja = pieza.bounds(definicion)
-                for _, punto in pieza.world_connections(definicion):
-                    self.assertTrue(caja.min_x <= punto[0] <= caja.max_x)
-                    self.assertTrue(caja.min_y <= punto[1] <= caja.max_y)
-                    self.assertTrue(caja.min_z <= punto[2] <= caja.max_z)
+                for c in pieza.world_connections(definicion):
+                    self.assertTrue(caja.min_x <= c.punto[0] <= caja.max_x)
+                    self.assertTrue(caja.min_y <= c.punto[1] <= caja.max_y)
+                    self.assertTrue(caja.min_z <= c.punto[2] <= caja.max_z)
 
     def test_a_beam_is_pierced_by_its_holes(self) -> None:
         # Los agujeros salen por las dos caras. Eso no es un duplicado: es lo

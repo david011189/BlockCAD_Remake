@@ -112,7 +112,11 @@ def _definicion(pieza: dict) -> PartDefinition:
         },
         aliases=tuple(aliases),
         connections=tuple(
-            Connection(c["tipo"], tuple(round(v) for v in c["punto"]))
+            Connection(
+                c["tipo"],
+                tuple(round(v) for v in c["punto"]),
+                tuple(float(v) for v in c.get("eje", (0.0, 0.0, 0.0))),
+            )
             for c in pieza.get("conexiones_motor", ())
         ),
     )

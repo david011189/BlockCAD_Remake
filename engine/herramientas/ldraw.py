@@ -128,10 +128,40 @@ class Matriz:
         )
 
 
+def _eje_de(m: "Matriz") -> Punto:
+    """Hacia dónde mira una primitiva ya colocada.
+
+    Toda primitiva de LDraw se dibuja a lo largo de su +Y local —un agujero es
+    un cilindro en Y, un pin también—, así que su eje en el mundo es la segunda
+    columna de la matriz: lo que le pasa al vector (0,1,0) al transformarlo.
+
+    Se normaliza porque una matriz de LDraw puede escalar: un agujero más largo
+    se dibuja estirando la misma primitiva, y lo que hace falta es la dirección,
+    no el tamaño.
+    """
+    x, y, z = m.b, m.e, m.h
+    largo = (x * x + y * y + z * z) ** 0.5
+    if largo < 1e-9:
+        return Punto(0.0, 0.0, 0.0)
+    return Punto(round(x / largo, 4), round(y / largo, 4), round(z / largo, 4))
+
+
 @dataclass
 class Conexion:
+    """Un sitio por donde se une una pieza, y hacia dónde mira.
+
+    La dirección no es un adorno: un punto no dice si algo está insertado. Un
+    pin metido en un agujero son dos rectas que coinciden, no dos puntos que
+    coinciden. Sin el eje, el motor no puede distinguir una unión de un choque.
+
+    Y no se puede deducir de la caja de la pieza: en el ladrillo 44865 el pin
+    sale de lado y no a lo largo, así que «la dimensión más larga» daría un eje
+    falso sin que saltara ningún error. La matriz de LDraw lo dice bien.
+    """
+
     tipo: str
     punto: Punto
+    eje: Punto
 
 
 @dataclass
@@ -264,7 +294,11 @@ class Biblioteca:
                 tipo = CONEXIONES.get(subarchivo.split("/")[-1].lower())
                 if tipo is not None:
                     pieza.conexiones.append(
-                        Conexion(tipo, Punto(completa.x, completa.y, completa.z))
+                        Conexion(
+                            tipo,
+                            Punto(completa.x, completa.y, completa.z),
+                            _eje_de(completa),
+                        )
                     )
 
                 if self.existe(subarchivo):

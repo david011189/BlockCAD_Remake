@@ -8,11 +8,103 @@ from .errors import (
     DuplicateInstanceError,
     InstanceNotFoundError,
 )
-from .geometry import Bounds3D, GridPosition, Orientation
+from .geometry import Bounds3D, Connection, GridPosition, Orientation
 from .parts import PartCatalog, PartDefinition, validate_color
 
 #: Nombre de un modelo al que nadie ha puesto uno.
 DEFAULT_MODEL_NAME = "Modelo sin título"
+
+#: Cuánto puede desviarse una recta girada de otra para considerarlas la misma.
+#: Los giros del motor son de cuartos de vuelta con matrices de enteros, así
+#: que una recta cae exacta o cae lejos; el margen es para la aritmética con
+#: decimales, no para perdonar piezas mal puestas.
+_MARGEN_RECTA = 1e-6
+
+
+@dataclass(frozen=True, slots=True)
+class WorldConnection:
+    """Un punto de conexión ya girado y puesto en el mundo."""
+
+    tipo: str
+    punto: tuple[int, int, int]
+    eje: tuple[float, float, float]
+
+    @property
+    def es_macho(self) -> bool:
+        return self.tipo in Connection.MACHOS
+
+    @property
+    def es_hembra(self) -> bool:
+        return self.tipo in Connection.HEMBRAS
+
+    def misma_recta_que(self, otra: "WorldConnection") -> bool:
+        """¿Son las dos la misma recta en el espacio?
+
+        Dos rectas son la misma si apuntan igual y además pasan por el mismo
+        sitio. Lo segundo es lo que se olvida: dos agujeros paralelos de una
+        viga apuntan igual y no son el mismo agujero.
+        """
+        if not _paralelas(self.eje, otra.eje):
+            return False
+        # Pasan por el mismo sitio si lo que las separa va en su dirección.
+        entre = tuple(a - b for a, b in zip(self.punto, otra.punto))
+        return _paralelas(entre, self.eje) or not any(entre)
+
+
+def _hay_insercion(
+    unas: tuple[WorldConnection, ...], otras: tuple[WorldConnection, ...]
+) -> bool:
+    """¿Hay un macho de un lado metido por un agujero del otro?
+
+    Es la misma pregunta que responde si dos piezas están unidas y si su
+    solapamiento es legal, así que vive en un solo sitio: si un pin está
+    dentro de una viga, las dos cosas son ciertas a la vez.
+
+    Lo que hace la inserción es que el macho y el agujero sean la MISMA RECTA:
+    el pin metido por donde se mete. No basta con que las dos piezas sean de
+    las que se insertan, ni con que las rectas sean paralelas: si el pin va por
+    otro sitio, es un choque como cualquier otro y hay que decirlo.
+    """
+    return any(
+        macho.misma_recta_que(hembra)
+        for a, b in ((unas, otras), (otras, unas))
+        for macho in a
+        if macho.es_macho
+        for hembra in b
+        if hembra.es_hembra
+    )
+
+
+def _recta_canonica(eje: tuple[float, ...]) -> tuple[float, float, float]:
+    """La misma recta, siempre escrita igual.
+
+    Una recta no tiene sentido —entrar por un lado o por el otro es la misma
+    inserción—, así que (1,0,0) y (-1,0,0) son la misma y deben compararse
+    iguales. Se elige el primer componente no nulo positivo.
+    """
+    valores = [round(float(v), 4) + 0.0 for v in eje]
+    for v in valores:
+        if abs(v) > _MARGEN_RECTA:
+            if v < 0:
+                valores = [-x + 0.0 for x in valores]
+            break
+    return (valores[0], valores[1], valores[2])
+
+
+def _paralelas(a: tuple[float, ...], b: tuple[float, ...]) -> bool:
+    """¿Van las dos en la misma dirección? El sentido da igual.
+
+    Se compara con el producto vectorial: es cero cuando son paralelas, y no
+    obliga a normalizar nada.
+    """
+    if not any(a) or not any(b):
+        return False
+    cruz = (
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0],
+    )
+    return all(abs(c) < _MARGEN_RECTA for c in cruz)
 
 
 @dataclass(frozen=True, slots=True)
@@ -58,13 +150,17 @@ class PlacedPart:
 
     def world_connections(
         self, definition: PartDefinition
-    ) -> tuple[tuple[str, tuple[int, int, int]], ...]:
+    ) -> tuple["WorldConnection", ...]:
         """Dónde caen sus puntos de conexión, ya girados y colocados.
 
         Girar mueve la caja fuera de su sitio: un ladrillo de 2x4 girado un
         cuarto de vuelta ocupa donde antes no ocupaba. Como el motor guarda la
         esquina mínima DESPUÉS de girar, hay que reanclar la pieza —y con ella
         sus puntos— para que esa esquina vuelva al origen.
+
+        La recta se gira pero NO se reancla ni se mueve: una dirección no está
+        en ningún sitio. Sumarle la posición sería el error clásico, y aquí ni
+        siquiera saltaría —daría una recta plausible apuntando a cualquier lado.
         """
         if not definition.connections:
             return ()
@@ -85,13 +181,14 @@ class PlacedPart:
         puntos = []
         for conexion in definition.connections:
             girado = self.orientation.apply(*conexion.punto)
-            puntos.append((
+            puntos.append(WorldConnection(
                 conexion.tipo,
                 (
                     self.position.x + girado[0] + desplazamiento[0],
                     self.position.y + girado[1] + desplazamiento[1],
                     self.position.z + girado[2] + desplazamiento[2],
                 ),
+                _recta_canonica(self.orientation.apply(*conexion.eje)),
             ))
         return tuple(puntos)
 
@@ -299,35 +396,49 @@ class BlockModel:
             if existing.instance_id == ignore_instance_id:
                 continue
             existing_definition = self.catalog.get(existing.part_id)
-            if candidate_bounds.intersects(existing.bounds(existing_definition)):
-                collisions.append(existing)
+            if not candidate_bounds.intersects(existing.bounds(existing_definition)):
+                continue
+            # Que dos cajas se solapen es un choque para ladrillos de sistema,
+            # que se apoyan y se tocan pero nunca se invaden. Technic es lo
+            # contrario: se construye metiendo cosas dentro de otras, y un pin
+            # OCUPA el agujero. Sin esta excepción, cada unión Technic de
+            # verdad sería un error y el set entero resultaría imposible.
+            if _hay_insercion(
+                candidate.world_connections(definition),
+                existing.world_connections(existing_definition),
+            ):
+                continue
+            collisions.append(existing)
 
         return tuple(collisions)
 
-    def connected_to(self, instance_id: str) -> tuple[PlacedPart, ...]:
-        """Piezas unidas a esta por compartir un punto de conexión.
 
-        Un agujero aparece en las dos caras de la pieza, así que dos vigas
-        pegadas comparten los puntos de la cara que se tocan. Es lo que
-        permite saber que están unidas sin modelar el pin.
+    def connected_to(self, instance_id: str) -> tuple[PlacedPart, ...]:
+        """Piezas unidas a esta.
+
+        Dos piezas se unen de dos maneras distintas, y hacen falta las dos:
+
+        - **Compartiendo un punto.** Un agujero aparece en las dos caras de la
+          pieza, así que dos vigas pegadas comparten los puntos de la cara que
+          se tocan. Es lo que permite saber que están unidas sin modelar el pin.
+        - **Insertándose.** Un pin metido en un agujero casi nunca cae sobre el
+          punto del agujero: entra por él y se queda a otra profundidad. Lo que
+          comparten es la RECTA, no el punto. Con la regla anterior, un pin
+          podía estar dentro de una viga y el motor los daba por desconocidos.
         """
         pieza = self.get(instance_id)
-        mios = {
-            punto
-            for _, punto in pieza.world_connections(self.catalog.get(pieza.part_id))
-        }
-        if not mios:
+        mias = pieza.world_connections(self.catalog.get(pieza.part_id))
+        if not mias:
             return ()
 
+        puntos = {c.punto for c in mias}
         unidas = []
         for otra in self._instances.values():
             if otra.instance_id == instance_id:
                 continue
-            suyos = {
-                punto
-                for _, punto in otra.world_connections(self.catalog.get(otra.part_id))
-            }
-            if mios & suyos:
+            suyas = otra.world_connections(self.catalog.get(otra.part_id))
+            comparten_punto = puntos & {c.punto for c in suyas}
+            if comparten_punto or _hay_insercion(mias, suyas):
                 unidas.append(otra)
         return tuple(unidas)
 

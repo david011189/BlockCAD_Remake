@@ -159,14 +159,33 @@ class Connection:
     El punto va en LDU y relativo a la esquina mínima de la pieza, así que
     para saber dónde cae de verdad hay que girarlo y sumarle su posición.
 
-    Los tipos vienen de LDraw: `stud` es un pivote, `agujero_pin` el hueco de
-    un pin y `agujero_eje` el de un eje. Un agujero aparece en las dos caras
-    de la pieza, y eso no es un duplicado: es lo que hace que dos vigas
-    pegadas compartan el punto y se sepan conectadas.
+    Los tipos vienen de LDraw. Hay hembras —`agujero_pin` es el hueco de un
+    pin, `agujero_eje` el de un eje— y machos: `pin` es un pin y `punta_eje`
+    la punta de un eje. `stud` es el pivote de siempre. Un agujero aparece en
+    las dos caras de la pieza, y eso no es un duplicado: es lo que hace que
+    dos vigas pegadas compartan el punto y se sepan conectadas.
+
+    El `eje` es la RECTA por la que se entra o se sale, no una flecha: meter
+    un pin por un lado o por el otro es la misma inserción, así que el sentido
+    se descarta. Sin la recta, un punto no dice si algo está insertado: un pin
+    en un agujero son dos rectas que coinciden.
     """
 
     tipo: str
     punto: tuple[int, int, int]
+    eje: tuple[float, float, float] = (0.0, 0.0, 0.0)
+
+    #: Los tipos que se meten, y los que alojan.
+    MACHOS = ("pin", "punta_eje")
+    HEMBRAS = ("agujero_pin", "agujero_eje")
+
+    @property
+    def es_macho(self) -> bool:
+        return self.tipo in self.MACHOS
+
+    @property
+    def es_hembra(self) -> bool:
+        return self.tipo in self.HEMBRAS
 
 
 @dataclass(frozen=True, slots=True)
