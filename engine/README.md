@@ -266,6 +266,28 @@ eje 6 en el agujero 2 de chasis llamado transmision
 Todo lo del eje gira junto: es un solo grado de libertad, que es lo que hace
 transmisión a una transmisión.
 
+Un engranaje tiene un solo agujero, pero una viga tiene siete: para colgarla
+de un eje hay que decir por cuál, con `por su agujero N` (numerados en la
+pieza sin girar, del extremo hacia dentro). Es lo que convierte una viga en
+una **palanca**: la puerta de una barrera es una viga colgada de la bisagra
+por su agujero 1.
+
+```
+catalogo "wedo"
+modelo "Barrera"
+
+21980 en 0,0,0 color blanco llamado motor
+eje 6 en el agujero 3 de motor desplazado -2 llamado bisagra
+42136 en el eje de bisagra desplazado -1 color gris
+viga 7 en el eje de bisagra por su agujero 1 desplazado -2 rot x 90 color rojo
+```
+
+El `rot` de la última línea es el grado de libertad de la bisagra: con
+`rot x 90` la puerta está subida, con `rot x 90 rot y 270` bajada. El motor
+no se anima —el visor enseña la construcción, no la simula—, pero las dos
+posturas son el mismo código con un giro de diferencia, que es exactamente
+lo que el motor real haría.
+
 **El límite honesto de hoy: los dientes no muerden.** Dos ruedas de 8 en
 agujeros vecinos —la distancia exacta a la que engranan en la realidad—
 chocan para el motor, porque al engranar los dientes se entrelazan y las

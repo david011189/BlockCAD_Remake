@@ -306,6 +306,68 @@ class LenguajeTests(unittest.TestCase):
                     self.compilar(codigo)
                 self.assertIn(pista, str(ctx.exception))
 
+    def test_a_beam_hangs_from_an_axle_by_a_chosen_hole(self) -> None:
+        """`por su agujero 1`: la puerta de una barrera, colgada de su bisagra.
+
+        Una viga tiene siete agujeros y colgarla exige decir por cuál. Es lo
+        que faltaba para que un motor LEVANTE algo: motor, eje en su boca, y
+        la palanca colgada del eje.
+        """
+        modelo = self.compilar(
+            "21980 en 0,0,0 llamado motor\n"
+            "eje 6 en el agujero 3 de motor desplazado -2 llamado bisagra\n"
+            "viga 7 en el eje de bisagra por su agujero 1 desplazado -2 rot x 90"
+        )
+        puerta = modelo.instances[-1]
+        unidas = {p.part_id for p in modelo.connected_to(puerta.instance_id)}
+        self.assertIn("3706", unidas)
+        self.assertFalse(modelo.floating())
+
+    def test_both_poses_of_the_door_compile(self) -> None:
+        # La puerta subida y bajada son el mismo código con un giro más: el
+        # grado de libertad que queda libre es justo el de la bisagra.
+        for giro in ("rot x 90", "rot x 90 rot y 270"):
+            with self.subTest(giro=giro):
+                self.compilar(
+                    "21980 en 0,0,0 llamado motor\n"
+                    "eje 6 en el agujero 3 de motor desplazado -2 llamado b\n"
+                    f"viga 7 en el eje de b por su agujero 1 desplazado -2 {giro}"
+                )
+
+    def test_a_door_pointing_into_the_floor_is_refused(self) -> None:
+        from blockcad_engine.errors import DslError
+
+        with self.assertRaises(DslError) as ctx:
+            self.compilar(
+                "21980 en 0,0,0 llamado motor\n"
+                "eje 6 en el agujero 3 de motor desplazado -2 llamado b\n"
+                "viga 7 en el eje de b por su agujero 1 desplazado -2 "
+                "rot x 90 rot y 180"
+            )
+        self.assertIn("más arriba", str(ctx.exception))
+
+    def test_hanging_a_beam_without_choosing_a_hole_teaches(self) -> None:
+        from blockcad_engine.errors import DslError
+
+        with self.assertRaises(DslError) as ctx:
+            self.compilar(
+                "3701 en 0,0,0 llamado v\n"
+                "4519 en el agujero 2 de v llamado e\n"
+                "viga 7 en el eje de e rot x 90"
+            )
+        self.assertIn("por su agujero", str(ctx.exception))
+
+    def test_choosing_a_hole_that_does_not_exist_teaches(self) -> None:
+        from blockcad_engine.errors import DslError
+
+        with self.assertRaises(DslError) as ctx:
+            self.compilar(
+                "3701 en 0,0,0 llamado v\n"
+                "4519 en el agujero 2 de v llamado e\n"
+                "viga 7 en el eje de e por su agujero 9 rot x 90"
+            )
+        self.assertIn("7 agujeros", str(ctx.exception))
+
     def test_the_result_survives_the_round_trip(self) -> None:
         # El código generado desde el modelo usa `en x,y,z` con decimales.
         # Tiene que volver a compilar y dejar las piezas donde estaban.

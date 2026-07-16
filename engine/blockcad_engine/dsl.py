@@ -113,10 +113,13 @@ _AGUJERO_RE = re.compile(
 )
 
 # «en el eje de motor1»: el caso espejo. Aquí no hay número porque un eje es
-# una sola recta; lo que se elige es cuánto resbalar por ella.
+# una sola recta; lo que se elige es cuánto resbalar por ella. `por su
+# agujero 2` dice por cuál de los agujeros PROPIOS se cuelga la pieza: a un
+# engranaje le sobra (tiene uno), a una viga le hace falta (tiene siete).
 _EJE_RE = re.compile(
     r"^en\s+(?:el\s+)?eje"
     r"(?:\s+de\s+(?P<nombre>[^\W\d]\w*))?"
+    r"(?:\s+por\s+su\s+agujero\s+(?P<agujero>\d+))?"
     rf"(?:\s+desplazado\s+(?P<d>{_NUMERO}))?"
     r"(?P<opciones>.*)$"
 )
@@ -569,6 +572,43 @@ class _Builder:
                 line.number,
                 f"{definition.name} no tiene agujero por donde pase un eje.",
             )
+
+        # Si la pieza tiene varios agujeros —una viga tiene siete—, hay que
+        # decir por cuál se cuelga. Se agrupan por recta EN LA PIEZA SIN
+        # GIRAR y se numeran por posición, igual que los de una referencia:
+        # el agujero 1 de una viga es el de su extremo, se mire como se mire.
+        propios = PlacedPart.create(
+            definition.part_id, GridPosition(0, 0, 0)
+        ).world_connections(definition)
+        grupos: list[list[int]] = []
+        for i in indices:
+            for grupo in grupos:
+                if propios[i].misma_recta_que(propios[grupo[0]]):
+                    grupo.append(i)
+                    break
+            else:
+                grupos.append([i])
+        grupos.sort(key=lambda g: min(propios[i].punto for i in g))
+
+        elegido = match.group("agujero")
+        if elegido is None:
+            if len(grupos) > 1:
+                raise DslError(
+                    line.number,
+                    f"{definition.name} tiene {len(grupos)} agujeros y no sé "
+                    "por cuál colgarla. Dilo con 'por su agujero 2'.",
+                )
+            indices = grupos[0]
+        else:
+            numero = int(elegido)
+            if not 1 <= numero <= len(grupos):
+                raise DslError(
+                    line.number,
+                    f"{definition.name} tiene {len(grupos)} "
+                    f"agujero{'s' if len(grupos) > 1 else ''}; no hay "
+                    f"agujero {numero}. Se numeran desde 1, por posición.",
+                )
+            indices = grupos[numero - 1]
 
         # El centro del eje: el punto medio entre sus puntas. Un eje con tope
         # tiene una sola punta, y entonces el centro es esa punta.
