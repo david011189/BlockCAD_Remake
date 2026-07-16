@@ -367,7 +367,35 @@ El editor de ladrillos, completo y coherente, quedó etiquetado en
 | Hecho | Conexiones y aviso de piezas en el aire. |
 | Hecho | Visor con la geometría real de LDraw. |
 | Hecho | Pinchar una pieza lleva a su línea; Supr la borra. |
-| **Siguiente** | El camino de vuelta: mover y girar con el ratón. |
+| Hecho | El catálogo sabe qué se mete y qué aloja. |
+| **Siguiente** | Que insertar no sea chocar. |
+| Luego | El camino de vuelta: mover y girar con el ratón. |
+
+### Que insertar no sea chocar
+
+Es lo que bloquea el set entero, y se descubrió intentando construir el camión
+de reciclaje del WeDo 2.0: **el motor sabe apilar pero no sabe insertar**. Para
+él una colisión es que dos cajas se solapen, que es exactamente lo correcto
+para ladrillos de sistema —se apoyan y se tocan, nunca se invaden— y
+exactamente lo contrario de Technic, donde un pin *ocupa* el agujero y un eje
+*atraviesa* la viga. Hoy cada unión Technic de verdad es, para el motor, un
+error:
+
+| Lo que pide Technic | El motor |
+|---|---|
+| Pin en el agujero de una viga | choca |
+| Eje atravesando una viga | choca |
+| Rueda dentada en un eje | choca |
+
+La primera mitad ya está: el catálogo distingue las piezas macho de las
+hembra. Falta que las conexiones lleven su **dirección** —un punto no dice si
+algo está insertado; un pin en un agujero son dos rectas que coinciden— y que
+la regla de colisión acepte el solapamiento cuando un agujero lo justifica.
+
+La dirección está en la matriz de cada primitiva de LDraw, que el lector
+todavía descarta. No vale deducirla de la caja: en el `44865` el pin sale de
+lado y no a lo largo, así que «la dimensión más larga» daría un eje falso sin
+que saltara ningún error.
 
 **El giro a Technic está terminado.** El motor mide en LDU, gira en tres ejes,
 conoce las piezas de la caja y sabe qué se sostiene.
