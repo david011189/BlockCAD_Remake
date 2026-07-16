@@ -131,14 +131,31 @@ class RatonTests(unittest.TestCase):
         # Los bordes son líneas de un pixel: pinchar uno es pinchar un pelo.
         self.assertIn("rayo.intersectObjects(dibujadas.map((d) => d.cuerpo)", self.html)
 
-    def test_what_is_selected_is_a_line(self) -> None:
-        self.assertIn("d.linea === seleccion", self.html)
+    def test_what_lights_up_is_the_piece_you_clicked(self) -> None:
+        # Y solo esa. Una línea con `repetir` pone cuatro ladrillos iguales:
+        # encender los cuatro al pinchar uno no responde a lo que has tocado.
+        self.assertIn(
+            "d.linea === seleccion.linea && d.orden === seleccion.orden", self.html
+        )
+
+    def test_a_piece_is_told_apart_by_its_place_in_its_line(self) -> None:
+        # El número de línea no basta para saber cuál es cuál cuando la línea
+        # pone varias; el puesto dentro de la línea sí, y sobrevive a un
+        # recompilado, que es cuando se tira todo lo dibujado.
+        anotar = self.html.split("function anotar(")[1].split("\n}")[0]
+        self.assertIn("dibujadas.filter((d) => d.linea === p.linea).length", anotar)
 
     def test_the_selection_survives_a_rebuild(self) -> None:
-        # Al recompilar se tira todo lo dibujado. Si la línea sigue poniendo
-        # piezas, sigue elegida; si no, deja de estarlo sola.
+        # Al recompilar se tira todo lo dibujado. Si la pieza sigue estando,
+        # sigue elegida; si ya no la pone nadie, deja de estarlo sola.
         pintar = self.html.split("function pintarSeleccion()")[1].split("\n}")[0]
         self.assertIn("seleccion = null", pintar)
+
+    def test_deleting_a_repeated_line_is_announced(self) -> None:
+        # Se elige una pieza pero se borra su línea: no hay forma de quitar un
+        # ladrillo de un `repetir` sin reescribir el bucle. Llevarse cuatro por
+        # sorpresa sería el peor final; se avisa antes.
+        self.assertIn("Supr borra la línea entera", self.html)
 
     def test_delete_does_not_steal_the_keyboard(self) -> None:
         # Escribiendo, Supr borra letras. Solo fuera del texto borra la pieza.
@@ -147,7 +164,7 @@ class RatonTests(unittest.TestCase):
     def test_delete_goes_through_the_console(self) -> None:
         # `borrar` ya registra el deshacer y recompila. Un camino aparte sería
         # un segundo sitio donde el texto cambia.
-        self.assertIn("borrar(String(seleccion))", self.html)
+        self.assertIn("borrar(String(seleccion.linea))", self.html)
 
     def test_selecting_does_not_erase_the_error_mark(self) -> None:
         # El gutter se repinta al elegir; la línea rota tiene que seguir roja.
