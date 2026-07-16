@@ -118,6 +118,24 @@ def _giradas_90(conexiones, fondo: float) -> list[dict]:
     return giradas
 
 
+_DIENTES_RE = re.compile(r"Gear (\d+) Tooth")
+
+
+def _dientes(nombre_ldraw: str) -> dict[str, str]:
+    """Cuántos dientes tiene la pieza, si es una rueda dentada.
+
+    Sale del nombre de LDraw, que lo declara siempre («Gear 8 Tooth»). Los
+    dientes son lo que decide a qué distancia muerde: el radio primitivo de
+    LEGO es 1,25 LDU por diente, y dos ruedas engranan cuando sus ejes están
+    a la suma de sus radios. El tornillo sin fin no dice dientes y queda
+    fuera a propósito: muerde con otra geometría.
+    """
+    # LDraw alinea números con espacios dobles («Gear  8 Tooth»): se
+    # normaliza antes de buscar, igual que hace el nombre de la pieza.
+    encontrado = _DIENTES_RE.search(re.sub(r"\s+", " ", nombre_ldraw))
+    return {"dientes": encontrado.group(1)} if encontrado else {}
+
+
 def _color(colores: list[str]) -> str:
     for nombre in colores:
         if nombre in _COLORES:
@@ -158,6 +176,7 @@ def _definicion(pieza: dict) -> PartDefinition:
             "nombre_lego": pieza.get("nombre_lego", ""),
             "cantidad_en_el_set": str(pieza.get("cantidad", 0)),
             **malla_giro,
+            **_dientes(pieza["nombre_ldraw"]),
         },
         aliases=tuple(aliases),
         connections=tuple(

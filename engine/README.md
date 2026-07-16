@@ -288,14 +288,19 @@ no se anima —el visor enseña la construcción, no la simula—, pero las dos
 posturas son el mismo código con un giro de diferencia, que es exactamente
 lo que el motor real haría.
 
-**El límite honesto de hoy: los dientes no muerden.** Dos ruedas de 8 en
-agujeros vecinos —la distancia exacta a la que engranan en la realidad—
-chocan para el motor, porque al engranar los dientes se entrelazan y las
-cajas se solapan sin que haya macho y hembra que lo justifique. Hace falta
-una regla nueva (dos ejes paralelos a la suma de sus radios primitivos:
-1,25 LDU por diente), y es el siguiente trabajo del motor. El engranaje de
-24 dientes además no tiene agujero detectable: LDraw lo dibuja sin
-primitiva.
+**Los dientes muerden.** Dos ruedas engranadas se solapan de verdad —los
+dientes de una entran en los huecos de la otra— y el motor lo acepta como la
+tercera manera legal de solaparse, junto a la inserción. La condición es
+geométrica y estrecha: ejes paralelos separados EXACTAMENTE por la suma de
+los radios primitivos, a 1,25 LDU por diente. De ahí salen todas las parejas
+del sistema: 8+8 a un módulo, 12+12 a módulo y medio, 8+12 a 25 LDU. Más
+cerca chocan de frente; más lejos no se tocan; y morder no es agarrar: dos
+ruedas engranadas siguen sin estar unidas.
+
+Quedan fuera, cada uno con su motivo: el **tornillo sin fin** y las parejas
+cónicas **en ángulo recto** muerden con otra geometría; la **cremallera** no
+declara dientes; y el engranaje de **24 dientes** no tiene agujero detectable
+en LDraw, así que ni siquiera puede recibir su eje.
 
 ### Nombrar el modelo
 
@@ -458,6 +463,7 @@ El editor de ladrillos, completo y coherente, quedó etiquetado en
 | Hecho | El catálogo sabe qué se mete y qué aloja. |
 | Hecho | Insertar no es chocar: el pin entra en el agujero. |
 | Hecho | `en el agujero 2 de marco`: insertar sin calcular LDU. |
+| Hecho | Los dientes muerden: la regla de engrane. |
 | **Siguiente** | El camión de reciclaje, con las instrucciones delante. |
 | Luego | El camino de vuelta: mover y girar con el ratón. |
 

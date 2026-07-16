@@ -79,6 +79,59 @@ def _hay_insercion(
     )
 
 
+#: Radio primitivo de una rueda dentada de LEGO, en LDU por diente. Dos de 8
+#: dientes muerden a 20 LDU (un módulo justo), 8 y 24 a 40, 12 y 12 a 30:
+#: todas las parejas del sistema salen de esta constante.
+_LDU_POR_DIENTE = 1.25
+
+
+def _muerden(
+    a: PlacedPart,
+    def_a: PartDefinition,
+    b: PlacedPart,
+    def_b: PartDefinition,
+) -> bool:
+    """¿Están estas dos ruedas dentadas engranadas?
+
+    Dos ruedas que muerden se solapan DE VERDAD: los dientes de una entran
+    en los huecos de la otra, y las cajas no saben contar eso. Es la tercera
+    manera legal de solaparse, junto a la inserción: aquí no hay macho ni
+    hembra, hay dos perfiles entrelazados.
+
+    La condición es geométrica y estrecha: ejes paralelos (no la misma
+    recta) y separados EXACTAMENTE por la suma de los radios primitivos,
+    1,25 LDU por diente. Más cerca los dientes chocan de frente; más lejos
+    no se tocan. El tornillo sin fin y las parejas en ángulo quedan fuera:
+    muerden con otra geometría, y fingir que esta las cubre sería mentir.
+    """
+    dientes_a = def_a.metadata.get("dientes")
+    dientes_b = def_b.metadata.get("dientes")
+    if not dientes_a or not dientes_b:
+        return False
+
+    ejes_a = [c for c in a.world_connections(def_a) if c.tipo == "agujero_eje"]
+    ejes_b = [c for c in b.world_connections(def_b) if c.tipo == "agujero_eje"]
+    if not ejes_a or not ejes_b:
+        return False
+
+    eje_a, eje_b = ejes_a[0], ejes_b[0]
+    if not _paralelas(eje_a.eje, eje_b.eje) or eje_a.misma_recta_que(eje_b):
+        return False
+
+    # Distancia entre las dos rectas paralelas: lo que separa los puntos,
+    # quitando la parte que va a lo largo del eje.
+    entre = tuple(pa - pb for pa, pb in zip(eje_a.punto, eje_b.punto))
+    u = eje_a.eje
+    largo_u = sum(v * v for v in u) ** 0.5
+    a_lo_largo = sum(e * v for e, v in zip(entre, u)) / largo_u
+    distancia = (
+        sum(e * e for e in entre) - a_lo_largo * a_lo_largo
+    ) ** 0.5
+
+    primitivos = (int(dientes_a) + int(dientes_b)) * _LDU_POR_DIENTE
+    return abs(distancia - primitivos) < 1e-6
+
+
 def _recta_canonica(eje: tuple[float, ...]) -> tuple[float, float, float]:
     """La misma recta, siempre escrita igual.
 
@@ -411,6 +464,10 @@ class BlockModel:
                 candidate.world_connections(definition),
                 existing.world_connections(existing_definition),
             ):
+                continue
+            # Dos ruedas dentadas engranadas también se solapan de verdad:
+            # los dientes de una entran en los huecos de la otra.
+            if _muerden(candidate, definition, existing, existing_definition):
                 continue
             collisions.append(existing)
 
