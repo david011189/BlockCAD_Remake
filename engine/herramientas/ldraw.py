@@ -38,12 +38,29 @@ PLACA = 8
 LADRILLO = 24
 MODULO_TECHNIC = 20
 
-#: Primitivas que delatan una conexión.
+#: Primitivas que delatan una conexión, con el título que LDraw les pone.
+#:
+#: El título importa: es lo que distingue un agujero de un eje, y por el
+#: nombre solo no se ve. `axlehol8.dat` se llama «Technic Axle Perimeter» y
+#: es el perfil en cruz de un eje —el mismo contorno vale para el eje macizo
+#: y para el hueco que lo aloja—, así que no dice si hay agujero. Estuvo
+#: mapeado a `agujero_eje` y le puso agujeros fantasma a seis ejes: un eje no
+#: tiene agujeros, tiene contorno.
+#:
+#: Por eso aquí solo entran las primitivas cuyo título afirma la pieza, no la
+#: forma. Lo que describe aristas, perfiles o superficies se queda fuera.
 CONEXIONES = {
-    "peghole.dat": "agujero_pin",
-    "axlehole.dat": "agujero_eje",
-    "axlehol8.dat": "agujero_eje",
-    "axlehol9.dat": "agujero_eje",
+    # Hembra: hay un hueco donde meter algo.
+    "peghole.dat": "agujero_pin",  # Peg Hole End
+    "axlehole.dat": "agujero_eje",  # Technic Axle Hole Closed
+    # Macho: es lo que se mete.
+    "confric4.dat": "pin",  # Technic Friction Pin 1.0 with Base Collar
+    "confric5.dat": "pin",  # Technic Friction Pin 1.0 Slotted
+    "connect.dat": "pin",  # Technic Pin 1.0 with Base Collar
+    "connect8.dat": "pin",  # Technic Pin 1.0 with Base Collar and Blind Hole
+    "axleend2.dat": "punta_eje",  # Technic Axle End Beveled
+    "axleend20.dat": "punta_eje",  # Technic Axle End 20 LDU
+    # Studs: el pivote de siempre.
     "stud.dat": "stud",
     "stud2.dat": "stud",
     "stud2a.dat": "stud",

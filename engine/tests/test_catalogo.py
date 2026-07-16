@@ -24,6 +24,82 @@ MODULO_TECHNIC = 20
 MEDIO_MODULO = 10
 
 
+class MachoYHembraTests(unittest.TestCase):
+    """Lo que se mete y lo que aloja.
+
+    Technic no se apila: se inserta. Un pin entra en un agujero y un eje
+    atraviesa una viga. Para que el motor pueda distinguir esa unión de un
+    choque hace falta saber cuál de las dos piezas es cuál, y eso se decide
+    aquí, en el dato.
+    """
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.piezas = {
+            p["diseno"]: p
+            for p in json.loads(_CATALOGO.read_text(encoding="utf-8"))["piezas"]
+        }
+
+    def conexiones(self, diseno, tipo):
+        return [
+            c["punto"] for c in self.piezas[diseno]["conexiones"] if c["tipo"] == tipo
+        ]
+
+    def test_an_axle_has_no_holes(self) -> None:
+        """Un eje es macizo. Parece obvio y estuvo mal mucho tiempo.
+
+        `axlehol8.dat` se llama «Technic Axle Perimeter»: es el perfil en cruz
+        de un eje, y LDraw lo usa igual para el eje macizo que para el hueco
+        que lo aloja. Estaba mapeado a `agujero_eje`, así que seis ejes de
+        este set salían del catálogo con un agujero que no existe.
+        """
+        for diseno in ("3706", "3737", "4519", "44294", "87083", "32062"):
+            with self.subTest(eje=diseno):
+                self.assertEqual(self.conexiones(diseno, "agujero_eje"), [])
+
+    def test_an_axle_is_as_long_as_its_name_says(self) -> None:
+        # Las dos puntas de un eje de N módulos están a N x 20 LDU. Es la
+        # comprobación que delata si las puntas se detectan donde no son.
+        for diseno, modulos in (("4519", 3), ("3706", 6), ("44294", 7), ("3737", 10)):
+            with self.subTest(eje=diseno):
+                puntas = self.conexiones(diseno, "punta_eje")
+                self.assertEqual(len(puntas), 2, "un eje tiene dos puntas")
+                largo = max(abs(a - b) for a, b in zip(*puntas))
+                self.assertEqual(largo, modulos * MODULO_TECHNIC)
+
+    def test_an_axle_with_a_stop_has_only_one_end(self) -> None:
+        # El 87083 lleva tope en un extremo: por ahí no entra en ningún sitio.
+        self.assertEqual(len(self.conexiones("87083", "punta_eje")), 1)
+
+    def test_the_pins_are_male(self) -> None:
+        # Sin esto un pin no se puede unir a nada: no tiene agujeros ni studs
+        # que detectar, y el catálogo lo daba como pieza sin conexiones.
+        for diseno in ("2780", "6562", "18651"):
+            with self.subTest(pin=diseno):
+                self.assertTrue(self.conexiones(diseno, "pin"))
+
+    def test_a_beam_is_female_and_keeps_its_holes(self) -> None:
+        # La otra mitad no se puede romper al arreglar esta: una viga 1x4
+        # tiene 3 agujeros, y cada uno asoma por las dos caras.
+        self.assertEqual(len(self.conexiones("3701", "agujero_pin")), 6)
+        self.assertEqual(len(self.conexiones("3700", "agujero_pin")), 2)
+
+    def test_a_part_is_not_male_and_female_at_the_same_place(self) -> None:
+        # Un mismo punto no puede ser el pin y el agujero donde entra: si sale
+        # así, una primitiva se está leyendo por las dos caras.
+        for diseno, pieza in self.piezas.items():
+            machos = {
+                tuple(c["punto"]) for c in pieza["conexiones"]
+                if c["tipo"] in ("pin", "punta_eje")
+            }
+            hembras = {
+                tuple(c["punto"]) for c in pieza["conexiones"]
+                if c["tipo"] in ("agujero_pin", "agujero_eje")
+            }
+            with self.subTest(pieza=diseno):
+                self.assertEqual(machos & hembras, set())
+
+
 class CatalogTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
