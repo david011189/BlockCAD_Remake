@@ -223,17 +223,21 @@ class Connection:
     punto: tuple[int, int, int]
     eje: tuple[float, float, float] = (0.0, 0.0, 0.0)
 
-    #: Los tipos que se meten, y los que alojan.
-    MACHOS = ("pin", "punta_eje")
-    HEMBRAS = ("agujero_pin", "agujero_eje")
+    #: Los tipos que se meten, y los que alojan. La bola es el macho de la
+    #: rótula: no gira alrededor de una recta sino alrededor de un PUNTO,
+    #: que es lo que la hace articulación y no eje.
+    MACHOS = ("pin", "punta_eje", "bola")
+    HEMBRAS = ("agujero_pin", "agujero_eje", "cazoleta")
 
     #: Qué macho entra en qué agujero. No es simétrico: un eje pasa por el
     #: agujero redondo (gira libre: así se cuelgan las ruedas) y por el de
     #: cruz (gira solidario: así se mueven los engranajes), pero un pin solo
-    #: cabe en el redondo — la cruz le cierra el paso al cilindro.
+    #: cabe en el redondo — la cruz le cierra el paso al cilindro. La bola
+    #: solo se asienta en su cazoleta, y nada más entra ahí.
     ENCAJES = {
         "pin": ("agujero_pin",),
         "punta_eje": ("agujero_pin", "agujero_eje"),
+        "bola": ("cazoleta",),
     }
 
     @property

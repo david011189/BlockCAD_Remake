@@ -56,12 +56,16 @@ modelo "Camion de reciclaje"
 // Pasos 11-15: el hub se conecta y se monta atras, sobre el motor.
 19071 en -1.5,-1,17 rot 270 color blanco llamado hub
 
-// PARED (pasos 16 a 19): los ganchos de remolque.
-//  - 57909 (ladrillo con bola) y 92013 (ladrillo con cazoleta): LDraw solo
-//    declara sus studs. La bola y la cazoleta no existen como conexiones,
-//    asi que encajarlos seria un solape ilegal para el motor.
-//  - Los ojos (16424) y la teja curva si se podrian poner; van sobre las
-//    piezas anteriores, asi que caen con ellas.
+// Pasos 16 a 19: los dos ganchos de remolque, armados aparte como en su
+// lamina: la bola del ladrillo negro se asienta en la cazoleta transparente
+// —los brazos se interpenetran, y el motor lo acepta porque el centro de la
+// bola ES el centro de la copa—. En plastico, de estas cazoletas cuelgan
+// las cadenas. El montaje exacto sobre el camion y los ojos de encima
+// quedan pendientes de sus laminas.
+92013 en 0,-8,0 color celeste llamado gancho_delantero
+57909 en 2.35,-8,0 rot 180 color negro
+92013 en 0,-5.5,0 color celeste llamado gancho_trasero
+57909 en 2.35,-5.5,0 rot 180 color negro
 
 // ---------- El bastidor volcador (pasos 22 a 31) ----------
 // Un marco en U que se arrastra por el suelo. Se construye aparte, a la

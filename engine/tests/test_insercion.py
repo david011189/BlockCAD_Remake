@@ -122,6 +122,55 @@ class InsercionTests(unittest.TestCase):
             self.poner("3001", (0, 0, 0))
 
 
+class RotulaTests(unittest.TestCase):
+    """La bola se asienta en su cazoleta: punto compartido, no recta.
+
+    Una rótula no tiene recta —girar hacia cualquier lado es su oficio—,
+    así que la regla es distinta a la del pin: el centro de la bola tiene
+    que SER el centro de la copa. Es lo que piden los ganchos de remolque
+    del camión de reciclaje (pasos 16 a 19).
+
+    Las posiciones salen de preguntarle al motor: la cazoleta del 92013 en
+    el origen tiene su copa en (60, 20, 14), y la bola del 57909 girado
+    media vuelta cae ahí puesto en (47, 0, 0).
+    """
+
+    def setUp(self) -> None:
+        self.modelo = BlockModel(catalog=cargar("wedo"))
+        self.modelo.add("92013", GridPosition(0, 0, 0))
+
+    MEDIA_VUELTA = Orientation.z(180)
+
+    def test_the_ball_seats_in_the_socket(self) -> None:
+        # Los brazos se interpenetran de verdad: sin la regla, esto es choque.
+        bola = self.modelo.add(
+            "57909", GridPosition(47, 0, 0), orientation=self.MEDIA_VUELTA
+        )
+        unidas = self.modelo.connected_to(bola.instance_id)
+        self.assertEqual([p.part_id for p in unidas], ["92013"])
+
+    def test_a_ball_beside_the_cup_collides(self) -> None:
+        # La misma bola, 4 LDU al lado: atraviesa el plástico de la copa.
+        with self.assertRaises(CollisionError):
+            self.modelo.add(
+                "57909", GridPosition(47, 4, 0), orientation=self.MEDIA_VUELTA
+            )
+
+    def test_a_pin_does_not_seat_in_the_cup(self) -> None:
+        # La recta del pin pasa por el centro de la copa, pero un pin no es
+        # una bola: falla por el TIPO, no por la geometría.
+        with self.assertRaises(CollisionError):
+            self.modelo.add("2780", GridPosition(40, 12, 6))
+
+    def test_a_ball_does_not_enter_a_pin_hole(self) -> None:
+        # El caso espejo: el centro de la bola cae en el punto del agujero
+        # de una viga, y aun así no entra: una bola no cabe por un agujero.
+        modelo = BlockModel(catalog=cargar("wedo"))
+        modelo.add("3701", GridPosition(0, 0, 0))
+        with self.assertRaises(CollisionError):
+            modelo.add("57909", GridPosition(-50, 0, 0))
+
+
 class EncajeTipadoTests(unittest.TestCase):
     """No todo macho entra en todo agujero.
 

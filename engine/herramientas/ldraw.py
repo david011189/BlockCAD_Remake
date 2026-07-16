@@ -81,6 +81,16 @@ CONEXIONES = {
     "connect8.dat": "pin",  # Technic Pin 1.0 with Base Collar and Blind Hole
     "axleend2.dat": "punta_eje",  # Technic Axle End Beveled
     "axleend20.dat": "punta_eje",  # Technic Axle End 20 LDU
+    # La rótula. La bola NO se detecta por la esfera —el sensor de distancia
+    # y el separador dibujan esferas de adorno—, sino por el cuello que la
+    # afirma: «Technic Axle Truncated to Fit Ball Joint», cuyo origen cae
+    # justo en el centro de la bola. La cazoleta es como la rueda de 24: un
+    # subarchivo con el título por delante («Ball Socket Half Type 3») y el
+    # centro de la copa declarado a mano, porque su origen es el del
+    # ladrillo. El 40 no es casual: es el mismo +40 de la bola de su pareja,
+    # así que dos ladrillos unidos quedan a rejilla exacta de 4 studs.
+    "axlesphe.dat": "bola",  # Technic Axle Truncated to Fit Ball Joint
+    "92013s01.dat": ("cazoleta", (0.0, 1.0, 0.0), (40.0, 10.0, 0.0)),
     # Studs: el pivote de siempre.
     "stud.dat": "stud",
     "stud2.dat": "stud",
@@ -318,16 +328,18 @@ class Biblioteca:
 
                 entrada = CONEXIONES.get(subarchivo.split("/")[-1].lower())
                 if entrada is not None:
-                    if isinstance(entrada, tuple):
-                        tipo, eje_local = entrada
-                    else:
-                        tipo, eje_local = entrada, (0.0, 1.0, 0.0)
+                    if not isinstance(entrada, tuple):
+                        entrada = (entrada,)
+                    tipo = entrada[0]
+                    eje_local = entrada[1] if len(entrada) > 1 else (0.0, 1.0, 0.0)
+                    # Las primitivas ponen su conexión en su propio origen.
+                    # Un subarchivo puede no hacerlo —el centro de la copa de
+                    # una cazoleta no es el origen del ladrillo— y entonces
+                    # declara dónde cae, en sus coordenadas locales.
+                    local = entrada[2] if len(entrada) > 2 else (0.0, 0.0, 0.0)
+                    punto = completa.aplicar(Punto(*local))
                     pieza.conexiones.append(
-                        Conexion(
-                            tipo,
-                            Punto(completa.x, completa.y, completa.z),
-                            _eje_de(completa, eje_local),
-                        )
+                        Conexion(tipo, punto, _eje_de(completa, eje_local))
                     )
 
                 if self.existe(subarchivo):

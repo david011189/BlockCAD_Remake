@@ -110,6 +110,34 @@ class MachoYHembraTests(unittest.TestCase):
         # En el centro de la rueda, no en un diente.
         self.assertEqual(agujeros[0], [0.0, 0.0, 0.0])
 
+    def test_the_ball_is_at_the_centre_of_its_sphere(self) -> None:
+        """La bola no se detecta por la esfera: por el cuello que la afirma.
+
+        El sensor de distancia y el separador dibujan esferas de adorno, así
+        que mapear la esfera inventaría rótulas. Lo que afirma es «Technic
+        Axle Truncated to Fit Ball Joint», cuyo origen cae en el centro
+        exacto de la bola.
+        """
+        self.assertEqual(self.conexiones("57909", "bola"), [[40.0, 10.0, 0.0]])
+        # El ladrillo de dos bolas tiene una en cada brazo.
+        self.assertEqual(
+            self.conexiones("17114", "bola"),
+            [[-40.0, 10.0, 0.0], [40.0, 10.0, 0.0]],
+        )
+        # Y las piezas que dibujan esferas de adorno siguen sin bola.
+        for numero in ("20844", "31510", "60474"):
+            with self.subTest(pieza=numero):
+                self.assertEqual(self.conexiones(numero, "bola"), [])
+
+    def test_the_socket_is_one_cup_not_two_halves(self) -> None:
+        # LDraw dibuja la cazoleta en dos mitades espejadas. Las dos caen en
+        # el mismo centro —el +40 de la copa es el mismo +40 de la bola de su
+        # pareja: dos ladrillos unidos quedan a rejilla de 4 studs— y la
+        # deduplicación las deja en una.
+        self.assertEqual(
+            self.conexiones("92013", "cazoleta"), [[40.0, 10.0, 0.0]]
+        )
+
     def test_the_pins_are_male(self) -> None:
         # Sin esto un pin no se puede unir a nada: no tiene agujeros ni studs
         # que detectar, y el catálogo lo daba como pieza sin conexiones.
