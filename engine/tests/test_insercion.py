@@ -12,8 +12,8 @@ entre piezas de las que se insertan sería más fácil y dejaría al motor sin l
 que lo justifica: saber si un modelo se puede construir.
 
 Las posiciones no están escritas a ojo. Salen de preguntarle al motor dónde
-caen los puntos: la viga 3701 en el origen tiene agujeros a x=20, 40 y 60,
-todos a z=14, con la recta (0,1,0).
+caen los puntos: la viga 3701 en el origen tiene agujeros a y=20, 40 y 60,
+todos a z=14, con la recta (1,0,0).
 """
 
 import unittest
@@ -22,10 +22,11 @@ from blockcad_engine import BlockModel, GridPosition, Orientation
 from blockcad_engine.catalogos import cargar
 from blockcad_engine.errors import CollisionError
 
-#: El pin 2780 girado un cuarto de vuelta sobre z apunta en (0,1,0), como el
-#: agujero. Puesto aquí, su punto cae en (20, -10, 14): sobre la recta del
-#: primer agujero, y centrado a lo ancho de la viga.
-PIN_EN_EL_PRIMER_AGUJERO = (12, -30, 6)
+#: El pin 2780 sin girar apunta en (1,0,0), como el agujero: la postura de
+#: la viga la manda su nombre, y el pin nace alineado con ella. Puesto aquí,
+#: su punto cae en (10, 20, 14): sobre la recta del primer agujero, y
+#: centrado a lo ancho de la viga.
+PIN_EN_EL_PRIMER_AGUJERO = (-10, 12, 6)
 DE_LADO = Orientation.around("z", 90)
 
 
@@ -48,12 +49,12 @@ class InsercionTests(unittest.TestCase):
         Sin esto no se puede montar ni la primera página de las instrucciones
         de ningún modelo WeDo.
         """
-        self.poner("2780", PIN_EN_EL_PRIMER_AGUJERO, DE_LADO)
+        self.poner("2780", PIN_EN_EL_PRIMER_AGUJERO)
 
     def test_an_inserted_pin_is_connected(self) -> None:
         # Un pin metido casi nunca cae sobre el punto del agujero: entra por
         # él y se queda a otra profundidad. Lo que comparten es la recta.
-        pin = self.poner("2780", PIN_EN_EL_PRIMER_AGUJERO, DE_LADO)
+        pin = self.poner("2780", PIN_EN_EL_PRIMER_AGUJERO)
         unidas = self.modelo.connected_to(pin.instance_id)
         self.assertEqual([p.part_id for p in unidas], ["3701"])
 
@@ -64,16 +65,16 @@ class InsercionTests(unittest.TestCase):
                 modelo = BlockModel(catalog=self.catalogo)
                 modelo.add("3701", GridPosition(0, 0, 0))
                 x, y, z = PIN_EN_EL_PRIMER_AGUJERO
-                modelo.add("2780", GridPosition(x + salto, y, z), orientation=DE_LADO)
+                modelo.add("2780", GridPosition(x, y + salto, z))
 
     def test_an_axle_goes_through_a_beam(self) -> None:
         # Un eje no se mete: atraviesa, y sale por el otro lado. Es como se
         # montan los engranajes, así que sin esto no hay transmisión posible.
-        # No hace falta girarlo: una pieza lineal ya se tumba a lo largo de
-        # Y, que es la recta de los agujeros de la viga.
+        # La viga también se endereza —el nombre manda—, así que sus agujeros
+        # cruzan por X, y el eje, que nace en Y, se gira un cuarto de vuelta.
         modelo = BlockModel(catalog=self.catalogo)
         modelo.add("3702", GridPosition(0, 0, 0))  # viga 1x8
-        eje = modelo.add("3706", GridPosition(14, -50, 8))
+        eje = modelo.add("3706", GridPosition(-50, 34, 8), orientation=DE_LADO)
         self.assertEqual(
             [p.part_id for p in modelo.connected_to(eje.instance_id)], ["3702"]
         )
@@ -82,7 +83,7 @@ class InsercionTests(unittest.TestCase):
         modelo = BlockModel(catalog=self.catalogo)
         modelo.add("3702", GridPosition(0, 0, 0))
         with self.assertRaises(CollisionError):
-            modelo.add("3706", GridPosition(14, -50, 12))
+            modelo.add("3706", GridPosition(-50, 34, 12), orientation=DE_LADO)
 
     # --- lo que NO puede entrar -------------------------------------------
 
@@ -96,19 +97,19 @@ class InsercionTests(unittest.TestCase):
         """
         x, y, z = PIN_EN_EL_PRIMER_AGUJERO
         with self.assertRaises(CollisionError):
-            self.poner("2780", (x, y, z + 4), DE_LADO)
+            self.poner("2780", (x, y, z + 4))
 
     def test_a_pin_between_two_holes_collides(self) -> None:
         # Los agujeros están cada 20; a mitad de camino no hay nada.
         x, y, z = PIN_EN_EL_PRIMER_AGUJERO
         with self.assertRaises(CollisionError):
-            self.poner("2780", (x + 5, y, z), DE_LADO)
+            self.poner("2780", (x, y + 5, z))
 
     def test_a_pin_across_the_beam_collides(self) -> None:
-        # Sin girar, el pin apunta a lo largo de la viga: la recorre por
-        # dentro en vez de entrar por un agujero.
+        # Girado un cuarto de vuelta, el pin apunta a lo largo de la viga:
+        # la recorre por dentro en vez de entrar por un agujero.
         with self.assertRaises(CollisionError):
-            self.poner("2780", (20, 2, 6))
+            self.poner("2780", (2, 20, 6), DE_LADO)
 
     def test_two_beams_in_the_same_place_still_collide(self) -> None:
         # Las dos tienen agujeros, y los agujeros hasta coinciden. No sirve:
@@ -175,14 +176,14 @@ class LenguajeTests(unittest.TestCase):
         self.assertEqual(len(modelo.instances), 4)
 
     def test_the_pin_lands_centered_in_the_hole(self) -> None:
-        # La viga en el origen tiene su primer agujero en x=20, z=14, cruzando
-        # el fondo. El pin (40 de largo) queda centrado: asoma 10 por cada
+        # La viga en el origen tiene su primer agujero en y=20, z=14, cruzando
+        # el ancho. El pin (40 de largo) queda centrado: asoma 10 por cada
         # cara, listo para recibir otra viga.
         modelo = self.compilar("3701 en 0,0,0 llamado v\n2780 en el agujero 1 de v")
         pin = modelo.instances[-1]
         definicion = modelo.catalog.get("2780")
         macho = [c for c in pin.world_connections(definicion) if c.es_macho][0]
-        self.assertEqual(macho.punto, (20, 10, 14))
+        self.assertEqual(macho.punto, (10, 20, 14))
 
     def test_displacement_slides_along_the_line(self) -> None:
         # `desplazado 0.5` son 10 LDU por la recta del agujero, no por x.
@@ -196,9 +197,9 @@ class LenguajeTests(unittest.TestCase):
         self.assertEqual(macho.punto, (20, 20, 14))
 
     def test_holes_are_numbered_by_position(self) -> None:
-        # Agujeros 1, 2 y 3 de la viga: x=20, 40, 60. El número se puede
+        # Agujeros 1, 2 y 3 de la viga: y=20, 40, 60. El número se puede
         # contar mirando el visor.
-        for numero, x in ((1, 20), (2, 40), (3, 60)):
+        for numero, y in ((1, 20), (2, 40), (3, 60)):
             with self.subTest(agujero=numero):
                 modelo = self.compilar(
                     f"3701 en 0,0,0 llamado v\n2780 en el agujero {numero} de v"
@@ -208,7 +209,7 @@ class LenguajeTests(unittest.TestCase):
                 macho = [
                     c for c in pin.world_connections(definicion) if c.es_macho
                 ][0]
-                self.assertEqual(macho.punto[0], x)
+                self.assertEqual(macho.punto[1], y)
 
     def test_without_a_name_it_uses_the_last_piece(self) -> None:
         self.compilar("3701 en 0,0,0\n2780 en el agujero 2")
@@ -225,7 +226,9 @@ class LenguajeTests(unittest.TestCase):
             ("3701 en 0,0,0 llamado v\n2780 en el agujero 9 de v", "3 agujero"),
             ("3701 en 0,0,0 llamado v\n3001 en el agujero 1 de v", "nada que meter"),
             ("10928 en 0,0,0 llamado g\n2780 en el agujero 1 de g", "cruz"),
-            ("3701 en 0,0,0 llamado v\n2780 en el agujero 1 de v rot x 90", "giro"),
+            # rot 90 saca el pin de la recta del agujero. Ojo: rot x 90 ya no
+            # sirve de caso malo, porque girar sobre X conserva la dirección X.
+            ("3701 en 0,0,0 llamado v\n2780 en el agujero 1 de v rot 90", "giro"),
             ("3001 en 0,0,0 llamado b\n2780 en el agujero 1 de b", "no tiene agujeros"),
         )
         for codigo, pista in casos:

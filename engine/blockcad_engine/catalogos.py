@@ -68,6 +68,14 @@ _COLORES = {
 _GRIS_POR_DEFECTO = "#9BA19D"
 
 
+#: Ladrillos Technic con nombre NxM. No ganan alias —se escriben por su
+#: número de molde, como en las instrucciones—, pero su postura también la
+#: manda el nombre: un "Technic Brick 1 x 4" tiene 1 stud de ancho en X.
+_LADRILLO_TECHNIC = re.compile(
+    r"^Technic Brick (\d+) x (\d+) with (?:Holes?|Axlehole)"
+)
+
+
 def _alias_y_categoria(
     nombre_ldraw: str,
 ) -> tuple[list[str], str, tuple[int, ...]]:
@@ -77,6 +85,9 @@ def _alias_y_categoria(
         if encontrado:
             medidas = tuple(int(g) for g in encontrado.groups())
             return [plantilla.format(*encontrado.groups())], categoria, medidas
+    encontrado = _LADRILLO_TECHNIC.match(limpio)
+    if encontrado:
+        return [], "technic", tuple(int(g) for g in encontrado.groups())
     if limpio.startswith("Technic"):
         return [], "technic", ()
     if limpio.startswith("Electric Power Functions"):

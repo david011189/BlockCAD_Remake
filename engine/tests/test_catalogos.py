@@ -176,6 +176,21 @@ class ConventionTests(unittest.TestCase):
                     definicion.dimensions.depth, definicion.dimensions.width
                 )
 
+    def test_technic_bricks_obey_their_name_too(self) -> None:
+        # "Technic Brick 1 x 4 with Holes" no gana alias —se escribe por su
+        # molde, como en las instrucciones—, pero su postura también la manda
+        # el nombre: 1 stud de ancho en X. Sin esto, el paso 1 del camión de
+        # reciclaje dejaba el ladrillo de agujeros cruzado sobre la base.
+        ladrillo = self.wedo.get("3701")
+        self.assertEqual(
+            (ladrillo.dimensions.width, ladrillo.dimensions.depth),
+            (1 * STUD, 4 * STUD),
+        )
+        for numero in ("3700", "3701", "3702", "3703", "3895", "31493"):
+            with self.subTest(pieza=numero):
+                pieza = self.wedo.get(numero)
+                self.assertLess(pieza.dimensions.width, pieza.dimensions.depth)
+
     def test_a_turned_axle_keeps_its_line_along_y(self) -> None:
         # Girar la caja sin girar la recta dejaría el eje atravesado dentro
         # de sí mismo: nada podría insertarse por él.
