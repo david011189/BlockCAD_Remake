@@ -100,6 +100,41 @@ class CompileTests(unittest.TestCase):
         self.assertIn("UTF-8", respuestas[0]["mensaje"])
 
 
+class PaletaTests(unittest.TestCase):
+    """Soltar una pieza escribe código; la paleta solo dice qué hay."""
+
+    def test_the_palette_lists_the_catalog(self) -> None:
+        from blockcad_web.server import piezas_para_soltar
+
+        wedo = piezas_para_soltar("wedo")["piezas"]
+        self.assertGreater(len(wedo), 90)
+        # Cada pieza dice cómo se ESCRIBE, porque soltar es escribir.
+        escrituras = {p["escritura"] for p in wedo}
+        self.assertIn("ladrillo 2x4", escrituras)
+        self.assertIn("viga 7", escrituras)
+
+    def test_without_a_catalog_line_the_basic_one_answers(self) -> None:
+        from blockcad_web.server import piezas_para_soltar
+
+        self.assertEqual(len(piezas_para_soltar("")["piezas"]), 7)
+
+    def test_an_unknown_catalog_is_just_empty(self) -> None:
+        from blockcad_web.server import piezas_para_soltar
+
+        self.assertEqual(piezas_para_soltar("nada")["piezas"], [])
+
+    def test_dropping_goes_through_the_console(self) -> None:
+        # `anadirPiezas` valida antes de tocar el código y registra el
+        # deshacer. Un camino aparte sería un segundo sitio donde el texto
+        # cambia, que es justo lo que este editor prohíbe.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        soltar = html.split("if (armada) {")[1].split("return;")[0]
+        self.assertIn("anadirPiezas", soltar)
+
+    def test_escape_disarms(self) -> None:
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("evento.key === 'Escape' && armada", html)
+
 
 class SeleccionTests(unittest.TestCase):
     """Pinchar una pieza tiene que llevar a su línea de código.

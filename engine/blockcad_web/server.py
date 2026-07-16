@@ -14,6 +14,7 @@ from blockcad_engine import (
     parse_model,
     parse_model_con_lineas,
 )
+from blockcad_engine.catalogos import cargar as cargar_catalogo
 from blockcad_engine.dsl import model_to_source
 from blockcad_engine.serialization import model_from_dict, model_to_dict
 
@@ -187,6 +188,44 @@ def compile_json(source: str) -> dict:
     }
 
 
+def piezas_para_soltar(texto: str) -> dict:
+    """La paleta del editor: qué piezas hay y cómo se escriben.
+
+    Recibe el nombre del catálogo («wedo», o «basico» si el código no dice
+    ninguno) y devuelve, por pieza, la frase con que se escribe en el
+    lenguaje —soltar una pieza ESCRIBE CÓDIGO, no toca ningún modelo— y su
+    caja, para que el visor enseñe un fantasma del tamaño verdadero.
+    """
+    from blockcad_engine.dsl import _part_phrase
+    from blockcad_engine.parts import PartCatalog
+
+    nombre = texto.strip().strip('"') or "basico"
+    try:
+        catalogo = (
+            PartCatalog.with_basic_parts()
+            if nombre == "basico"
+            else cargar_catalogo(nombre)
+        )
+    except BlockCADError:
+        return {"piezas": []}
+
+    piezas = []
+    for definicion in catalogo.all():
+        piezas.append({
+            "escritura": _part_phrase(
+                definicion.aliases[0] if definicion.aliases else definicion.part_id
+            ),
+            "nombre": definicion.name,
+            "categoria": definicion.category,
+            "ancho": definicion.dimensions.width,
+            "fondo": definicion.dimensions.depth,
+            "alto": definicion.dimensions.height,
+            "color": definicion.default_color,
+        })
+    piezas.sort(key=lambda p: (p["categoria"], p["escritura"]))
+    return {"piezas": piezas}
+
+
 def mallas_pedidas(texto: str) -> dict:
     """Devuelve solo las mallas que hagan falta.
 
@@ -278,6 +317,7 @@ class _Handler(BaseHTTPRequestHandler):
             "/api/json": compile_json,
             "/api/importar": import_json,
             "/api/mallas": mallas_pedidas,
+            "/api/piezas": piezas_para_soltar,
         }
         accion = rutas.get(self.path)
         if accion is None:

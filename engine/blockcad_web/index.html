@@ -151,6 +151,33 @@
 
   .visor { flex: 1; position: relative; min-width: 0; }
   canvas { display: block; width: 100%; height: 100%; }
+  #paleta {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    bottom: 8px;
+    width: 190px;
+    overflow-y: auto;
+    background: rgba(19, 22, 29, 0.92);
+    border: 1px solid #2a3040;
+    border-radius: 8px;
+    padding: 6px;
+  }
+  #paleta button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin: 2px 0;
+    padding: 4px 8px;
+    background: #1d2230;
+    color: #cdd4e0;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    font: 12px ui-monospace, Consolas, monospace;
+    cursor: pointer;
+  }
+  #paleta button:hover { border-color: #3a4560; }
+  #paleta button.armada { border-color: #63b3ed; color: #63b3ed; }
   .pista {
     position: absolute;
     left: 12px;
@@ -183,6 +210,7 @@
     <button id="guardar" title="Descargar el código como archivo .blockcad">Guardar</button>
     <button id="exportar" title="Descargar el modelo en el formato JSON del motor">Exportar JSON</button>
     <span class="separador"></span>
+    <button id="piezas">Piezas</button>
     <button id="ejemplo">Ejemplo</button>
     <button id="centrar">Centrar</button>
   </div>
@@ -211,6 +239,7 @@ ladrillo 2x4 en 2,0,0 color amarillo'></textarea>
   </section>
   <section class="visor">
     <canvas id="lienzo"></canvas>
+    <div id="paleta" hidden></div>
     <div class="pista">Arrastra para girar · rueda para acercar · clic derecho para desplazar · clic en una pieza para ver su línea, Supr la borra</div>
   </section>
 </main>
@@ -459,6 +488,7 @@ function anotar(p, cuerpo, aristas, color, opacidad) {
   cuerpo.userData.pieza = dibujadas.length;
   dibujadas.push({
     linea: p.linea, orden, cuerpo, aristas, color, opacidad, nombre: p.nombre,
+    caja: { x: p.x, y: p.y, z: p.z, ancho: p.ancho, fondo: p.fondo, alto: p.alto },
   });
 }
 
@@ -533,6 +563,98 @@ function elegir(pieza) {
   );
 }
 
+// --- Soltar piezas ----------------------------------------------------------
+//
+// Soltar una pieza ESCRIBE CÓDIGO: la línea entra por el mismo camino que la
+// consola (validar primero, deshacer incluido). El visor solo elige el sitio.
+
+const paleta = document.getElementById('paleta');
+let armada = null;   // la pieza elegida en la paleta, o null
+let fantasma = null; // la caja translúcida que sigue al puntero
+
+// Un plano invisible en z=0, dentro del grupo del modelo: para soltar en el
+// suelo aunque no haya ninguna pieza que pinchar.
+const suelo = new THREE.Mesh(
+  new THREE.PlaneGeometry(4000, 4000),
+  new THREE.MeshBasicMaterial({ visible: false }),
+);
+suelo.position.set(0, 0, 0);
+modelo.add(suelo);
+
+async function abrirPaleta() {
+  if (!paleta.hidden) { paleta.hidden = true; desarmar(); return; }
+  const encontrado = areaCodigo.value.match(/^\s*catalogo\s+"([^"]+)"/m);
+  const nombre = encontrado ? encontrado[1] : 'basico';
+  const respuesta = await fetch('/api/piezas', { method: 'POST', body: nombre });
+  const datos = await respuesta.json();
+  paleta.replaceChildren(...datos.piezas.map((pieza) => {
+    const boton = document.createElement('button');
+    boton.textContent = pieza.escritura;
+    boton.title = pieza.nombre;
+    boton.addEventListener('click', () => armar(pieza, boton));
+    return boton;
+  }));
+  paleta.hidden = false;
+}
+
+function armar(pieza, boton) {
+  desarmar();
+  armada = pieza;
+  boton.classList.add('armada');
+  fantasma = new THREE.Mesh(
+    new THREE.BoxGeometry(pieza.ancho, pieza.fondo, pieza.alto),
+    new THREE.MeshBasicMaterial({
+      color: pieza.color, transparent: true, opacity: 0.45, depthWrite: false,
+    }),
+  );
+  fantasma.visible = false;
+  modelo.add(fantasma);
+  decir(`Pincha el suelo o una pieza para soltar ${pieza.escritura}. Esc cancela.`);
+}
+
+function desarmar() {
+  armada = null;
+  if (fantasma) { modelo.remove(fantasma); fantasma.geometry.dispose(); fantasma = null; }
+  for (const b of paleta.querySelectorAll('.armada')) b.classList.remove('armada');
+}
+
+// Dónde caería la pieza: sobre el suelo o sobre la tapa de lo pinchado,
+// con la esquina ajustada a studs enteros. Devuelve LDU.
+function sitioParaSoltar(evento) {
+  const caja = lienzo.getBoundingClientRect();
+  puntero.x = ((evento.clientX - caja.left) / caja.width) * 2 - 1;
+  puntero.y = -((evento.clientY - caja.top) / caja.height) * 2 + 1;
+  rayo.setFromCamera(puntero, camara);
+  const blancos = [suelo, ...dibujadas.map((d) => d.cuerpo)];
+  const tocado = rayo.intersectObjects(blancos, false)[0];
+  if (!tocado) return null;
+
+  const local = modelo.worldToLocal(tocado.point.clone());
+  const x = Math.round((local.x - armada.ancho / 2) / 20) * 20;
+  const y = Math.round((local.y - armada.fondo / 2) / 20) * 20;
+  let z = 0;
+  if (tocado.object !== suelo) {
+    const encima = dibujadas[tocado.object.userData.pieza];
+    if (encima) z = encima.caja.z + encima.caja.alto;
+  }
+  return { x, y, z };
+}
+
+lienzo.addEventListener('pointermove', (evento) => {
+  if (!armada || !fantasma) return;
+  const sitio = sitioParaSoltar(evento);
+  fantasma.visible = sitio !== null;
+  if (sitio) {
+    fantasma.position.set(
+      sitio.x + armada.ancho / 2, sitio.y + armada.fondo / 2, sitio.z + armada.alto / 2,
+    );
+  }
+});
+
+addEventListener('keydown', (evento) => {
+  if (evento.key === 'Escape' && armada) { desarmar(); decir(''); }
+});
+
 // Orbitar es arrastrar, y arrastrar termina en un clic. Lo que separa las dos
 // cosas es si el puntero se ha movido.
 let apretado = null;
@@ -546,6 +668,18 @@ lienzo.addEventListener('pointerup', (evento) => {
   const movido = Math.hypot(evento.clientX - apretado.x, evento.clientY - apretado.y);
   apretado = null;
   if (movido > 5) return;
+
+  if (armada) {
+    const sitio = sitioParaSoltar(evento);
+    if (sitio) {
+      // En studs y placas, que es como habla el lenguaje. El camino es el de
+      // la consola: valida antes de tocar el código y registra el deshacer.
+      const sx = sitio.x / 20, sy = sitio.y / 20, sz = sitio.z / 8;
+      anadirPiezas(`${armada.escritura} en ${sx},${sy},${sz}`);
+      desarmar();
+    }
+    return;
+  }
 
   const caja = lienzo.getBoundingClientRect();
   puntero.x = ((evento.clientX - caja.left) / caja.width) * 2 - 1;
@@ -714,6 +848,7 @@ function alEscribir() {
 areaCodigo.addEventListener('input', alEscribir);
 areaCodigo.addEventListener('scroll', () => { gutter.scrollTop = areaCodigo.scrollTop; });
 document.getElementById('centrar').addEventListener('click', centrar);
+document.getElementById('piezas').addEventListener('click', abrirPaleta);
 
 // Sustituir lo escrito sin avisar sería destruir trabajo de un clic.
 function puedoReemplazar() {

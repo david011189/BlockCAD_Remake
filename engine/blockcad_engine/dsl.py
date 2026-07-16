@@ -61,7 +61,9 @@ NAMED_COLORS = {
 _PREFIX_NAMES = {prefijo: nombre for nombre, prefijo in PART_PREFIXES.items()}
 _COLOR_NAMES = {valor: nombre for nombre, valor in NAMED_COLORS.items()}
 
-_PART_ID_RE = re.compile(r"^(?P<prefijo>[a-z]+)_(?P<medida>\d+x\d+)$")
+# La medida puede ser doble ("2x4") o simple ("7"): una viga se mide con un
+# solo número, y sin esto se escribiría "beam_7" en vez de "viga 7".
+_PART_ID_RE = re.compile(r"^(?P<prefijo>[a-z]+)_(?P<medida>\d+(?:x\d+)?)$")
 
 _NAME_RE = re.compile(r'^modelo\s+"(?P<nombre>[^"]*)"\s*$')
 
