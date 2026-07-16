@@ -112,6 +112,15 @@ _AGUJERO_RE = re.compile(
     r"(?P<opciones>.*)$"
 )
 
+# «en el eje de motor1»: el caso espejo. Aquí no hay número porque un eje es
+# una sola recta; lo que se elige es cuánto resbalar por ella.
+_EJE_RE = re.compile(
+    r"^en\s+(?:el\s+)?eje"
+    r"(?:\s+de\s+(?P<nombre>[^\W\d]\w*))?"
+    rf"(?:\s+desplazado\s+(?P<d>{_NUMERO}))?"
+    r"(?P<opciones>.*)$"
+)
+
 
 def _a_ldu(valor: str, unidad: int, nombre_unidad: str, line: int) -> int:
     """Traduce lo que escribe el usuario a las unidades del motor.
@@ -341,10 +350,15 @@ class _Builder:
         offset: tuple[int, int, int],
         definition,
     ) -> tuple[GridPosition, dict]:
-        # `en el agujero` va antes que `en x,y,z`: los dos empiezan por "en".
+        # `en el agujero` y `en el eje` van antes que `en x,y,z`: los tres
+        # empiezan por "en".
         agujero = _AGUJERO_RE.match(lugar)
         if agujero:
             return self._en_agujero(agujero, line, definition)
+
+        eje = _EJE_RE.match(lugar)
+        if eje:
+            return self._en_eje(eje, line, definition)
 
         absoluto = _ABSOLUTO_RE.match(lugar)
         if absoluto:
@@ -506,69 +520,140 @@ class _Builder:
                 "no hay nada que meter por un agujero.",
             )
 
+        centro = tuple(
+            sum(c.punto[k] for c in agujero) / len(agujero) for k in range(3)
+        )
+        return self._colocar_por_recta(
+            definition, indices_macho, agujero[0].eje, centro, match, options, line
+        )
+
+    def _en_eje(
+        self, match: re.Match, line: _Line, definition
+    ) -> tuple[GridPosition, dict]:
+        """Encaja la pieza sobre el eje de otra: el caso espejo del agujero.
+
+        Un engranaje no se mete en nada: es él quien recibe el eje. Aquí la
+        recta la pone el macho de la referencia y el agujero lo trae la pieza
+        que se coloca. La resolución es la misma con los papeles cambiados.
+        """
+        options = _parse_options(match.group("opciones"), line.number)
+        referencia = self._referencia(match.group("nombre"), line, "'en el eje'")
+        definicion_ref = self.model.catalog.get(referencia.part_id)
+
+        puntas = [
+            c
+            for c in referencia.world_connections(definicion_ref)
+            if c.tipo == "punta_eje"
+        ]
+        if not puntas:
+            raise DslError(
+                line.number,
+                f"{definicion_ref.name} no tiene eje sobre el que encajar nada.",
+            )
+        if any(not c.misma_recta_que(puntas[0]) for c in puntas[1:]):
+            raise DslError(
+                line.number,
+                f"{definicion_ref.name} tiene ejes en varias direcciones y "
+                "no sé cuál quieres.",
+            )
+
+        # El agujero lo trae la pieza que se coloca, y tiene que ser de los
+        # que un eje atraviesa: el redondo o el de cruz.
+        indices = [
+            i
+            for i, c in enumerate(definition.connections)
+            if c.tipo in Connection.ENCAJES["punta_eje"]
+        ]
+        if not indices:
+            raise DslError(
+                line.number,
+                f"{definition.name} no tiene agujero por donde pase un eje.",
+            )
+
+        # El centro del eje: el punto medio entre sus puntas. Un eje con tope
+        # tiene una sola punta, y entonces el centro es esa punta.
+        centro = tuple(
+            sum(c.punto[k] for c in puntas) / len(puntas) for k in range(3)
+        )
+        return self._colocar_por_recta(
+            definition, indices, puntas[0].eje, centro, match, options, line
+        )
+
+    def _colocar_por_recta(
+        self,
+        definition,
+        indices: list[int],
+        eje_objetivo,
+        centro,
+        match: re.Match,
+        options: dict,
+        line: _Line,
+    ) -> tuple[GridPosition, dict]:
+        """Resuelve giro y posición para que unas conexiones caigan en una recta.
+
+        Es el corazón compartido de `en el agujero` y `en el eje`: en ambos
+        casos hay una recta objetivo y unas conexiones de la pieza nueva que
+        deben acabar sobre ella, centradas en `centro` y corridas lo que diga
+        `desplazado`.
+        """
         # Sin girar y en el origen: la vara de medir de la propia pieza.
         base = PlacedPart.create(
             definition.part_id, GridPosition(0, 0, 0)
         ).world_connections(definition)
-        macho = base[indices_macho[0]]
-        if any(
-            not base[i].misma_recta_que(macho) for i in indices_macho[1:]
-        ):
-            # Las dos puntas de un eje son la misma recta y pasan por aquí.
-            # Dos pines en rectas distintas, no: elegir sería adivinar.
+        primera = base[indices[0]]
+        if any(not base[i].misma_recta_que(primera) for i in indices[1:]):
+            # Las dos puntas de un eje —o las dos caras de un agujero— son la
+            # misma recta y pasan por aquí. Varias rectas distintas, no:
+            # elegir sería adivinar.
             raise DslError(
                 line.number,
-                f"{definition.name} tiene varios sitios que meter y no sé "
+                f"{definition.name} tiene varios sitios que encajar y no sé "
                 "cuál quieres. De momento esa pieza va con 'en x,y,z'.",
             )
 
-        eje_agujero = agujero[0].eje
         orientacion = options.get("orientation")
         if orientacion is not None:
-            if not _paralelas(orientacion.apply(*macho.eje), eje_agujero):
+            if not _paralelas(orientacion.apply(*primera.eje), eje_objetivo):
                 raise DslError(
                     line.number,
-                    "Con ese giro la pieza no apunta por el agujero. "
+                    "Con ese giro la pieza no apunta por donde se encaja. "
                     "Quita el 'rot' y el giro se resuelve solo.",
                 )
         else:
-            # El primer giro de los 24 que deja el macho paralelo al agujero.
-            # El orden de `todas()` es fijo, así que el resultado también.
+            # El primer giro de los 24 que la deja paralela. El orden de
+            # `todas()` es fijo, así que el resultado también.
             orientacion = next(
                 (
                     o
                     for o in Orientation.todas()
-                    if _paralelas(o.apply(*macho.eje), eje_agujero)
+                    if _paralelas(o.apply(*primera.eje), eje_objetivo)
                 ),
                 None,
             )
             if orientacion is None:
                 raise DslError(
                     line.number,
-                    "Ese agujero no va paralelo a ningún eje y no hay giro "
-                    "de 90 grados que lo alcance.",
+                    "Esa recta no va paralela a ningún eje y no hay giro "
+                    "de 90 grados que la alcance.",
                 )
             options["orientation"] = orientacion
 
-        # Dónde queda el ancla de la pieza (el centro de sus machos) una vez
-        # girada, y dónde tiene que acabar: el centro del agujero, más el
+        # Dónde queda el ancla de la pieza (el centro de sus conexiones) una
+        # vez girada, y dónde tiene que acabar: `centro`, más el
         # desplazamiento que pida el usuario, en módulos y por la recta.
         girados = PlacedPart.create(
             definition.part_id, GridPosition(0, 0, 0), orientation=orientacion
         ).world_connections(definition)
         ancla = tuple(
-            sum(girados[i].punto[k] for i in indices_macho) / len(indices_macho)
+            sum(girados[i].punto[k] for i in indices) / len(indices)
             for k in range(3)
-        )
-        centro = tuple(
-            sum(c.punto[k] for c in agujero) / len(agujero) for k in range(3)
         )
         modulos = _a_ldu(
             match.group("d") or "0", MODULO_TECHNIC, "módulos", line.number
         )
-        largo = sum(v * v for v in eje_agujero) ** 0.5
+        largo = sum(v * v for v in eje_objetivo) ** 0.5
         valores = [
-            centro[k] + modulos * eje_agujero[k] / largo - ancla[k]
+            centro[k] + modulos * eje_objetivo[k] / largo - ancla[k]
             for k in range(3)
         ]
         enteros = [round(v) for v in valores]
@@ -578,7 +663,16 @@ class _Builder:
                 "Con ese desplazamiento la pieza cae entre dos posiciones "
                 "LDU. Prueba con medios módulos: 0.5, 1, 1.5...",
             )
-        return GridPosition(*enteros), options
+        try:
+            return GridPosition(*enteros), options
+        except BlockCADError as exc:
+            # El caso típico: una rueda más grande que la altura de su eje
+            # acaba por debajo del suelo. El motor lo rechaza; aquí se le pone
+            # el número de línea y el remedio.
+            raise DslError(
+                line.number,
+                f"{exc} Ahí la pieza no cabe: prueba a construir más arriba.",
+            ) from exc
 
     def _describe(self, collisions: tuple[PlacedPart, ...], current: int) -> str:
         lines = sorted({self._line_by_id[item.instance_id] for item in collisions})

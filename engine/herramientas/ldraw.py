@@ -52,7 +52,15 @@ MODULO_TECHNIC = 20
 CONEXIONES = {
     # Hembra: hay un hueco donde meter algo.
     "peghole.dat": "agujero_pin",  # Peg Hole End
+    "peghole5.dat": "agujero_pin",  # Peg Hole End Extended Medium
     "axlehole.dat": "agujero_eje",  # Technic Axle Hole Closed
+    # Las variantes «Reduced» y compañía son agujeros de eje igual de reales:
+    # con menos plástico alrededor, pero el hueco es el mismo. Los engranajes
+    # dibujan el suyo con estas, así que sin ellas una rueda dentada no tiene
+    # dónde recibir su eje.
+    "axl2hole.dat": "agujero_eje",  # Technic Axle Hole Reduced Closed
+    "axl3hole.dat": "agujero_eje",  # Technic Axle Hole Semi-Reduced
+    "axl4hole.dat": "agujero_eje",  # Technic Axle Hole Two-toothed Sliding
     # Macho: es lo que se mete.
     "confric4.dat": "pin",  # Technic Friction Pin 1.0 with Base Collar
     "confric5.dat": "pin",  # Technic Friction Pin 1.0 Slotted

@@ -244,6 +244,37 @@ El encaje respeta el plástico, y no es simétrico:
 Un `rot` explícito se respeta si deja la pieza apuntando por el agujero; si
 no, el error lo dice y basta quitarlo para que el giro se resuelva solo.
 
+### Encajar sobre un eje
+
+El caso espejo: un engranaje no se mete en nada, es él quien recibe el eje.
+`en el eje de <nombre>` encaja la pieza sobre el eje de otra; aquí no hay
+número porque un eje es una sola recta, y `desplazado` elige el punto.
+
+```
+catalogo "wedo"
+
+// La viga por defecto tiene los agujeros en vertical: se tumba con rot x 90
+// y se eleva, porque una rueda más grande que su altura tocaría el suelo.
+viga 7 en 0,0,2 rot x 90 color verde llamado chasis
+
+eje 6 en el agujero 2 de chasis llamado transmision
+32270 en el eje de transmision desplazado -1.5 color rojo     // 12 dientes
+32270 en el eje de transmision desplazado 1.5 color amarillo
+10928 en el eje de transmision desplazado 2.5 color gris      // 8 dientes
+```
+
+Todo lo del eje gira junto: es un solo grado de libertad, que es lo que hace
+transmisión a una transmisión.
+
+**El límite honesto de hoy: los dientes no muerden.** Dos ruedas de 8 en
+agujeros vecinos —la distancia exacta a la que engranan en la realidad—
+chocan para el motor, porque al engranar los dientes se entrelazan y las
+cajas se solapan sin que haya macho y hembra que lo justifique. Hace falta
+una regla nueva (dos ejes paralelos a la suma de sus radios primitivos:
+1,25 LDU por diente), y es el siguiente trabajo del motor. El engranaje de
+24 dientes además no tiene agujero detectable: LDraw lo dibuja sin
+primitiva.
+
 ### Nombrar el modelo
 
 ```

@@ -71,6 +71,24 @@ class MachoYHembraTests(unittest.TestCase):
         # El 87083 lleva tope en un extremo: por ahí no entra en ningún sitio.
         self.assertEqual(len(self.conexiones("87083", "punta_eje")), 1)
 
+    def test_the_gears_have_their_axle_hole(self) -> None:
+        """Sin agujero, un engranaje no puede recibir su eje.
+
+        LDraw dibuja el agujero de los engranajes con la familia «Reduced»
+        (axl2hole y compañía), que son agujeros igual de reales con menos
+        plástico alrededor. No estaban en el mapa y las ruedas dentadas salían
+        del catálogo sin ninguna conexión: piezas que no se unían a nada.
+        """
+        for diseno in ("32270", "32905", "42136", "59443"):
+            with self.subTest(pieza=diseno):
+                self.assertTrue(self.conexiones(diseno, "agujero_eje"))
+
+    def test_the_24_tooth_gear_still_has_no_hole(self) -> None:
+        # El de 24 dientes dibuja su cruz con geometría cruda, sin primitiva:
+        # no hay nada que detectar. Documentarlo evita buscar el fallo donde
+        # no está; si LDraw lo arregla algún día, esta prueba avisará.
+        self.assertEqual(self.conexiones("24505", "agujero_eje"), [])
+
     def test_the_pins_are_male(self) -> None:
         # Sin esto un pin no se puede unir a nada: no tiene agujeros ni studs
         # que detectar, y el catálogo lo daba como pieza sin conexiones.

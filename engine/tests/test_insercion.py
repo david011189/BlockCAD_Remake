@@ -231,6 +231,81 @@ class LenguajeTests(unittest.TestCase):
                     self.compilar(codigo)
                 self.assertIn(pista, str(ctx.exception))
 
+    def test_a_gear_slides_onto_an_axle(self) -> None:
+        """El caso espejo: la hembra que se encaja sobre el macho.
+
+        Un engranaje no se mete en nada —es él quien recibe el eje—, así que
+        `en el agujero de` no podía expresarlo: la recta la pone el eje y el
+        agujero lo trae la pieza que se coloca.
+        """
+        modelo = self.compilar(
+            "viga 7 en 0,0,2 rot x 90 llamado chasis\n"
+            "eje 6 en el agujero 2 de chasis llamado eje1\n"
+            "32270 en el eje de eje1 desplazado -1.5"
+        )
+        rueda = modelo.instances[-1]
+        unidas = {p.part_id for p in modelo.connected_to(rueda.instance_id)}
+        self.assertIn("3706", unidas)
+
+    def test_the_motor_pattern_of_the_truck(self) -> None:
+        # Motor, eje en su boca (el agujero 3: los otros son de pin), y la
+        # rueda dentada en la mitad libre del eje. Es el arranque real de
+        # cualquier modelo WeDo con transmisión.
+        modelo = self.compilar(
+            "21980 en 0,0,0 llamado motor\n"
+            "4519 en el agujero 3 de motor llamado eje\n"
+            "32270 en el eje de eje desplazado -1"
+        )
+        self.assertEqual(len(modelo.instances), 3)
+        self.assertFalse(modelo.floating())
+
+    def test_a_centered_gear_inside_the_motor_is_refused(self) -> None:
+        # Sin desplazar, el engranaje cae dentro del cuerpo del motor. Que
+        # esto choque es la regla estrecha trabajando: la recta del agujero
+        # del engranaje coincide con la del motor, pero el motor no es un
+        # macho metido en él.
+        from blockcad_engine.errors import DslError
+
+        with self.assertRaises(DslError):
+            self.compilar(
+                "21980 en 0,0,0 llamado motor\n"
+                "4519 en el agujero 3 de motor llamado eje\n"
+                "32270 en el eje de eje"
+            )
+
+    def test_a_wheel_bigger_than_its_height_names_the_line(self) -> None:
+        # La viga por defecto tiene los agujeros en vertical: un eje metido
+        # ahí apunta al suelo. El error debe decir la línea y el remedio, no
+        # solo «la coordenada z no puede ser negativa» sin dónde.
+        from blockcad_engine.errors import DslError
+
+        with self.assertRaises(DslError) as ctx:
+            self.compilar(
+                "viga 7 en 0,0,3 llamado chasis\n"
+                "eje 6 en el agujero 2 de chasis"
+            )
+        self.assertEqual(ctx.exception.line, 3)
+        self.assertIn("más arriba", str(ctx.exception))
+
+    def test_en_el_eje_errors_teach_too(self) -> None:
+        from blockcad_engine.errors import DslError
+
+        casos = (
+            # Una viga no tiene eje sobre el que encajar.
+            ("3701 en 0,0,0 llamado v\n32270 en el eje de v", "no tiene eje"),
+            # Un ladrillo no tiene agujero por donde pase un eje.
+            (
+                "3701 en 0,0,0 llamado v\n4519 en el agujero 2 de v llamado e\n"
+                "3001 en el eje de e",
+                "por donde pase un eje",
+            ),
+        )
+        for codigo, pista in casos:
+            with self.subTest(pista=pista):
+                with self.assertRaises(DslError) as ctx:
+                    self.compilar(codigo)
+                self.assertIn(pista, str(ctx.exception))
+
     def test_the_result_survives_the_round_trip(self) -> None:
         # El código generado desde el modelo usa `en x,y,z` con decimales.
         # Tiene que volver a compilar y dejar las piezas donde estaban.
