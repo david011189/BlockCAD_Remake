@@ -240,7 +240,7 @@ ladrillo 2x4 en 2,0,0 color amarillo'></textarea>
   <section class="visor">
     <canvas id="lienzo"></canvas>
     <div id="paleta" hidden></div>
-    <div class="pista">Arrastra para girar · rueda para acercar · clic derecho para desplazar · clic en una pieza para ver su línea, Supr la borra</div>
+    <div class="pista">Arrastra para girar · rueda para acercar · clic en una pieza para ver su línea · clic derecho la quita · arrastrar con el derecho desplaza</div>
   </section>
 </main>
 
@@ -694,6 +694,8 @@ addEventListener('keydown', (evento) => {
 // cosas es si el puntero se ha movido.
 let apretado = null;
 
+lienzo.addEventListener('contextmenu', (evento) => evento.preventDefault());
+
 lienzo.addEventListener('pointerdown', (evento) => {
   apretado = { x: evento.clientX, y: evento.clientY };
 });
@@ -703,6 +705,19 @@ lienzo.addEventListener('pointerup', (evento) => {
   const movido = Math.hypot(evento.clientX - apretado.x, evento.clientY - apretado.y);
   apretado = null;
   if (movido > 5) return;
+
+  if (evento.button === 2) {
+    // Arrastrar con el derecho sigue siendo desplazar la camara; solo el
+    // clic quieto quita. Y quita por el camino de la consola: con deshacer.
+    const caja2 = lienzo.getBoundingClientRect();
+    puntero.x = ((evento.clientX - caja2.left) / caja2.width) * 2 - 1;
+    puntero.y = -((evento.clientY - caja2.top) / caja2.height) * 2 + 1;
+    rayo.setFromCamera(puntero, camara);
+    const tocada = rayo.intersectObjects(dibujadas.map((d) => d.cuerpo), false)[0];
+    const cual = tocada ? dibujadas[tocada.object.userData.pieza] : null;
+    if (cual && cual.linea != null) borrar(String(cual.linea));
+    return;
+  }
 
   if (armada) {
     const sitio = sitioParaSoltar(evento);

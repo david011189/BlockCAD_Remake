@@ -171,6 +171,14 @@ class InventarioTests(unittest.TestCase):
         quitar = html.split("if (modoQuitar) {")[1].split("return;")[0]
         self.assertIn("borrar(String(pieza.linea))", quitar)
 
+    def test_right_click_removes_through_the_console(self) -> None:
+        # Clic derecho quieto = quitar la pieza (su linea, con deshacer);
+        # arrastrar con el derecho sigue desplazando la camara.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        rama = html.split("if (evento.button === 2) {")[1].split("return;")[0]
+        self.assertIn("borrar(String(cual.linea))", rama)
+        self.assertIn("contextmenu", html)
+
     def test_the_footer_reports_it(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn("datos.agotadas", html)
