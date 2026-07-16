@@ -361,7 +361,21 @@
         20.0,
         54.0
       ],
-      "conexiones_motor": [],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            27.0,
+            0.0,
+            27.0
+          ],
+          "eje": [
+            0.0,
+            1.0,
+            0.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -27.0,
@@ -379,7 +393,16 @@
         54.0,
         20.0
       ],
-      "conexiones": []
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            -10.0
+          ]
+        }
+      ]
     },
     {
       "diseno": "18651",
@@ -4594,6 +4617,19 @@
       ],
       "conexiones_motor": [
         {
+          "tipo": "agujero_eje",
+          "punto": [
+            20.0,
+            20.0,
+            14.0
+          ],
+          "eje": [
+            0.0,
+            1.0,
+            0.0
+          ]
+        },
+        {
           "tipo": "stud",
           "punto": [
             10.0,
@@ -4651,6 +4687,14 @@
         20.0
       ],
       "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            10.0,
+            10.0
+          ]
+        },
         {
           "tipo": "stud",
           "punto": [
@@ -6068,7 +6112,21 @@
         10.0,
         52.0
       ],
-      "conexiones_motor": [],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            26.0,
+            7.0,
+            26.0
+          ],
+          "eje": [
+            0.0,
+            1.0,
+            0.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -26.0,
@@ -6086,7 +6144,16 @@
         52.0,
         10.0
       ],
-      "conexiones": []
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
     },
     {
       "diseno": "32270",
@@ -12599,7 +12666,21 @@
         20.0,
         18.0
       ],
-      "conexiones_motor": [],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            9.0,
+            0.0,
+            9.0
+          ],
+          "eje": [
+            0.0,
+            1.0,
+            0.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -9.0,
@@ -12617,7 +12698,16 @@
         18.0,
         20.0
       ],
-      "conexiones": []
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            -10.0
+          ]
+        }
+      ]
     },
     {
       "diseno": "4282",
@@ -16478,7 +16568,21 @@
         10.0,
         60.0
       ],
-      "conexiones_motor": [],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            30.0,
+            0.0,
+            30.0
+          ],
+          "eje": [
+            0.0,
+            1.0,
+            0.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -30.0,
@@ -16496,7 +16600,16 @@
         60.0,
         10.0
       ],
-      "conexiones": []
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            -5.0
+          ]
+        }
+      ]
     },
     {
       "diseno": "73587",

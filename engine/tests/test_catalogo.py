@@ -83,6 +83,18 @@ class MachoYHembraTests(unittest.TestCase):
             with self.subTest(pieza=diseno):
                 self.assertTrue(self.conexiones(diseno, "agujero_eje"))
 
+    def test_the_lever_brick_has_its_cross(self) -> None:
+        """El 31493 es la pieza que convierte un giro en una palanca.
+
+        Es un ladrillo 1x2 con agujero de CRUZ: el eje lo arrastra en vez de
+        resbalar, y sus studs llevan el brazo. Salía sin la cruz porque LDraw
+        la dibuja con `axlehol5` («Axle Hole Open Two Opposite Sides»), que no
+        estaba en el mapa. Lo descubrió el plástico: un usuario montó la pinza
+        colgada de un agujero redondo y el eje giraba sin mover nada.
+        """
+        self.assertTrue(self.conexiones("31493", "agujero_eje"))
+        self.assertEqual(len(self.conexiones("31493", "stud")), 3)
+
     def test_the_24_tooth_gear_still_has_no_hole(self) -> None:
         # El de 24 dientes dibuja su cruz con geometría cruda, sin primitiva:
         # no hay nada que detectar. Documentarlo evita buscar el fallo donde

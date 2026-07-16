@@ -61,6 +61,7 @@ CONEXIONES = {
     "axl2hole.dat": "agujero_eje",  # Technic Axle Hole Reduced Closed
     "axl3hole.dat": "agujero_eje",  # Technic Axle Hole Semi-Reduced
     "axl4hole.dat": "agujero_eje",  # Technic Axle Hole Two-toothed Sliding
+    "axlehol5.dat": "agujero_eje",  # Technic Axle Hole Open Two Opposite Sides
     # Macho: es lo que se mete.
     "confric4.dat": "pin",  # Technic Friction Pin 1.0 with Base Collar
     "confric5.dat": "pin",  # Technic Friction Pin 1.0 Slotted
