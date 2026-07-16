@@ -715,9 +715,47 @@ let piezaDelMenu = null;
 
 function cerrarMenu() { menuCtx.style.display = 'none'; piezaDelMenu = null; }
 
-opcionQuitar.addEventListener('click', () => {
-  if (piezaDelMenu) borrar(String(piezaDelMenu.linea));
+opcionQuitar.addEventListener('click', async () => {
+  if (!piezaDelMenu) return cerrarMenu();
+  const cual = piezaDelMenu;
   cerrarMenu();
+
+  // Desconectar SEPARA, no elimina: la pieza se aparta al suelo, junto al
+  // modelo, y las dos partes sobreviven. En codigo: su linea se reescribe
+  // con una posicion absoluta.
+  const hermanas = dibujadas.filter((d) => d.linea === cual.linea).length;
+  if (hermanas > 1) {
+    decir('Esa linea pone ' + hermanas + ' piezas (un repetir): no se puede separar una sola. Edita el bucle en el codigo.', 'fallo');
+    return;
+  }
+
+  const lineas = areaCodigo.value.split('\n');
+  const vieja = lineas[cual.linea - 1];
+  const partes = vieja.match(/^(\s*)(\S+(?:\s+\d+(?:x\d+)?)?)\s+((?:encima|en).*)$/);
+  if (!partes) {
+    decir('No he sabido reescribir esa linea.', 'fallo');
+    return;
+  }
+  // Las opciones sobreviven a la mudanza; el lugar no.
+  const opciones = (partes[3].match(/(color\s+\S+|rot(?:ado)?(?:\s+[xyz])?\s+\d+|llamado\s+\S+|grupo\s+\d+|paso\s+\d+|transparente)/g) || []).join(' ');
+
+  // El sitio: a dos studs a la derecha de todo el modelo, en el suelo.
+  const maxX = Math.max(...dibujadas.map((d) => d.caja.x + d.caja.ancho));
+  const sx = Math.ceil((maxX + 40) / 20);
+  const sy = cual.caja.y / 20;
+  lineas[cual.linea - 1] = partes[1] + partes[2] + ' en ' + sx + ',' + sy + ',0'
+    + (opciones ? ' ' + opciones : '');
+  const propuesta = lineas.join('\n');
+
+  const respuesta = await fetch('/api/modelo', { method: 'POST', body: propuesta });
+  const datos = await respuesta.json();
+  if (!datos.ok) {
+    decir('Al separarla choca: ' + datos.mensaje, 'fallo');
+    return;
+  }
+  registrar();
+  aplicar(propuesta);
+  decir('Separada: la pieza de la linea ' + cual.linea + ' quedo aparte, en ' + sx + ',' + sy + ',0.', 'hecho');
 });
 
 opcionGirar.addEventListener('click', async () => {

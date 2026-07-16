@@ -181,12 +181,24 @@ class InventarioTests(unittest.TestCase):
         self.assertIn("contextmenu", html)
 
     def test_the_menu_options_edit_the_code(self) -> None:
-        # Desconectar borra la linea por la consola; girar valida la linea
-        # girada ANTES de aplicarla: si choca, el codigo queda intacto.
+        # Girar valida la linea girada ANTES de aplicarla: si choca, el
+        # codigo queda intacto.
         html = (_WEB / "index.html").read_text(encoding="utf-8")
-        girar = html.split("opcionGirar.addEventListener")[1].split("addEventListener('pointerdown'")[0]
-        self.assertIn("borrar(String(piezaDelMenu.linea))", html)
+        girar = html.split("opcionGirar.addEventListener")[1].split("opcionQuitar.addEventListener")[0]
         self.assertLess(girar.index("fetch('/api/modelo'"), girar.index("aplicar(propuesta)"))
+
+    def test_disconnect_separates_it_does_not_delete(self) -> None:
+        # Desconectar SEPARA: reescribe la linea de la pieza a una posicion
+        # absoluta en el suelo, junto al modelo. Las dos piezas sobreviven,
+        # las opciones (color, nombre...) viajan con la mudanza, y tambien
+        # valida antes de tocar. Un `repetir` se rehusa explicando.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        sep = html.split("opcionQuitar.addEventListener")[1].split("addEventListener('pointerdown'")[0]
+        self.assertNotIn("borrar(", sep)
+        self.assertIn("' en ' + sx", sep)
+        self.assertIn("color", sep)
+        self.assertIn("no se puede separar una sola", sep)
+        self.assertLess(sep.index("fetch('/api/modelo'"), sep.index("aplicar(propuesta)"))
 
     def test_the_footer_reports_it(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
