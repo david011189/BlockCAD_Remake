@@ -169,6 +169,19 @@ class VisorTests(unittest.TestCase):
             / "index.html"
         ).read_text(encoding="utf-8")
 
+    def test_opened_as_a_file_the_page_explains_itself(self) -> None:
+        """Abierta con doble clic (file://), la página debe decir qué le falta.
+
+        Lo que importa es DÓNDE vive el aviso: fuera del módulo principal.
+        Con file:// el navegador ni siquiera carga el módulo —Three.js llega
+        por el servidor—, así que un aviso dentro de él no se ejecutaría nunca
+        y la página se quedaría en «Cargando…» para siempre, que no explica
+        nada. Lo encontró un usuario, no una prueba.
+        """
+        antes_del_modulo = self.html.split('<script type="module">')[0]
+        self.assertIn("location.protocol === 'file:'", antes_del_modulo)
+        self.assertIn("python -m blockcad_web", antes_del_modulo)
+
     def test_the_axes_are_turned_not_mirrored(self) -> None:
         # Intercambiar Y y Z es un reflejo, no un giro: a una caja simétrica le
         # da igual, pero a una malla le invierte las normales.

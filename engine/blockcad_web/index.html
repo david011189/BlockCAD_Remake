@@ -217,6 +217,21 @@ ladrillo 2x4 en 2,0,0 color amarillo'></textarea>
 
 <footer id="estado">Cargando…</footer>
 
+<script>
+  // Abierta como archivo (file://) esta página no puede funcionar: compilar,
+  // las mallas y el propio Three.js llegan por su servidor, y el navegador
+  // ni siquiera carga el módulo principal desde el disco. Por eso este aviso
+  // vive FUERA del módulo: es lo único que llega a ejecutarse, y sin él la
+  // página se queda en «Cargando…» para siempre, que no explica nada.
+  if (location.protocol === 'file:') {
+    const estado = document.getElementById('estado');
+    estado.className = 'fallo';
+    estado.textContent =
+      'Esta página necesita su servidor: ejecuta "python -m blockcad_web" '
+      + 'en la carpeta engine y se abrirá sola en la dirección buena.';
+  }
+</script>
+
 <!-- Three.js va incluido en vendor/ (licencia MIT): el visor funciona sin conexión. -->
 <script type="importmap">
 {
