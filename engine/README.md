@@ -78,6 +78,25 @@ La consola edita el texto, no un modelo aparte. El código sigue siendo el
 único origen de la verdad, así que tus `repetir` y tus comentarios
 sobreviven a cualquier orden.
 
+### El ratón
+
+Pincha una pieza en el visor y se enciende, se marca en azul la línea que la
+puso y se te dice cuál es. **Supr borra esa línea**, pasando por la misma
+orden `borrar` de la consola: el deshacer sigue valiendo.
+
+Se enciende solo la pieza que pinchas. Pero lo que se borra es la **línea**,
+y una línea con `repetir` pone varias piezas: no hay forma de quitar un
+ladrillo de un bucle sin reescribirlo. Cuando pasa, se avisa antes —«pone 4
+piezas, y Supr borra la línea entera»— en vez de llevarse cuatro por
+sorpresa.
+
+Arrastrar gira la cámara y no elige nada: un clic solo cuenta como clic si el
+ratón no se ha movido.
+
+El ratón navega el código; no edita un modelo paralelo. Una pieza abierta
+desde un `.json` no salió de ningún texto, así que no lleva línea: se dibuja
+igual, y al pincharla se te dice que no hay adónde llevarte.
+
 ## El lenguaje
 
 Una instrucción por línea. Los errores indican siempre la línea y, cuando dos
@@ -347,7 +366,8 @@ El editor de ladrillos, completo y coherente, quedó etiquetado en
 | Hecho | El catálogo del set, cargado en el motor. |
 | Hecho | Conexiones y aviso de piezas en el aire. |
 | Hecho | Visor con la geometría real de LDraw. |
-| **Siguiente** | Selección y edición con el ratón. |
+| Hecho | Pinchar una pieza lleva a su línea; Supr la borra. |
+| **Siguiente** | El camino de vuelta: mover y girar con el ratón. |
 
 **El giro a Technic está terminado.** El motor mide en LDU, gira en tres ejes,
 conoce las piezas de la caja y sabe qué se sostiene.
