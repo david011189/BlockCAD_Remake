@@ -62,6 +62,18 @@ CONEXIONES = {
     "axl3hole.dat": "agujero_eje",  # Technic Axle Hole Semi-Reduced
     "axl4hole.dat": "agujero_eje",  # Technic Axle Hole Two-toothed Sliding
     "axlehol5.dat": "agujero_eje",  # Technic Axle Hole Open Two Opposite Sides
+    # La rueda de 24 dientes (3648b, alias 24505) dibuja su agujero a mano,
+    # en octavos de geometría cruda, sin pasar por ninguna primitiva. El
+    # título del subarchivo sí lo afirma: «Eighth of Centre Axlehole». Los
+    # ocho octavos caen en el mismo punto con la misma recta, así que la
+    # deduplicación del generador los deja en un solo agujero. Sin esto, la
+    # rueda no podía recibir su eje y el camión de reciclaje se quedaba sin
+    # tren de volcado.
+    #
+    # Ojo: es un subarchivo, no una primitiva, y su agujero corre por su +Z
+    # local —la rueda se dibuja plana en el plano XY—, no por el +Y que usan
+    # todas las primitivas. Por eso declara su eje.
+    "3648s02.dat": ("agujero_eje", (0.0, 0.0, 1.0)),
     # Macho: es lo que se mete.
     "confric4.dat": "pin",  # Technic Friction Pin 1.0 with Base Collar
     "confric5.dat": "pin",  # Technic Friction Pin 1.0 Slotted
@@ -137,18 +149,22 @@ class Matriz:
         )
 
 
-def _eje_de(m: "Matriz") -> Punto:
+def _eje_de(m: "Matriz", eje_local: tuple = (0.0, 1.0, 0.0)) -> Punto:
     """Hacia dónde mira una primitiva ya colocada.
 
     Toda primitiva de LDraw se dibuja a lo largo de su +Y local —un agujero es
     un cilindro en Y, un pin también—, así que su eje en el mundo es la segunda
     columna de la matriz: lo que le pasa al vector (0,1,0) al transformarlo.
+    Un subarchivo que no siga ese convenio declara su eje local en el mapa.
 
     Se normaliza porque una matriz de LDraw puede escalar: un agujero más largo
     se dibuja estirando la misma primitiva, y lo que hace falta es la dirección,
     no el tamaño.
     """
-    x, y, z = m.b, m.e, m.h
+    lx, ly, lz = eje_local
+    x = m.a * lx + m.b * ly + m.c * lz
+    y = m.d * lx + m.e * ly + m.f * lz
+    z = m.g * lx + m.h * ly + m.i * lz
     largo = (x * x + y * y + z * z) ** 0.5
     if largo < 1e-9:
         return Punto(0.0, 0.0, 0.0)
@@ -300,13 +316,17 @@ class Biblioteca:
                 completa = transformacion.componer(hija)
                 subarchivo = " ".join(campos[14:]).replace("\\", "/")
 
-                tipo = CONEXIONES.get(subarchivo.split("/")[-1].lower())
-                if tipo is not None:
+                entrada = CONEXIONES.get(subarchivo.split("/")[-1].lower())
+                if entrada is not None:
+                    if isinstance(entrada, tuple):
+                        tipo, eje_local = entrada
+                    else:
+                        tipo, eje_local = entrada, (0.0, 1.0, 0.0)
                     pieza.conexiones.append(
                         Conexion(
                             tipo,
                             Punto(completa.x, completa.y, completa.z),
-                            _eje_de(completa),
+                            _eje_de(completa, eje_local),
                         )
                     )
 

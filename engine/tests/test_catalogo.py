@@ -95,11 +95,20 @@ class MachoYHembraTests(unittest.TestCase):
         self.assertTrue(self.conexiones("31493", "agujero_eje"))
         self.assertEqual(len(self.conexiones("31493", "stud")), 3)
 
-    def test_the_24_tooth_gear_still_has_no_hole(self) -> None:
-        # El de 24 dientes dibuja su cruz con geometría cruda, sin primitiva:
-        # no hay nada que detectar. Documentarlo evita buscar el fallo donde
-        # no está; si LDraw lo arregla algún día, esta prueba avisará.
-        self.assertEqual(self.conexiones("24505", "agujero_eje"), [])
+    def test_the_24_tooth_gear_has_its_hole_now(self) -> None:
+        """El de 24 dientes dibuja su cruz con geometría cruda, sin primitiva.
+
+        Durante meses no hubo nada que detectar y esta prueba fijaba la
+        carencia. La salida fue el título de su subarchivo —«Eighth of
+        Centre Axlehole» afirma el agujero igual que una primitiva— con su
+        eje declarado a mano, porque la rueda se dibuja plana en XY y su
+        agujero corre por Z, no por el +Y de las primitivas. Lo exigió el
+        camión de reciclaje: sin este agujero no hay tren de volcado.
+        """
+        agujeros = self.conexiones("24505", "agujero_eje")
+        self.assertEqual(len(agujeros), 1)
+        # En el centro de la rueda, no en un diente.
+        self.assertEqual(agujeros[0], [0.0, 0.0, 0.0])
 
     def test_the_pins_are_male(self) -> None:
         # Sin esto un pin no se puede unir a nada: no tiene agujeros ni studs

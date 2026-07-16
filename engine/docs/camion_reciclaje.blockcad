@@ -24,22 +24,31 @@ modelo "Camion de reciclaje"
 // Paso 4: el eje con tope entra por la boca del motor (agujero 3, de cruz)
 // y la rueda de 8 dientes se encaja en la punta que asoma.
 87083 en el agujero 3 de motor desplazado -2 llamado eje_motor
-10928 en el eje de eje_motor desplazado -2 color gris llamado pinon
+10928 en el eje de eje_motor color gris llamado pinon
 
 // Paso 5: el primer ladrillo negro sobre los studs del motor.
 3003 en -1.5,-0.5,13 color negro
 
-// Paso 8: el segundo ladrillo de agujeros, cruzado delante del morro. No
-// se apoya en nada: cuelga del eje del motor, que pasa por su agujero 1.
-3701 en -2.5,-0.5,8 color verde llamado torre
+// Paso 8: el segundo ladrillo de agujeros, DE PIE delante del morro: es la
+// pared de la caja de cambios. No se apoya en nada; lo atraviesan los dos
+// ejes, y por eso se sostiene.
+3701 en -2.5,0,2.25 rot x 90 color verde llamado torre
 
-// PARED (pasos 6, 7, 9 y 10): el tren de volcado no se puede representar.
-//  - 24505, la rueda de 24 dientes: LDraw no declara su agujero de eje, asi
-//    que el catalogo la carga sin conexiones. No puede recibir su eje ni
-//    demostrar que muerde con el pinon (8+24 a dos modulos, pareja legal).
-//  - Sin la de 24, el eje largo (3737), los conectores angulares turquesa
-//    (42127), los ejes 3 y los medios bujes (42136) que cuelgan de el se
-//    quedan sin donde ir.
+// Pasos 6, 7, 9 y 10: el tren de volcado. El eje del motor pasa por el
+// agujero de ARRIBA de la torre; el eje largo, por el de ABAJO. Entre ellos
+// hay dos modulos justos: la de 8 y la de 24 muerden a 40 LDU (10+30).
+3737 en el agujero 1 de torre desplazado -3 llamado transmision
+24505 en el eje de transmision desplazado 2 color amarillo llamado corona
+
+// Los medios bujes retienen la corona en su eje.
+42136 en el eje de transmision desplazado 0.95 color gris
+42136 en el eje de transmision desplazado 3.5 color amarillo
+
+// Los conectores angulares turquesa cuelgan de las puntas del eje largo.
+// Sus ejes 3 de remate (paso 10) quedan pendientes: LDraw no declara el
+// agujero de cruz del conector, la misma ceguera que tenia la corona.
+42127 en el eje de transmision desplazado -4.5 color celeste
+42127 en el eje de transmision desplazado 4.5 color celeste
 
 // Paso 13: la placa Technic naranja de remate, sobre el ladrillo negro.
 3709 en -1.5,-0.5,16 rot 90 color naranja llamado remate

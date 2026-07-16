@@ -3139,7 +3139,21 @@
         19.25,
         64.78
       ],
-      "conexiones_motor": [],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            32.39,
+            9.62,
+            32.39
+          ],
+          "eje": [
+            0.0,
+            1.0,
+            0.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -32.39,
@@ -3157,7 +3171,16 @@
         64.78,
         19.25
       ],
-      "conexiones": []
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
     },
     {
       "diseno": "2654",
