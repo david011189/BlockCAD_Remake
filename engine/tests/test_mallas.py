@@ -133,6 +133,8 @@ class EncajeTests(unittest.TestCase):
             'catalogo "wedo"\nladrillo 2x4 en 0,0,0',
             'catalogo "wedo"\nladrillo 2x4 en 0,0,0 rot 90',
             'catalogo "wedo"\nplaca 1x6 en 0,0,0 rot x 90',
+            'catalogo "wedo"\neje 6 en 0,0,0',
+            'catalogo "wedo"\neje 6 en 0,0,0 rot 90',
         ):
             with self.subTest(codigo=codigo.splitlines()[-1]):
                 self.assertEqual(self._vertices_fuera(codigo), 0)

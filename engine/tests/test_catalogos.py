@@ -156,6 +156,34 @@ class ConventionTests(unittest.TestCase):
                     self.assertTrue(0 <= y <= caja.depth)
                     self.assertTrue(0 <= z <= caja.height)
 
+    def test_every_linear_part_lies_along_y(self) -> None:
+        # Viga y eje se nombran con UN número: no hay "2x4" que mande, así
+        # que la postura hay que decidirla. Una pieza lineal se tumba a lo
+        # largo de Y, como ya venía la viga; los ejes llegaban a lo largo
+        # de X y se enderezan al cargar.
+        lineales = [
+            definicion
+            for definicion in self.wedo.all()
+            if any(
+                alias.startswith(("beam_", "axle_"))
+                for alias in definicion.aliases
+            )
+        ]
+        self.assertGreaterEqual(len(lineales), 5)
+        for definicion in lineales:
+            with self.subTest(pieza=definicion.part_id):
+                self.assertGreater(
+                    definicion.dimensions.depth, definicion.dimensions.width
+                )
+
+    def test_a_turned_axle_keeps_its_line_along_y(self) -> None:
+        # Girar la caja sin girar la recta dejaría el eje atravesado dentro
+        # de sí mismo: nada podría insertarse por él.
+        eje = self.wedo.get("axle_6")
+        for conexion in eje.connections:
+            with self.subTest(tipo=conexion.tipo):
+                self.assertEqual(conexion.eje, (0.0, 1.0, 0.0))
+
     def test_the_base_of_the_house_builds_in_both_catalogs(self) -> None:
         # Las dos primeras líneas del ejemplo del editor: dos ladrillos 2x4
         # que se tocan sin chocar. Antes de la convención, en el catálogo

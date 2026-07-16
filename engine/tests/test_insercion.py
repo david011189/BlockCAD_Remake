@@ -69,9 +69,11 @@ class InsercionTests(unittest.TestCase):
     def test_an_axle_goes_through_a_beam(self) -> None:
         # Un eje no se mete: atraviesa, y sale por el otro lado. Es como se
         # montan los engranajes, así que sin esto no hay transmisión posible.
+        # No hace falta girarlo: una pieza lineal ya se tumba a lo largo de
+        # Y, que es la recta de los agujeros de la viga.
         modelo = BlockModel(catalog=self.catalogo)
         modelo.add("3702", GridPosition(0, 0, 0))  # viga 1x8
-        eje = modelo.add("3706", GridPosition(14, -50, 8), orientation=DE_LADO)
+        eje = modelo.add("3706", GridPosition(14, -50, 8))
         self.assertEqual(
             [p.part_id for p in modelo.connected_to(eje.instance_id)], ["3702"]
         )
@@ -80,7 +82,7 @@ class InsercionTests(unittest.TestCase):
         modelo = BlockModel(catalog=self.catalogo)
         modelo.add("3702", GridPosition(0, 0, 0))
         with self.assertRaises(CollisionError):
-            modelo.add("3706", GridPosition(14, -50, 12), orientation=DE_LADO)
+            modelo.add("3706", GridPosition(14, -50, 12))
 
     # --- lo que NO puede entrar -------------------------------------------
 
@@ -140,9 +142,10 @@ class EncajeTipadoTests(unittest.TestCase):
             self.modelo.add("2780", GridPosition(4, -8, 4), orientation=DE_LADO)
 
     def test_an_axle_does_fit_a_cross_hole(self) -> None:
-        # La misma recta, el macho que sí cabe.
+        # La misma recta, el macho que sí cabe. El eje ya apunta en (0,1,0)
+        # sin girarlo: es la postura de toda pieza lineal.
         self.modelo.add("10928", GridPosition(0, 0, 0))
-        self.modelo.add("4519", GridPosition(6, -20, 6), orientation=DE_LADO)
+        self.modelo.add("4519", GridPosition(6, -20, 6))
 
 
 class LenguajeTests(unittest.TestCase):

@@ -87,17 +87,24 @@ def _alias_y_categoria(
 def _viene_acostada(
     medidas: tuple[int, ...], ancho: float, fondo: float
 ) -> bool:
-    """True si la caja contradice al nombre: "2 x 4" con 4 studs en X.
+    """True si la caja llega tumbada hacia el lado que no le toca.
 
-    LDraw dibuja el lado largo en X, así que un "Brick 2 x 4" llega midiendo
-    80x40. Pero el nombre manda: en un alias `brick_2x4`, el 2 es el ancho
-    en X, igual que en el catálogo básico. Si no, el mismo código colocaría
-    las piezas giradas según el catálogo elegido.
+    LDraw dibuja las piezas como quiere, y cada familia hereda otra postura:
+    el "Brick 2 x 4" llega con los 4 studs en X, la viga a lo largo de Y y
+    los ejes a lo largo de X. Aquí se decide una sola postura por nombre:
+
+    - Dos números ("2x4"): el nombre manda. El 2 es el ancho en X, igual
+      que en el catálogo básico. Si no, el mismo código colocaría las
+      piezas giradas según el catálogo elegido.
+    - Un número (viga 7, eje 6): la pieza es una línea y se tumba a lo
+      largo de Y, que es como ya venía la viga.
     """
-    if len(medidas) != 2:
-        return False
-    n, m = medidas
-    return n != m and (ancho, fondo) == (m * STUD, n * STUD)
+    if len(medidas) == 2:
+        n, m = medidas
+        return n != m and (ancho, fondo) == (m * STUD, n * STUD)
+    if len(medidas) == 1:
+        return ancho > fondo
+    return False
 
 
 def _giradas_90(conexiones, fondo: float) -> list[dict]:
