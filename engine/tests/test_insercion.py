@@ -119,6 +119,134 @@ class InsercionTests(unittest.TestCase):
             self.poner("3001", (0, 0, 0))
 
 
+class EncajeTipadoTests(unittest.TestCase):
+    """No todo macho entra en todo agujero.
+
+    Un eje pasa por el agujero redondo (gira libre: así se cuelgan las ruedas)
+    y por el de cruz (gira solidario: así se mueven los engranajes). Un pin
+    solo cabe en el redondo: la cruz le cierra el paso al cilindro. Sin este
+    tipado, el motor aceptaría uniones que en plástico no existen.
+    """
+
+    def setUp(self) -> None:
+        self.modelo = BlockModel(catalog=cargar("wedo"))
+
+    def test_a_pin_does_not_fit_a_cross_hole(self) -> None:
+        # El engranaje 10928 tiene su agujero de cruz en (12,0,12) con recta
+        # (0,1,0). El pin girado apunta igual y su recta pasa por ahí: la
+        # geometría es la de una inserción perfecta. Falla por el TIPO.
+        self.modelo.add("10928", GridPosition(0, 0, 0))
+        with self.assertRaises(CollisionError):
+            self.modelo.add("2780", GridPosition(4, -8, 4), orientation=DE_LADO)
+
+    def test_an_axle_does_fit_a_cross_hole(self) -> None:
+        # La misma recta, el macho que sí cabe.
+        self.modelo.add("10928", GridPosition(0, 0, 0))
+        self.modelo.add("4519", GridPosition(6, -20, 6), orientation=DE_LADO)
+
+
+class LenguajeTests(unittest.TestCase):
+    """Insertar sin calcular LDU: «en el agujero 2 de marco».
+
+    Quien escribe dice qué unión quiere y el motor resuelve giro y posición,
+    igual que `encima` resuelve la altura. Antes de esto, meter un pin exigía
+    saber que el agujero cae en z=14 LDU y escribir `2780 en 0.6,-1.5,0.75
+    rot z 90`, que no es un lenguaje: es una calculadora.
+    """
+
+    def compilar(self, codigo: str) -> BlockModel:
+        from blockcad_engine import parse_model
+
+        return parse_model('catalogo "wedo"\n' + codigo)
+
+    def test_the_truck_step_two_compiles_as_written(self) -> None:
+        # Las instrucciones reales del camión de reciclaje: el ladrillo
+        # naranja, el verde con agujeros encima, y dos pines metidos. Es el
+        # paso que descubrió todo esto.
+        modelo = self.compilar(
+            "3001 en 0,0,0 llamado base\n"
+            "3701 encima de base llamado verde\n"
+            "2780 en el agujero 1 de verde\n"
+            "2780 en el agujero 3 de verde"
+        )
+        self.assertEqual(len(modelo.instances), 4)
+
+    def test_the_pin_lands_centered_in_the_hole(self) -> None:
+        # La viga en el origen tiene su primer agujero en x=20, z=14, cruzando
+        # el fondo. El pin (40 de largo) queda centrado: asoma 10 por cada
+        # cara, listo para recibir otra viga.
+        modelo = self.compilar("3701 en 0,0,0 llamado v\n2780 en el agujero 1 de v")
+        pin = modelo.instances[-1]
+        definicion = modelo.catalog.get("2780")
+        macho = [c for c in pin.world_connections(definicion) if c.es_macho][0]
+        self.assertEqual(macho.punto, (20, 10, 14))
+
+    def test_displacement_slides_along_the_line(self) -> None:
+        # `desplazado 0.5` son 10 LDU por la recta del agujero, no por x.
+        modelo = self.compilar(
+            "3701 en 0,0,0 llamado v\n"
+            "2780 en el agujero 1 de v desplazado 0.5"
+        )
+        pin = modelo.instances[-1]
+        definicion = modelo.catalog.get("2780")
+        macho = [c for c in pin.world_connections(definicion) if c.es_macho][0]
+        self.assertEqual(macho.punto, (20, 20, 14))
+
+    def test_holes_are_numbered_by_position(self) -> None:
+        # Agujeros 1, 2 y 3 de la viga: x=20, 40, 60. El número se puede
+        # contar mirando el visor.
+        for numero, x in ((1, 20), (2, 40), (3, 60)):
+            with self.subTest(agujero=numero):
+                modelo = self.compilar(
+                    f"3701 en 0,0,0 llamado v\n2780 en el agujero {numero} de v"
+                )
+                pin = modelo.instances[-1]
+                definicion = modelo.catalog.get("2780")
+                macho = [
+                    c for c in pin.world_connections(definicion) if c.es_macho
+                ][0]
+                self.assertEqual(macho.punto[0], x)
+
+    def test_without_a_name_it_uses_the_last_piece(self) -> None:
+        self.compilar("3701 en 0,0,0\n2780 en el agujero 2")
+
+    def test_an_axle_goes_through_a_round_hole_too(self) -> None:
+        self.compilar("3701 en 0,0,0 llamado v\n4519 en el agujero 2 de v")
+
+    def test_the_errors_teach(self) -> None:
+        # Cada error dice qué está mal Y qué hacer. Se comprueba el contenido,
+        # no la frase exacta: la redacción puede mejorar sin romper nada.
+        from blockcad_engine.errors import DslError
+
+        casos = (
+            ("3701 en 0,0,0 llamado v\n2780 en el agujero 9 de v", "3 agujero"),
+            ("3701 en 0,0,0 llamado v\n3001 en el agujero 1 de v", "nada que meter"),
+            ("10928 en 0,0,0 llamado g\n2780 en el agujero 1 de g", "cruz"),
+            ("3701 en 0,0,0 llamado v\n2780 en el agujero 1 de v rot x 90", "giro"),
+            ("3001 en 0,0,0 llamado b\n2780 en el agujero 1 de b", "no tiene agujeros"),
+        )
+        for codigo, pista in casos:
+            with self.subTest(pista=pista):
+                with self.assertRaises(DslError) as ctx:
+                    self.compilar(codigo)
+                self.assertIn(pista, str(ctx.exception))
+
+    def test_the_result_survives_the_round_trip(self) -> None:
+        # El código generado desde el modelo usa `en x,y,z` con decimales.
+        # Tiene que volver a compilar y dejar las piezas donde estaban.
+        from blockcad_engine.dsl import model_to_source, parse_model
+
+        modelo = self.compilar(
+            "3701 en 0,0,0 llamado v\n2780 en el agujero 1 de v"
+        )
+        texto = 'catalogo "wedo"\n' + model_to_source(modelo)
+        segundo = parse_model(texto)
+        self.assertEqual(
+            [(p.part_id, p.position) for p in modelo.instances],
+            [(p.part_id, p.position) for p in segundo.instances],
+        )
+
+
 class ApilarSigueIgualTests(unittest.TestCase):
     """Lo de siempre no se puede haber roto por el camino."""
 

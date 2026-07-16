@@ -64,9 +64,13 @@ def _hay_insercion(
     el pin metido por donde se mete. No basta con que las dos piezas sean de
     las que se insertan, ni con que las rectas sean paralelas: si el pin va por
     otro sitio, es un choque como cualquier otro y hay que decirlo.
+
+    Y el macho tiene que CABER en ese agujero: un eje pasa por el agujero
+    redondo, pero un pin no entra en el de cruz.
     """
     return any(
-        macho.misma_recta_que(hembra)
+        hembra.tipo in Connection.ENCAJES[macho.tipo]
+        and macho.misma_recta_que(hembra)
         for a, b in ((unas, otras), (otras, unas))
         for macho in a
         if macho.es_macho

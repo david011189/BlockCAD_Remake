@@ -209,6 +209,41 @@ Opciones, todas opcionales y en cualquier orden:
 Colores con nombre: `rojo`, `azul`, `celeste`, `amarillo`, `verde`,
 `naranja`, `blanco`, `negro`, `gris`, `marron`, `rosa`, `morado`.
 
+### Meter una pieza por un agujero
+
+Technic no se apila: se inserta. `en el agujero N de <nombre>` mete un pin o
+un eje por un agujero de otra pieza, y el motor resuelve el giro y la
+posición — igual que `encima` resuelve la altura. Sin esto, colocar un pin
+exigía saber que el agujero cae en z=14 LDU y escribir la pieza girada de
+cabeza.
+
+```
+catalogo "wedo"
+
+3001 en 0,0,0 color naranja llamado base
+3701 encima de base color verde llamado verde
+2780 en el agujero 1 de verde color negro    // un pin, metido
+2780 en el agujero 3 de verde color negro
+```
+
+Los agujeros se numeran desde 1, **por posición**: primero x, luego y, luego
+z. Se pueden contar mirando el visor. Sin `de <nombre>`, se usa la última
+pieza, como en `encima`.
+
+La pieza queda **centrada** en el agujero: un pin asoma lo mismo por las dos
+caras, listo para recibir otra viga. `desplazado 0.5` la corre medio módulo
+(10 LDU) por la recta del agujero — con signo, para elegir el lado.
+
+El encaje respeta el plástico, y no es simétrico:
+
+| | agujero redondo | agujero de cruz |
+|---|---|---|
+| **pin** | entra | no entra: la cruz cierra el paso |
+| **eje** | pasa, gira libre (ruedas) | pasa, gira solidario (engranajes) |
+
+Un `rot` explícito se respeta si deja la pieza apuntando por el agujero; si
+no, el error lo dice y basta quitarlo para que el giro se resuelva solo.
+
 ### Nombrar el modelo
 
 ```
@@ -368,34 +403,34 @@ El editor de ladrillos, completo y coherente, quedó etiquetado en
 | Hecho | Visor con la geometría real de LDraw. |
 | Hecho | Pinchar una pieza lleva a su línea; Supr la borra. |
 | Hecho | El catálogo sabe qué se mete y qué aloja. |
-| **Siguiente** | Que insertar no sea chocar. |
+| Hecho | Insertar no es chocar: el pin entra en el agujero. |
+| Hecho | `en el agujero 2 de marco`: insertar sin calcular LDU. |
+| **Siguiente** | El camión de reciclaje, con las instrucciones delante. |
 | Luego | El camino de vuelta: mover y girar con el ratón. |
 
-### Que insertar no sea chocar
+### Insertar no es chocar
 
-Es lo que bloquea el set entero, y se descubrió intentando construir el camión
-de reciclaje del WeDo 2.0: **el motor sabe apilar pero no sabe insertar**. Para
-él una colisión es que dos cajas se solapen, que es exactamente lo correcto
-para ladrillos de sistema —se apoyan y se tocan, nunca se invaden— y
+Era lo que bloqueaba el set entero, y se descubrió intentando construir el
+camión de reciclaje del WeDo 2.0: el motor sabía apilar pero no insertar.
+Para él una colisión era que dos cajas se solaparan —exactamente lo correcto
+para ladrillos de sistema, que se apoyan y se tocan pero nunca se invaden— y
 exactamente lo contrario de Technic, donde un pin *ocupa* el agujero y un eje
-*atraviesa* la viga. Hoy cada unión Technic de verdad es, para el motor, un
-error:
+*atraviesa* la viga. Cada unión Technic de verdad era un error.
 
-| Lo que pide Technic | El motor |
-|---|---|
-| Pin en el agujero de una viga | choca |
-| Eje atravesando una viga | choca |
-| Rueda dentada en un eje | choca |
+La solución tiene tres capas, cada una con su porqué:
 
-La primera mitad ya está: el catálogo distingue las piezas macho de las
-hembra. Falta que las conexiones lleven su **dirección** —un punto no dice si
-algo está insertado; un pin en un agujero son dos rectas que coinciden— y que
-la regla de colisión acepte el solapamiento cuando un agujero lo justifica.
-
-La dirección está en la matriz de cada primitiva de LDraw, que el lector
-todavía descarta. No vale deducirla de la caja: en el `44865` el pin sale de
-lado y no a lo largo, así que «la dimensión más larga» daría un eje falso sin
-que saltara ningún error.
+- **Cada conexión lleva su recta, no solo su punto.** Un punto no dice si
+  algo está insertado: un pin en un agujero son dos rectas que coinciden. La
+  dirección estaba en la matriz de cada primitiva de LDraw y el lector la
+  tiraba. No vale deducirla de la caja: en el `44865` el pin sale de lado.
+- **El solapamiento es legal solo si un macho y un agujero son la misma
+  recta.** La excepción es estrecha a propósito: un pin 4 LDU más arriba del
+  agujero —mismo pin, misma dirección, misma viga— choca, porque ahí lo que
+  hay es plástico. Sin esa estrechez el motor dejaría de saber si un modelo
+  se puede construir.
+- **El encaje respeta el tipo.** Un eje pasa por el agujero redondo y por el
+  de cruz; un pin solo por el redondo. La geometría del pin ante un agujero
+  de cruz es la de una inserción perfecta, y aun así no entra.
 
 **El giro a Technic está terminado.** El motor mide en LDU, gira en tres ejes,
 conoce las piezas de la caja y sabe qué se sostiene.

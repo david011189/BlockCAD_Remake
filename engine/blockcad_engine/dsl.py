@@ -21,8 +21,15 @@ import re
 
 from .catalogos import cargar as cargar_catalogo
 from .errors import BlockCADError, DslError
-from .geometry import PLACA, STUD, GridPosition, Orientation
-from .model import DEFAULT_MODEL_NAME, BlockModel, PlacedPart
+from .geometry import (
+    MODULO_TECHNIC,
+    PLACA,
+    STUD,
+    Connection,
+    GridPosition,
+    Orientation,
+)
+from .model import DEFAULT_MODEL_NAME, BlockModel, PlacedPart, _paralelas
 from .parts import PartCatalog, validate_color
 
 #: Nombre en el lenguaje -> prefijo del identificador en el catálogo.
@@ -92,6 +99,16 @@ _ABSOLUTO_RE = re.compile(
 _ENCIMA_RE = re.compile(
     r"^encima(?:\s+de\s+(?P<nombre>[^\W\d]\w*))?"
     rf"(?:\s+desplazado\s+(?P<dx>{_NUMERO})\s*,\s*(?P<dy>{_NUMERO}))?"
+    r"(?P<opciones>.*)$"
+)
+
+# «en el agujero 2 de marco desplazado 0.5». El desplazamiento es UN número
+# —módulos por la recta del agujero—, no dos como en `encima`: dentro de un
+# agujero solo se puede resbalar en una dirección.
+_AGUJERO_RE = re.compile(
+    r"^en\s+(?:el\s+)?agujero\s+(?P<numero>\d+)"
+    r"(?:\s+de\s+(?P<nombre>[^\W\d]\w*))?"
+    rf"(?:\s+desplazado\s+(?P<d>{_NUMERO}))?"
     r"(?P<opciones>.*)$"
 )
 
@@ -277,12 +294,16 @@ class _Builder:
         part_id = _resolve_part_id(
             match.group("tipo"), match.group("medida"), line.number
         )
-        position, options = self._locate(match.group("lugar"), line, offset)
-
+        # La definición hace falta ANTES de resolver el lugar: para meter la
+        # pieza por un agujero hay que saber qué pin o punta de eje tiene.
         try:
             definition = self.model.catalog.get(part_id)
         except BlockCADError as exc:
             raise DslError(line.number, str(exc)) from exc
+
+        position, options = self._locate(
+            match.group("lugar"), line, offset, definition
+        )
 
         nombre = options.pop("nombre", None)
         candidate = PlacedPart.create(
@@ -318,7 +339,13 @@ class _Builder:
         lugar: str,
         line: _Line,
         offset: tuple[int, int, int],
+        definition,
     ) -> tuple[GridPosition, dict]:
+        # `en el agujero` va antes que `en x,y,z`: los dos empiezan por "en".
+        agujero = _AGUJERO_RE.match(lugar)
+        if agujero:
+            return self._en_agujero(agujero, line, definition)
+
         absoluto = _ABSOLUTO_RE.match(lugar)
         if absoluto:
             options = _parse_options(absoluto.group("opciones"), line.number)
@@ -347,20 +374,15 @@ class _Builder:
             raise DslError(
                 line.number,
                 f"No entiendo dónde va la pieza: {lugar!r}. Usa 'en 0,0,0', "
-                "'encima' o 'encima de <nombre>'.",
+                "'encima', 'encima de <nombre>' o 'en el agujero 2 de "
+                "<nombre>'.",
             )
 
         options = _parse_options(encima.group("opciones"), line.number)
         return self._on_top_of(encima, line), options
 
-    def _on_top_of(self, match: re.Match, line: _Line) -> GridPosition:
-        """Calcula la posición justo encima de otra pieza.
-
-        El desplazamiento de un `repetir` no se aplica aquí: `encima` significa
-        «sobre esa pieza», y sumarle el del bucle lo convertiría en otra cosa.
-        La referencia ya está donde está.
-        """
-        nombre = match.group("nombre")
+    def _referencia(self, nombre: str | None, line: _Line, para: str) -> PlacedPart:
+        """La pieza a la que se refiere una orden: por nombre, o la última."""
         if nombre:
             referencia = self._by_name.get(nombre)
             if referencia is None:
@@ -375,14 +397,25 @@ class _Builder:
                         "de su línea."
                     ),
                 )
-        else:
-            referencia = self._last
-            if referencia is None:
-                raise DslError(
-                    line.number,
-                    "'encima' necesita una pieza anterior sobre la que "
-                    "apoyarse. La primera debe decir dónde va, con 'en 0,0,0'.",
-                )
+            return referencia
+
+        referencia = self._last
+        if referencia is None:
+            raise DslError(
+                line.number,
+                f"{para} necesita una pieza anterior. "
+                "La primera debe decir dónde va, con 'en 0,0,0'.",
+            )
+        return referencia
+
+    def _on_top_of(self, match: re.Match, line: _Line) -> GridPosition:
+        """Calcula la posición justo encima de otra pieza.
+
+        El desplazamiento de un `repetir` no se aplica aquí: `encima` significa
+        «sobre esa pieza», y sumarle el del bucle lo convertiría en otra cosa.
+        La referencia ya está donde está.
+        """
+        referencia = self._referencia(match.group("nombre"), line, "'encima'")
 
         altura = self.model.catalog.get(referencia.part_id).dimensions.height
         try:
@@ -397,6 +430,155 @@ class _Builder:
             raise
         except BlockCADError as exc:
             raise DslError(line.number, str(exc)) from exc
+
+    def _en_agujero(
+        self, match: re.Match, line: _Line, definition
+    ) -> tuple[GridPosition, dict]:
+        """Mete la pieza por un agujero de otra, resolviendo giro y posición.
+
+        Quien escribe dice QUÉ unión quiere —este pin, en ese agujero— y las
+        coordenadas las calcula el motor, igual que `encima` calcula la altura.
+        La alternativa era lo que había: colocar un pin exigía saber que el
+        agujero cae en z=14 LDU y girar la pieza de cabeza.
+
+        El desplazamiento de un `repetir` no se aplica: el agujero está donde
+        está.
+        """
+        options = _parse_options(match.group("opciones"), line.number)
+        referencia = self._referencia(
+            match.group("nombre"), line, "'en el agujero'"
+        )
+        definicion_ref = self.model.catalog.get(referencia.part_id)
+
+        # Los agujeros de la referencia. Cada perforación asoma por las dos
+        # caras, y eso es UN agujero: se agrupan las que comparten recta.
+        grupos: list[list] = []
+        for conexion in referencia.world_connections(definicion_ref):
+            if not conexion.es_hembra:
+                continue
+            for grupo in grupos:
+                if conexion.misma_recta_que(grupo[0]):
+                    grupo.append(conexion)
+                    break
+            else:
+                grupos.append([conexion])
+
+        if not grupos:
+            raise DslError(
+                line.number,
+                f"{definicion_ref.name} no tiene agujeros donde meter nada.",
+            )
+
+        # Se numeran por dónde caen: primero x, luego y, luego z. Así el
+        # número se puede contar mirando el visor.
+        grupos.sort(key=lambda grupo: min(c.punto for c in grupo))
+        numero = int(match.group("numero"))
+        if not 1 <= numero <= len(grupos):
+            raise DslError(
+                line.number,
+                f"{definicion_ref.name} tiene "
+                f"{len(grupos)} agujero{'s' if len(grupos) > 1 else ''}, "
+                f"así que no hay agujero {numero}. Se numeran desde 1, "
+                "por posición.",
+            )
+        agujero = grupos[numero - 1]
+        tipos_que_aloja = {c.tipo for c in agujero}
+
+        # ¿Qué tiene esta pieza que quepa ahí? El encaje no es simétrico: un
+        # eje pasa por el agujero redondo, pero un pin no entra en la cruz.
+        indices_macho = [
+            i
+            for i, c in enumerate(definition.connections)
+            if c.tipo in Connection.MACHOS
+            and tipos_que_aloja & set(Connection.ENCAJES[c.tipo])
+        ]
+        if not indices_macho:
+            if any(c.tipo in Connection.MACHOS for c in definition.connections):
+                raise DslError(
+                    line.number,
+                    f"Ese agujero es de cruz y el pin de {definition.name} "
+                    "no entra: la cruz le cierra el paso al cilindro. "
+                    "Un eje sí pasaría.",
+                )
+            raise DslError(
+                line.number,
+                f"{definition.name} no tiene pin ni punta de eje: "
+                "no hay nada que meter por un agujero.",
+            )
+
+        # Sin girar y en el origen: la vara de medir de la propia pieza.
+        base = PlacedPart.create(
+            definition.part_id, GridPosition(0, 0, 0)
+        ).world_connections(definition)
+        macho = base[indices_macho[0]]
+        if any(
+            not base[i].misma_recta_que(macho) for i in indices_macho[1:]
+        ):
+            # Las dos puntas de un eje son la misma recta y pasan por aquí.
+            # Dos pines en rectas distintas, no: elegir sería adivinar.
+            raise DslError(
+                line.number,
+                f"{definition.name} tiene varios sitios que meter y no sé "
+                "cuál quieres. De momento esa pieza va con 'en x,y,z'.",
+            )
+
+        eje_agujero = agujero[0].eje
+        orientacion = options.get("orientation")
+        if orientacion is not None:
+            if not _paralelas(orientacion.apply(*macho.eje), eje_agujero):
+                raise DslError(
+                    line.number,
+                    "Con ese giro la pieza no apunta por el agujero. "
+                    "Quita el 'rot' y el giro se resuelve solo.",
+                )
+        else:
+            # El primer giro de los 24 que deja el macho paralelo al agujero.
+            # El orden de `todas()` es fijo, así que el resultado también.
+            orientacion = next(
+                (
+                    o
+                    for o in Orientation.todas()
+                    if _paralelas(o.apply(*macho.eje), eje_agujero)
+                ),
+                None,
+            )
+            if orientacion is None:
+                raise DslError(
+                    line.number,
+                    "Ese agujero no va paralelo a ningún eje y no hay giro "
+                    "de 90 grados que lo alcance.",
+                )
+            options["orientation"] = orientacion
+
+        # Dónde queda el ancla de la pieza (el centro de sus machos) una vez
+        # girada, y dónde tiene que acabar: el centro del agujero, más el
+        # desplazamiento que pida el usuario, en módulos y por la recta.
+        girados = PlacedPart.create(
+            definition.part_id, GridPosition(0, 0, 0), orientation=orientacion
+        ).world_connections(definition)
+        ancla = tuple(
+            sum(girados[i].punto[k] for i in indices_macho) / len(indices_macho)
+            for k in range(3)
+        )
+        centro = tuple(
+            sum(c.punto[k] for c in agujero) / len(agujero) for k in range(3)
+        )
+        modulos = _a_ldu(
+            match.group("d") or "0", MODULO_TECHNIC, "módulos", line.number
+        )
+        largo = sum(v * v for v in eje_agujero) ** 0.5
+        valores = [
+            centro[k] + modulos * eje_agujero[k] / largo - ancla[k]
+            for k in range(3)
+        ]
+        enteros = [round(v) for v in valores]
+        if any(abs(v - e) > 1e-6 for v, e in zip(valores, enteros)):
+            raise DslError(
+                line.number,
+                "Con ese desplazamiento la pieza cae entre dos posiciones "
+                "LDU. Prueba con medios módulos: 0.5, 1, 1.5...",
+            )
+        return GridPosition(*enteros), options
 
     def _describe(self, collisions: tuple[PlacedPart, ...], current: int) -> str:
         lines = sorted({self._line_by_id[item.instance_id] for item in collisions})

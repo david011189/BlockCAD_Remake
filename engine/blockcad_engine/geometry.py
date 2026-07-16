@@ -59,6 +59,37 @@ _GIROS_90 = {
 }
 
 
+def _todas_las_matrices():
+    """Las 24 matrices de giro del cubo, en un orden fijo.
+
+    Se generan por construcción, no girando al azar: una fila por eje con
+    signo, cada eje usado una vez, y de las 48 combinaciones quedan las 24
+    con determinante +1 (las otras 24 son espejos). El orden sale del propio
+    recorrido, así que es estable entre ejecuciones y versiones.
+    """
+    ejes = ((1, 0, 0), (0, 1, 0), (0, 0, 1))
+    for i in range(3):
+        for si in (1, -1):
+            for j in range(3):
+                if j == i:
+                    continue
+                for sj in (1, -1):
+                    k = 3 - i - j
+                    fila_i = tuple(si * v for v in ejes[i])
+                    fila_j = tuple(sj * v for v in ejes[j])
+                    for sk in (1, -1):
+                        fila_k = tuple(sk * v for v in ejes[k])
+                        filas = (fila_i, fila_j, fila_k)
+                        (a, b, c), (d, e, f), (g, h, x) = filas
+                        det = (
+                            a * (e * x - f * h)
+                            - b * (d * x - f * g)
+                            + c * (d * h - e * g)
+                        )
+                        if det == 1:
+                            yield filas
+
+
 @dataclass(frozen=True, slots=True)
 class Orientation:
     """Cómo está girada una pieza: una de las 24 orientaciones de un cubo.
@@ -122,6 +153,23 @@ class Orientation:
         """Atajo para el giro de siempre, el del eje vertical."""
         return cls.around("z", grados)
 
+    @classmethod
+    def todas(cls) -> tuple["Orientation", ...]:
+        """Las 24 orientaciones que existen, siempre en el mismo orden.
+
+        Sirven para buscar «un giro que haga X» —por ejemplo, el que alinea un
+        pin con un agujero—. El orden importa: quien busca se queda con la
+        primera que valga, y si el orden cambiara entre versiones, el mismo
+        código colocaría las piezas giradas de otra manera. La identidad va
+        primero a propósito: si sin girar ya vale, no se gira.
+        """
+        encontradas = [cls()]
+        for filas in _todas_las_matrices():
+            candidata = cls(filas)
+            if candidata != encontradas[0]:
+                encontradas.append(candidata)
+        return tuple(encontradas)
+
     def then(self, otra: "Orientation") -> "Orientation":
         """Aplica primero `otra` y luego esta."""
         return Orientation(
@@ -178,6 +226,15 @@ class Connection:
     #: Los tipos que se meten, y los que alojan.
     MACHOS = ("pin", "punta_eje")
     HEMBRAS = ("agujero_pin", "agujero_eje")
+
+    #: Qué macho entra en qué agujero. No es simétrico: un eje pasa por el
+    #: agujero redondo (gira libre: así se cuelgan las ruedas) y por el de
+    #: cruz (gira solidario: así se mueven los engranajes), pero un pin solo
+    #: cabe en el redondo — la cruz le cierra el paso al cilindro.
+    ENCAJES = {
+        "pin": ("agujero_pin",),
+        "punta_eje": ("agujero_pin", "agujero_eje"),
+    }
 
     @property
     def es_macho(self) -> bool:
