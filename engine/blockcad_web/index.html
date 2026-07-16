@@ -339,6 +339,19 @@ function construir(piezas) {
       color: p.color,
       transparent: p.transparente,
       opacity: p.transparente ? 0.45 : 1,
+      // Las dos caras, y no solo la de delante.
+      //
+      // LDraw dice hacia dónde mira cada triángulo con instrucciones BFC, y el
+      // lector de este proyecto no las interpreta: para medir una caja daba
+      // igual. Al dibujar no: la mitad de los triángulos quedan del revés y se
+      // descartan, y las piezas se ven huecas, como tubos rotos.
+      //
+      // Interpretar BFC de verdad —CERTIFY CCW/CW, INVERTNEXT, y voltear
+      // cuando una matriz invierte— es bastante maquinaria para llegar al
+      // mismo sitio. Dibujar las dos caras cuesta algo de relleno y ya está:
+      // la malla no está indexada, así que cada triángulo lleva su propia
+      // normal y Three.js la voltea sola en las caras traseras.
+      side: THREE.DoubleSide,
     });
 
     const geometria = mallas.get(p.malla);

@@ -180,6 +180,22 @@ class VisorTests(unittest.TestCase):
         limpiar = self.html.split("function limpiar(")[1].split("\n}")[0]
         self.assertIn("userData.compartida", limpiar)
 
+    def test_both_faces_are_drawn(self) -> None:
+        """Sin esto las piezas se ven huecas, como tubos rotos.
+
+        LDraw dice hacia dónde mira cada triángulo con instrucciones BFC, y el
+        lector no las interpreta: para medir una caja daba igual. Al dibujar,
+        la mitad de los triángulos quedan del revés y se descartan.
+        """
+        self.assertIn("side: THREE.DoubleSide", self.html)
+
+    def test_the_mesh_is_not_indexed(self) -> None:
+        # De eso depende lo anterior: sin índice, cada triángulo lleva su
+        # propia normal y Three.js la voltea sola en las caras traseras. Con
+        # índice, las normales se promediarían entre caras de sentido opuesto
+        # y se anularían.
+        self.assertNotIn("setIndex", self.html)
+
     def test_meshes_are_asked_for_before_drawing(self) -> None:
         compilar = self.html.split("async function compilar()")[1]
         self.assertLess(
