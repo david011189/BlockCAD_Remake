@@ -131,6 +131,10 @@
     color: var(--error);
     font-weight: 700;
   }
+  .gutter div.elegida {
+    color: #63b3ed;
+    font-weight: 700;
+  }
   textarea::placeholder { color: #4d5566; }
   textarea {
     flex: 1;
@@ -207,7 +211,7 @@ ladrillo 2x4 en 2,0,0 color amarillo'></textarea>
   </section>
   <section class="visor">
     <canvas id="lienzo"></canvas>
-    <div class="pista">Arrastra para girar · rueda para acercar · clic derecho para desplazar</div>
+    <div class="pista">Arrastra para girar · rueda para acercar · clic derecho para desplazar · clic en una pieza para ver su línea, Supr la borra</div>
   </section>
 </main>
 
@@ -339,8 +343,14 @@ function limpiar(grupo) {
   }
 }
 
+// Lo dibujado, para poder pincharlo y resaltarlo. Cada entrada recuerda de qué
+// línea salió y de qué color eran sus bordes, que es lo que hay que devolver al
+// dejar de estar elegida.
+const dibujadas = [];
+
 function construir(piezas) {
   limpiar(modelo);
+  dibujadas.length = 0;
 
   for (const p of piezas) {
     const oscura = esOscura(p.color);
@@ -379,19 +389,24 @@ function construir(piezas) {
           0, 0, 0, 1,
         );
         modelo.add(objeto);
+        return objeto;
       };
 
-      colocar(new THREE.Mesh(malla.cuerpo, material));
+      const cuerpoMalla = colocar(new THREE.Mesh(malla.cuerpo, material));
 
       // Los bordes no son adorno: dos piezas del mismo color pegadas son
       // caras coplanares con la misma luz, así que sin ellos una pared de
       // ladrillos se ve como un bloque liso. Y son también lo que hace que
       // una pieza oscura se despegue del fondo.
-      colocar(new THREE.LineSegments(malla.bordes, new THREE.LineBasicMaterial({
-        color: p.flotante ? 0xe0a458 : (oscura ? 0xaab3c4 : 0x1a1d24),
+      const colorBorde = p.flotante ? 0xe0a458 : (oscura ? 0xaab3c4 : 0x1a1d24);
+      const opacidadBorde = p.flotante ? 0.95 : (oscura ? 0.5 : 0.35);
+      const aristasMalla = colocar(new THREE.LineSegments(malla.bordes, new THREE.LineBasicMaterial({
+        color: colorBorde,
         transparent: true,
-        opacity: p.flotante ? 0.95 : (oscura ? 0.5 : 0.35),
+        opacity: opacidadBorde,
       })));
+
+      anotar(p, cuerpoMalla, aristasMalla, colorBorde, opacidadBorde);
       continue;
     }
 
@@ -401,18 +416,133 @@ function construir(piezas) {
     cuerpo.position.set(p.x + p.ancho / 2, p.y + p.fondo / 2, p.z + p.alto / 2);
     modelo.add(cuerpo);
 
+    const colorCaja = p.flotante ? 0xe0a458 : (oscura ? 0xaab3c4 : 0x000000);
+    const opacidadCaja = p.flotante ? 0.95 : (oscura ? 0.55 : 0.3);
     const aristas = new THREE.LineSegments(
       new THREE.EdgesGeometry(caja),
       new THREE.LineBasicMaterial({
-        color: p.flotante ? 0xe0a458 : (oscura ? 0xaab3c4 : 0x000000),
+        color: colorCaja,
         transparent: true,
-        opacity: p.flotante ? 0.95 : (oscura ? 0.55 : 0.3),
+        opacity: opacidadCaja,
       }),
     );
     aristas.position.copy(cuerpo.position);
     modelo.add(aristas);
+
+    anotar(p, cuerpo, aristas, colorCaja, opacidadCaja);
+  }
+
+  pintarSeleccion();
+}
+
+function anotar(p, cuerpo, aristas, color, opacidad) {
+  cuerpo.userData.linea = p.linea;
+  dibujadas.push({ linea: p.linea, cuerpo, aristas, color, opacidad, nombre: p.nombre });
+}
+
+
+// --- Selección con el ratón -----------------------------------------------
+//
+// Lo elegido es una LÍNEA, no una pieza. No es un rodeo: el código es el
+// origen de la verdad y una línea puede haber puesto varias piezas —eso hace
+// `repetir`—, así que elegir una de ellas y no sus hermanas sería mentir sobre
+// lo que el ratón ha tocado. Pinchar lleva al código; el código sigue mandando.
+
+let seleccion = null;
+
+const rayo = new THREE.Raycaster();
+const puntero = new THREE.Vector2();
+
+function pintarSeleccion() {
+  // La pieza puede haber desaparecido al recompilar. Si ya no la pone nadie,
+  // no hay nada elegido.
+  if (seleccion !== null && !dibujadas.some((d) => d.linea === seleccion)) {
+    seleccion = null;
+  }
+
+  for (const d of dibujadas) {
+    const elegida = d.linea !== null && d.linea === seleccion;
+    d.aristas.material.color.set(elegida ? 0x63b3ed : d.color);
+    d.aristas.material.opacity = elegida ? 1 : d.opacidad;
+    // El borde solo se ve por fuera; el relleno dice cuál es sin taparla.
+    d.cuerpo.material.emissive.set(elegida ? 0x14344f : 0x000000);
   }
 }
+
+function verLinea(numero) {
+  const alto = Number.parseFloat(getComputedStyle(areaCodigo).lineHeight) || 21;
+  const arriba = (numero - 1) * alto;
+  const visible = areaCodigo.clientHeight;
+  if (arriba < areaCodigo.scrollTop || arriba + alto > areaCodigo.scrollTop + visible) {
+    areaCodigo.scrollTop = Math.max(0, arriba - visible / 2);
+  }
+  gutter.scrollTop = areaCodigo.scrollTop;
+}
+
+function elegir(linea) {
+  seleccion = linea;
+  pintarSeleccion();
+  pintarGutter(lineaRota);
+
+  if (linea === null) {
+    decir('');
+    return;
+  }
+
+  verLinea(linea);
+  const texto = (areaCodigo.value.split('\n')[linea - 1] || '').trim();
+  const cuantas = dibujadas.filter((d) => d.linea === linea).length;
+  decir(
+    cuantas > 1
+      ? `Línea ${linea} (${cuantas} piezas): ${texto} — Supr la borra.`
+      : `Línea ${linea}: ${texto} — Supr la borra.`,
+  );
+}
+
+// Orbitar es arrastrar, y arrastrar termina en un clic. Lo que separa las dos
+// cosas es si el puntero se ha movido.
+let apretado = null;
+
+lienzo.addEventListener('pointerdown', (evento) => {
+  apretado = { x: evento.clientX, y: evento.clientY };
+});
+
+lienzo.addEventListener('pointerup', (evento) => {
+  if (!apretado) return;
+  const movido = Math.hypot(evento.clientX - apretado.x, evento.clientY - apretado.y);
+  apretado = null;
+  if (movido > 5) return;
+
+  const caja = lienzo.getBoundingClientRect();
+  puntero.x = ((evento.clientX - caja.left) / caja.width) * 2 - 1;
+  puntero.y = -((evento.clientY - caja.top) / caja.height) * 2 + 1;
+  rayo.setFromCamera(puntero, camara);
+
+  // Solo los cuerpos: pinchar un borde es pinchar un pelo.
+  const tocadas = rayo.intersectObjects(dibujadas.map((d) => d.cuerpo), false);
+  const linea = tocadas.length ? tocadas[0].object.userData.linea : null;
+
+  // Una pieza importada de un JSON no viene de ninguna línea. Se dibuja, pero
+  // no hay código al que llevar.
+  if (tocadas.length && linea === undefined) {
+    elegir(null);
+    decir('Esta pieza no viene del código, así que no puedo llevarte a ella.', 'fallo');
+    return;
+  }
+
+  elegir(linea === seleccion ? null : linea);
+});
+
+addEventListener('keydown', (evento) => {
+  if (evento.key !== 'Delete' && evento.key !== 'Supr') return;
+  // Si se está escribiendo, Supr borra letras, que es lo suyo.
+  const donde = document.activeElement;
+  if (donde === areaCodigo || donde === areaOrden) return;
+  if (seleccion === null) return;
+  evento.preventDefault();
+  borrar(String(seleccion));
+  seleccion = null;
+});
 
 
 function centrar() {
@@ -431,11 +561,17 @@ function centrar() {
   controles.update();
 }
 
+// Cuál es la línea rota, para que repintar por otro motivo —elegir una pieza—
+// no borre la marca.
+let lineaRota = null;
+
 function pintarGutter(fallo) {
+  lineaRota = fallo;
   const total = areaCodigo.value.split('\n').length;
   let html = '';
   for (let i = 1; i <= total; i++) {
-    html += `<div class="${i === fallo ? 'fallo' : ''}">${i}</div>`;
+    const clase = i === fallo ? 'fallo' : (i === seleccion ? 'elegida' : '');
+    html += `<div class="${clase}">${i}</div>`;
   }
   gutter.innerHTML = html;
   gutter.scrollTop = areaCodigo.scrollTop;

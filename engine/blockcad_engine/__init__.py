@@ -13,7 +13,7 @@ from .commands import (
     TranslatePartCommand,
 )
 from .editor import BlockEditor
-from .dsl import parse_model
+from .dsl import parse_model, parse_model_con_lineas
 from .errors import (
     BlockCADError,
     CollisionError,
@@ -79,6 +79,7 @@ __all__ = [
     "load_model",
     "save_model",
     "parse_model",
+    "parse_model_con_lineas",
     "Command",
     "AddPartCommand",
     "RemovePartCommand",

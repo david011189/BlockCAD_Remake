@@ -12,6 +12,7 @@ from blockcad_engine import (
     DslError,
     Orientation,
     parse_model,
+    parse_model_con_lineas,
 )
 from blockcad_engine.dsl import model_to_source
 from blockcad_engine.serialization import model_from_dict, model_to_dict
@@ -107,12 +108,18 @@ def _transformacion(item, definition) -> dict:
     }
 
 
-def model_to_scene(model: BlockModel) -> dict:
+def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> dict:
     """Traduce el modelo a cajas listas para dibujar.
 
     El navegador no conoce el catálogo, así que aquí se resuelven las
     dimensiones ya rotadas de cada pieza.
+
+    `lineas` dice qué línea del código creó cada pieza, y viaja con ella para
+    que pinchar en el visor lleve al código. Un modelo que no viene de un
+    texto —el que se importa de un JSON— no lo tiene, y entonces la pieza no
+    lleva línea: se dibuja igual, pero no se puede pinchar.
     """
+    lineas = lineas or {}
     # Una pieza en el aire no es un error: se avisa y se deja construir. Se
     # calcula una vez y se marca cada pieza, en vez de preguntarlo por pieza.
     flotantes = {p.instance_id for p in model.floating()}
@@ -133,6 +140,7 @@ def model_to_scene(model: BlockModel) -> dict:
                 "transparente": item.transparent,
                 "nombre": definition.name,
                 "flotante": item.instance_id in flotantes,
+                "linea": lineas.get(item.instance_id),
                 # Qué malla dibujar y dónde. Sin malla, el visor cae a la caja.
                 "malla": definition.metadata.get("malla", definition.part_id),
                 **_transformacion(item, definition),
@@ -148,13 +156,13 @@ def model_to_scene(model: BlockModel) -> dict:
 def compile_source(source: str) -> dict:
     """Compila código BlockCAD y devuelve la escena o el error."""
     try:
-        model = parse_model(source)
+        model, lineas = parse_model_con_lineas(source)
     except DslError as error:
         return {"ok": False, "linea": error.line, "mensaje": error.message}
     except BlockCADError as error:
         return {"ok": False, "linea": None, "mensaje": str(error)}
 
-    scene = model_to_scene(model)
+    scene = model_to_scene(model, lineas)
     scene["ok"] = True
     return scene
 

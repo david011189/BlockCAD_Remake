@@ -78,6 +78,82 @@ class CompileTests(unittest.TestCase):
         self.assertEqual(len(resultado["piezas"]), 21)
 
 
+class SeleccionTests(unittest.TestCase):
+    """Pinchar una pieza tiene que llevar a su línea de código.
+
+    El código es el origen de la verdad. Si el ratón editara un modelo aparte
+    habría dos verdades; así que lo único que hace falta que viaje con cada
+    pieza es de qué línea salió.
+    """
+
+    def test_every_piece_says_which_line_made_it(self) -> None:
+        escena = compile_source("ladrillo 2x4 en 0,0,0\nladrillo 2x4 en 0,0,3")
+        self.assertEqual([p["linea"] for p in escena["piezas"]], [1, 2])
+
+    def test_comments_and_blank_lines_do_not_shift_it(self) -> None:
+        # El número tiene que ser el del editor, no el de las líneas útiles.
+        escena = compile_source("// una casa\n\nladrillo 2x2 en 0,0,0")
+        self.assertEqual(escena["piezas"][0]["linea"], 3)
+
+    def test_a_repeated_line_owns_all_its_pieces(self) -> None:
+        # `repetir` pone varias piezas desde una sola línea. Por eso lo elegido
+        # es la línea y no la pieza: no hay una línea por pieza que devolver.
+        escena = compile_source(
+            "repetir 3 veces desplazando 0,0,3:\n    ladrillo 2x2 en 0,0,0"
+        )
+        self.assertEqual([p["linea"] for p in escena["piezas"]], [2, 2, 2])
+
+    def test_an_imported_model_has_no_lines_and_says_so(self) -> None:
+        # Un modelo que viene de un JSON no salió de ningún texto. Se dibuja
+        # igual, pero no hay código al que llevar, y eso se dice con None en
+        # vez de inventar un número.
+        escena = model_to_scene(parse_model("ladrillo 2x4 en 0,0,0"))
+        self.assertIsNone(escena["piezas"][0]["linea"])
+
+    def test_the_whole_example_is_traceable(self) -> None:
+        escena = compile_source(EJEMPLO)
+        sin_linea = [p for p in escena["piezas"] if p["linea"] is None]
+        self.assertEqual(sin_linea, [])
+
+
+class RatonTests(unittest.TestCase):
+    """Lo que el visor hace con esa línea."""
+
+    def setUp(self) -> None:
+        self.html = (_WEB / "index.html").read_text(encoding="utf-8")
+
+    def test_a_click_is_not_a_drag(self) -> None:
+        # Orbitar es arrastrar, y arrastrar acaba en un pointerup. Sin medir el
+        # movimiento, girar la cámara elegiría la pieza de debajo.
+        self.assertIn("if (movido > 5) return;", self.html)
+
+    def test_only_bodies_are_clickable(self) -> None:
+        # Los bordes son líneas de un pixel: pinchar uno es pinchar un pelo.
+        self.assertIn("rayo.intersectObjects(dibujadas.map((d) => d.cuerpo)", self.html)
+
+    def test_what_is_selected_is_a_line(self) -> None:
+        self.assertIn("d.linea === seleccion", self.html)
+
+    def test_the_selection_survives_a_rebuild(self) -> None:
+        # Al recompilar se tira todo lo dibujado. Si la línea sigue poniendo
+        # piezas, sigue elegida; si no, deja de estarlo sola.
+        pintar = self.html.split("function pintarSeleccion()")[1].split("\n}")[0]
+        self.assertIn("seleccion = null", pintar)
+
+    def test_delete_does_not_steal_the_keyboard(self) -> None:
+        # Escribiendo, Supr borra letras. Solo fuera del texto borra la pieza.
+        self.assertIn("if (donde === areaCodigo || donde === areaOrden) return;", self.html)
+
+    def test_delete_goes_through_the_console(self) -> None:
+        # `borrar` ya registra el deshacer y recompila. Un camino aparte sería
+        # un segundo sitio donde el texto cambia.
+        self.assertIn("borrar(String(seleccion))", self.html)
+
+    def test_selecting_does_not_erase_the_error_mark(self) -> None:
+        # El gutter se repinta al elegir; la línea rota tiene que seguir roja.
+        self.assertIn("pintarGutter(lineaRota)", self.html)
+
+
 class ExportTests(unittest.TestCase):
     """Lo exportado debe ser exactamente lo que el motor sabe volver a leer."""
 

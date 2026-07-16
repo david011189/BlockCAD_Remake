@@ -259,6 +259,11 @@ class _Builder:
         self._by_name: dict[str, PlacedPart] = {}
         self._last: PlacedPart | None = None
 
+    @property
+    def lineas(self) -> dict[str, int]:
+        """Qué línea creó cada pieza."""
+        return self._line_by_id
+
     def place(self, line: _Line, offset: tuple[int, int, int]) -> None:
         match = _PIECE_RE.match(line.text)
         if not match:
@@ -557,6 +562,19 @@ def parse_model(source: str, *, catalog: PartCatalog | None = None) -> BlockMode
     Lanza `DslError` indicando la línea cuando el código no es válido o
     cuando el motor rechaza una pieza.
     """
+    return parse_model_con_lineas(source, catalog=catalog)[0]
+
+
+def parse_model_con_lineas(
+    source: str, *, catalog: PartCatalog | None = None
+) -> tuple[BlockModel, dict[str, int]]:
+    """Igual, pero dice además qué línea creó cada pieza.
+
+    El constructor ya lo sabía —lo usa para avisar de que una pieza «choca con
+    la línea 2»— pero lo tiraba al terminar. Hace falta para que pinchar una
+    pieza en el visor lleve a su línea: el código es el origen de la verdad, y
+    el 3D es una forma de navegarlo.
+    """
     if source.lstrip().startswith("{"):
         raise DslError(
             1,
@@ -604,5 +622,6 @@ def parse_model(source: str, *, catalog: PartCatalog | None = None) -> BlockMode
     if lines and lines[0].indent != 0:
         raise DslError(lines[0].number, "La primera instrucción no debe ir indentada.")
 
-    _run_block(lines, _Builder(model), 0, (0, 0, 0))
-    return model
+    constructor = _Builder(model)
+    _run_block(lines, constructor, 0, (0, 0, 0))
+    return model, dict(constructor.lineas)
