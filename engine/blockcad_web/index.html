@@ -570,6 +570,8 @@ function elegir(pieza) {
 
 const paleta = document.getElementById('paleta');
 let armada = null;   // la pieza elegida en la paleta, o null
+let modoQuitar = false; // el siguiente clic sobre una pieza la borra
+let ultimoInventario = null; // lo dijo el ultimo compilado
 let fantasma = null; // la caja translúcida que sigue al puntero
 
 // Un plano invisible en z=0, dentro del grupo del modelo: para soltar en el
@@ -587,7 +589,37 @@ async function abrirPaleta() {
   const nombre = encontrado ? encontrado[1] : 'basico';
   const respuesta = await fetch('/api/piezas', { method: 'POST', body: nombre });
   const datos = await respuesta.json();
-  paleta.replaceChildren(...datos.piezas.map((pieza) => {
+
+  const cabecera = document.createElement('div');
+  cabecera.style.cssText = 'padding:4px 6px 8px;font-size:11px;color:#8b93a7;';
+  if (ultimoInventario) {
+    const quedan = ultimoInventario.total - ultimoInventario.usadas;
+    cabecera.textContent = `Set 45300: usas ${ultimoInventario.usadas} de ` +
+      `${ultimoInventario.total} piezas · te quedan ${Math.max(0, quedan)}`;
+  } else {
+    cabecera.textContent = 'Catálogo básico (7 piezas idealizadas).';
+    const cambiar = document.createElement('button');
+    cambiar.textContent = 'usar el set 45300 (97 moldes)';
+    cambiar.addEventListener('click', () => {
+      // Cambiar de catálogo es ESCRIBIR la línea, con su deshacer.
+      registrar();
+      aplicar('catalogo "wedo"\n' + areaCodigo.value);
+      paleta.hidden = true;
+      abrirPaleta();
+    });
+    cabecera.append(document.createElement('br'), cambiar);
+  }
+  const quitar = document.createElement('button');
+  quitar.textContent = 'quitar pieza…';
+  quitar.addEventListener('click', () => {
+    desarmar();
+    modoQuitar = true;
+    quitar.classList.add('armada');
+    decir('Pincha la pieza que quieres quitar. Esc cancela.');
+  });
+  cabecera.append(document.createElement('br'), quitar);
+
+  paleta.replaceChildren(cabecera, ...datos.piezas.map((pieza) => {
     const boton = document.createElement('button');
     boton.textContent = pieza.cantidad
       ? `${pieza.escritura}  ×${pieza.cantidad}` : pieza.escritura;
@@ -653,7 +685,9 @@ lienzo.addEventListener('pointermove', (evento) => {
 });
 
 addEventListener('keydown', (evento) => {
-  if (evento.key === 'Escape' && armada) { desarmar(); decir(''); }
+  if (evento.key === 'Escape' && (armada || modoQuitar)) {
+    desarmar(); modoQuitar = false; decir('');
+  }
 });
 
 // Orbitar es arrastrar, y arrastrar termina en un clic. Lo que separa las dos
@@ -696,6 +730,18 @@ lienzo.addEventListener('pointerup', (evento) => {
   if (pieza && pieza.linea == null) {
     elegir(null);
     decir('Esta pieza no viene del código, así que no puedo llevarte a ella.', 'fallo');
+    return;
+  }
+
+  if (modoQuitar) {
+    modoQuitar = false;
+    for (const b of paleta.querySelectorAll('.armada')) b.classList.remove('armada');
+    if (pieza && pieza.linea != null) {
+      // Por el camino de la consola: borrar registra el deshacer.
+      borrar(String(pieza.linea));
+    } else {
+      decir('Ahí no hay ninguna pieza que quitar.');
+    }
     return;
   }
 
@@ -768,6 +814,7 @@ async function compilar() {
   }
 
   codigoValido = datos.ok;
+  if (datos.ok) ultimoInventario = datos.inventario || null;
 
   if (!datos.ok) {
     estado.className = 'fallo';

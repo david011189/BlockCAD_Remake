@@ -133,7 +133,8 @@ class PaletaTests(unittest.TestCase):
 
     def test_escape_disarms(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
-        self.assertIn("evento.key === 'Escape' && armada", html)
+        # Esc cancela tanto el soltado como el modo quitar.
+        self.assertIn("evento.key === 'Escape' && (armada || modoQuitar)", html)
 
 class InventarioTests(unittest.TestCase):
     """Usar más copias de un molde que la caja se avisa, no se rechaza."""
@@ -155,6 +156,21 @@ class InventarioTests(unittest.TestCase):
         # Las siete piezas idealizadas no vienen de ninguna caja.
         escena = compile_source("ladrillo 2x4 en 0,0,0")
         self.assertEqual(escena["agotadas"], [])
+
+    def test_the_scene_counts_the_inventory(self) -> None:
+        escena = compile_source('catalogo "wedo"
+21980 en 0,0,0')
+        self.assertEqual(escena["inventario"], {"total": 277, "usadas": 1})
+
+    def test_the_basic_catalog_has_no_box(self) -> None:
+        self.assertIsNone(compile_source("ladrillo 2x4 en 0,0,0")["inventario"])
+
+    def test_removing_goes_through_the_console_too(self) -> None:
+        # Quitar con el ratón borra la LÍNEA por el mismo camino que Supr y
+        # que la consola: el deshacer sigue valiendo.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        quitar = html.split("if (modoQuitar) {")[1].split("return;")[0]
+        self.assertIn("borrar(String(pieza.linea))", quitar)
 
     def test_the_footer_reports_it(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")

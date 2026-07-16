@@ -154,7 +154,20 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
         # Se avisa, no se rechaza: quizá hay dos cajas. Solo cuentan las
         # piezas cuyo catálogo declara cuántas trae el set.
         "agotadas": _sobreuso(model),
+        "inventario": _inventario(model),
     }
+
+
+def _inventario(model: BlockModel) -> dict | None:
+    """Cuántas piezas trae la caja y cuántas usa el modelo, si hay caja."""
+    total = sum(
+        int(d.metadata["cantidad_en_el_set"])
+        for d in model.catalog.all()
+        if d.metadata.get("cantidad_en_el_set")
+    )
+    if not total:
+        return None
+    return {"total": total, "usadas": len(model.instances)}
 
 
 def _sobreuso(model: BlockModel) -> list[dict]:
