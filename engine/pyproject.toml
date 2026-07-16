@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "blockcad-engine"
-version = "0.6.0"
+version = "0.7.0"
 description = "Editor de LEGO Technic y WeDo 2.0 con lenguaje textual y vista 3D"
 requires-python = ">=3.11"
 authors = [{name = "BlockCAD Remake"}]
