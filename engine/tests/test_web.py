@@ -158,8 +158,7 @@ class InventarioTests(unittest.TestCase):
         self.assertEqual(escena["agotadas"], [])
 
     def test_the_scene_counts_the_inventory(self) -> None:
-        escena = compile_source('catalogo "wedo"
-21980 en 0,0,0')
+        escena = compile_source('catalogo "wedo"\n21980 en 0,0,0')
         self.assertEqual(escena["inventario"], {"total": 277, "usadas": 1})
 
     def test_the_basic_catalog_has_no_box(self) -> None:
