@@ -64,6 +64,16 @@ _COLORES = {
     "Bright Orange": "#FE8A18",
     "Lime": "#BBE90B",
     "Transparent": "#FCFCFC",
+    # Los colores que faltaban de la caja real del 45300: sin ellos, media
+    # paleta caia al gris por defecto. Los nombres son los del inventario
+    # oficial (LEGO), los valores el hexadecimal canonico de cada color.
+    "Brick Yellow": "#DDC48E",
+    "Bright Yellowish Green": "#A5CA18",
+    "Flame Yellowish Orange": "#F57D20",
+    "Transparent Green": "#84B68D",
+    "Transparent Light Blue": "#AEE9EF",
+    "Transparent Red": "#E76A79",
+    "Transparent Yellow": "#F9EF69",
 }
 _GRIS_POR_DEFECTO = "#9BA19D"
 
