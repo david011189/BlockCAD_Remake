@@ -131,6 +131,18 @@ class PaletaTests(unittest.TestCase):
         soltar = html.split("if (armada) {")[1].split("return;")[0]
         self.assertIn("anadirPiezas", soltar)
 
+    def test_the_palette_shows_piece_images(self) -> None:
+        # Como el BlockCAD original: cada pieza con su imagen, renderizada
+        # una vez desde su malla real y cacheada. El servidor dice la malla.
+        from blockcad_web.server import piezas_para_soltar
+
+        piezas = piezas_para_soltar("wedo")["piezas"]
+        self.assertTrue(all("malla" in p for p in piezas))
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("function miniatura", html)
+        self.assertIn("pedirMallas(datos.piezas.map", html)
+        self.assertIn("miniaturas.set(nombreMalla", html)
+
     def test_escape_disarms(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         # Esc cancela el soltado, el modo quitar y el menú contextual.

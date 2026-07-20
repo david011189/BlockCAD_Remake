@@ -258,6 +258,7 @@ def piezas_para_soltar(texto: str) -> dict:
             "alto": definicion.dimensions.height,
             "color": definicion.default_color,
             "cantidad": int(definicion.metadata.get("cantidad_en_el_set", 0)),
+            "malla": definicion.metadata.get("malla", definicion.part_id),
         })
     piezas.sort(key=lambda p: (p["categoria"], p["escritura"]))
     return {"piezas": piezas}

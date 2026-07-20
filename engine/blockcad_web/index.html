@@ -166,7 +166,9 @@
     padding: 6px;
   }
   #paleta button {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     width: 100%;
     text-align: left;
     margin: 2px 0;
@@ -612,6 +614,45 @@ const suelo = new THREE.Mesh(
 suelo.position.set(0, 0, 0);
 modelo.add(suelo);
 
+// Cada pieza de la paleta se renderiza UNA vez con su malla de verdad y
+// queda cacheada como imagen: como el BlockCAD original.
+const miniaturas = new Map();
+let miniRender = null;
+
+function miniatura(nombreMalla, color) {
+  if (miniaturas.has(nombreMalla)) return miniaturas.get(nombreMalla);
+  const malla = mallas.get(nombreMalla);
+  if (!malla) return null;
+  if (!miniRender) {
+    miniRender = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    miniRender.setSize(48, 48);
+  }
+  const escenita = new THREE.Scene();
+  const grupo = new THREE.Group();
+  grupo.rotation.x = -Math.PI / 2;
+  grupo.add(new THREE.Mesh(malla.cuerpo, new THREE.MeshLambertMaterial({
+    color, side: THREE.DoubleSide,
+  })));
+  grupo.add(new THREE.LineSegments(malla.bordes, new THREE.LineBasicMaterial({
+    color: 0x1a1d24, transparent: true, opacity: 0.4,
+  })));
+  escenita.add(grupo);
+  escenita.add(new THREE.AmbientLight(0xffffff, 0.9));
+  const foco = new THREE.DirectionalLight(0xffffff, 1.3);
+  foco.position.set(1, 2, 1.5);
+  escenita.add(foco);
+  const caja = new THREE.Box3().setFromObject(grupo);
+  const centro = caja.getCenter(new THREE.Vector3());
+  const radio = caja.getSize(new THREE.Vector3()).length() / 2 || 1;
+  const cam = new THREE.PerspectiveCamera(35, 1, radio / 10, radio * 10);
+  cam.position.set(centro.x + radio * 1.6, centro.y + radio * 1.3, centro.z + radio * 1.8);
+  cam.lookAt(centro);
+  miniRender.render(escenita, cam);
+  const url = miniRender.domElement.toDataURL();
+  miniaturas.set(nombreMalla, url);
+  return url;
+}
+
 async function abrirPaleta() {
   if (!paleta.hidden) { paleta.hidden = true; desarmar(); return; }
   const encontrado = areaCodigo.value.match(/^\s*catalogo\s+"([^"]+)"/m);
@@ -638,10 +679,21 @@ async function abrirPaleta() {
     });
     cabecera.append(document.createElement('br'), cambiar);
   }
+  await pedirMallas(datos.piezas.map((pieza) => pieza.malla));
   paleta.replaceChildren(cabecera, ...datos.piezas.map((pieza) => {
     const boton = document.createElement('button');
-    boton.textContent = pieza.cantidad
+    const imagen = miniatura(pieza.malla, pieza.color);
+    if (imagen) {
+      const img = document.createElement('img');
+      img.src = imagen;
+      img.width = 36;
+      img.height = 36;
+      boton.append(img);
+    }
+    const texto = document.createElement('span');
+    texto.textContent = pieza.cantidad
       ? `${pieza.escritura}  ×${pieza.cantidad}` : pieza.escritura;
+    boton.append(texto);
     boton.title = pieza.nombre;
     boton.addEventListener('click', () => armar(pieza, boton));
     return boton;
