@@ -563,6 +563,7 @@ function anotar(p, cuerpos, aristas, color, opacidad) {
   for (const cuerpo of cuerpos) cuerpo.userData.pieza = dibujadas.length;
   dibujadas.push({
     linea: p.linea, orden, cuerpos, aristas, color, opacidad, nombre: p.nombre,
+    suelta: p.suelta,
     caja: { x: p.x, y: p.y, z: p.z, ancho: p.ancho, fondo: p.fondo, alto: p.alto },
   });
 }
@@ -634,10 +635,13 @@ function elegir(pieza) {
   // Si la línea pone varias piezas, hay que decirlo antes de que Supr se lleve
   // las cuatro: se ha elegido una, pero lo que se borra es la línea.
   const hermanas = dibujadas.filter((d) => d.linea === linea).length;
+  const pista = pieza.suelta
+    ? ' Está suelta: mantén el clic sobre ella y arrástrala.'
+    : '';
   decir(
-    hermanas > 1
+    (hermanas > 1
       ? `${pieza.nombre} — línea ${linea}: ${texto} · pone ${hermanas} piezas, y Supr borra la línea entera.`
-      : `${pieza.nombre} — línea ${linea}: ${texto} · Supr la borra.`,
+      : `${pieza.nombre} — línea ${linea}: ${texto} · Supr la borra.`) + pista,
   );
 }
 
@@ -649,6 +653,8 @@ function elegir(pieza) {
 const paleta = document.getElementById('paleta');
 let armada = null;   // la pieza elegida en la paleta, o null
 let moviendo = null; // la pieza que se esta reconectando, con su silueta
+let verboMovimiento = 'Conectada'; // que dira la consola al soltar
+let arrastrable = null; // la pieza suelta bajo el boton apretado
 let ultimoInventario = null; // lo dijo el ultimo compilado
 let fantasma = null; // la caja translúcida que sigue al puntero
 
@@ -770,6 +776,8 @@ function armar(pieza, boton) {
 function desarmar() {
   armada = null;
   moviendo = null;
+  arrastrable = null;
+  controles.enabled = true;
   if (fantasma) { modelo.remove(fantasma); fantasma.geometry.dispose(); fantasma = null; }
   for (const b of paleta.querySelectorAll('.armada')) b.classList.remove('armada');
 }
@@ -805,6 +813,13 @@ function sitioParaSoltar(evento) {
 }
 
 lienzo.addEventListener('pointermove', (evento) => {
+  if (arrastrable && !moviendo && apretado) {
+    const recorrido = Math.hypot(evento.clientX - apretado.x, evento.clientY - apretado.y);
+    if (recorrido > 5) {
+      iniciarMovimiento(arrastrable, 'Movida');
+      decir('Suelta el boton donde quieras dejarla. Esc cancela.');
+    }
+  }
   if ((!armada && !moviendo) || !fantasma) return;
   const sitio = sitioParaSoltar(evento);
   fantasma.visible = sitio !== null;
@@ -978,14 +993,12 @@ opcionQuitar.addEventListener('click', () => {
     'Separada', 'Al separarla choca');
 });
 
-opcionConectar.addEventListener('click', () => {
-  if (!piezaDelMenu) return cerrarMenu();
-  const cual = piezaDelMenu;
-  cerrarMenu();
+function iniciarMovimiento(cual, verbo) {
   desarmar();
   // La silueta: la caja de la pieza, siguiendo al puntero como en la
-  // paleta. El clic confirma; Esc cancela.
+  // paleta. Conectar confirma con un clic; arrastrar, al soltar el boton.
   moviendo = cual;
+  verboMovimiento = verbo;
   fantasma = new THREE.Mesh(
     new THREE.BoxGeometry(cual.caja.ancho, cual.caja.fondo, cual.caja.alto),
     new THREE.MeshBasicMaterial({
@@ -994,6 +1007,13 @@ opcionConectar.addEventListener('click', () => {
   );
   fantasma.visible = false;
   modelo.add(fantasma);
+}
+
+opcionConectar.addEventListener('click', () => {
+  if (!piezaDelMenu) return cerrarMenu();
+  const cual = piezaDelMenu;
+  cerrarMenu();
+  iniciarMovimiento(cual, 'Conectada');
   decir('Mueve el raton y pincha donde conectarla. Flechas: girar la camara; RePag/AvPag: acercar y alejar. Esc cancela.');
 });
 
@@ -1040,6 +1060,21 @@ addEventListener('pointerdown', (evento) => {
 
 lienzo.addEventListener('pointerdown', (evento) => {
   apretado = { x: evento.clientX, y: evento.clientY };
+
+  // Apretar sobre la pieza ELEGIDA y SUELTA la agarra: si el puntero se
+  // mueve, la pieza se va con el, y al soltar el boton se queda. Una pieza
+  // enganchada no se agarra: arrastrarla arrancaria medio modelo.
+  if (evento.button !== 0 || armada || moviendo || manoActiva) return;
+  const caja = lienzo.getBoundingClientRect();
+  puntero.x = ((evento.clientX - caja.left) / caja.width) * 2 - 1;
+  puntero.y = -((evento.clientY - caja.top) / caja.height) * 2 + 1;
+  rayo.setFromCamera(puntero, camara);
+  const tocada = rayo.intersectObjects(dibujadas.flatMap((d) => d.cuerpos), false)[0];
+  const cual = tocada ? dibujadas[tocada.object.userData.pieza] : null;
+  if (cual && esLaElegida(cual) && cual.suelta && cual.linea != null) {
+    arrastrable = cual;
+    controles.enabled = false;
+  }
 });
 
 lienzo.addEventListener('pointerup', (evento) => {
@@ -1067,15 +1102,27 @@ lienzo.addEventListener('pointerup', (evento) => {
   }
 
   if (moviendo) {
+    // Conectar confirma con un clic; el arrastre, al soltar el boton. En
+    // los dos casos este pointerup es el momento.
+    const eraArrastre = arrastrable !== null;
     const sitio = sitioParaSoltar(evento);
     if (sitio) {
       mudarPieza(moviendo, sitio.x / 20, sitio.y / 20, sitio.z / 8,
-        'Conectada', 'Ahi choca');
+        verboMovimiento, 'Ahi choca');
       moviendo = null;
       if (fantasma) { modelo.remove(fantasma); fantasma.geometry.dispose(); fantasma = null; }
+    } else if (eraArrastre) {
+      // Soltar fuera del plano cancela el arrastre.
+      desarmar();
+      decir('');
     }
+    arrastrable = null;
+    controles.enabled = true;
+    if (!eraArrastre) return;
     return;
   }
+  arrastrable = null;
+  controles.enabled = true;
 
   if (armada) {
     const sitio = sitioParaSoltar(evento);

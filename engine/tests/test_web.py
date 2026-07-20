@@ -161,6 +161,29 @@ class PaletaTests(unittest.TestCase):
         self.assertIn("editor.classList.toggle('oculto')", html)
         self.assertIn("dispatchEvent(new Event('resize'))", html)
 
+    def test_the_scene_says_which_pieces_are_loose(self) -> None:
+        # Solo una pieza SUELTA se puede arrastrar: sin union, sin apoyarse
+        # y sin nadie encima. La de abajo de una torre no esta suelta.
+        escena = compile_source(
+            "ladrillo 2x4 en 0,0,0\n"
+            "ladrillo 2x2 en 0,0,3\n"
+            "ladrillo 1x1 en 10,10,0"
+        )
+        sueltas = {p["nombre"]: p["suelta"] for p in escena["piezas"]}
+        self.assertFalse(sueltas["Ladrillo 2×4"])
+        self.assertFalse(sueltas["Ladrillo 2×2"])
+        self.assertTrue(sueltas["Ladrillo 1×1"])
+
+    def test_dragging_a_loose_piece_moves_it(self) -> None:
+        # Apretar sobre la elegida y suelta la agarra; el movimiento arranca
+        # tras unos pixeles (un clic quieto sigue siendo un clic) y soltar
+        # el boton la deja, por la misma mudanza validada de siempre.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("cual.suelta && cual.linea != null", html)
+        self.assertIn("iniciarMovimiento(arrastrable, 'Movida')", html)
+        self.assertIn("controles.enabled = false", html)
+        self.assertIn("verboMovimiento", html)
+
     def test_escape_disarms(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         # Esc cancela el soltado, el modo quitar y el menú contextual.
@@ -236,9 +259,12 @@ class InventarioTests(unittest.TestCase):
         # misma.
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn("opcionConectar", html)
+        # La silueta vive en iniciarMovimiento, compartida con el arrastre.
         conectar = html.split("opcionConectar.addEventListener")[1].split("});")[0]
-        self.assertIn("moviendo = cual", conectar)
-        self.assertIn("fantasma", conectar)
+        self.assertIn("iniciarMovimiento(cual, 'Conectada')", conectar)
+        mover = html.split("function iniciarMovimiento")[1].split("\n}")[0]
+        self.assertIn("moviendo = cual", mover)
+        self.assertIn("fantasma", mover)
         clic = html.split("if (moviendo) {")[1].split("return;")[0]
         self.assertIn("mudarPieza(moviendo", clic)
         self.assertIn("!moviendo || d !== moviendo", html)

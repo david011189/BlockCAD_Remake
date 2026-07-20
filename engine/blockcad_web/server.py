@@ -125,6 +125,20 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
     # calcula una vez y se marca cada pieza, en vez de preguntarlo por pieza.
     flotantes = {p.instance_id for p in model.floating()}
 
+    # Que piezas estan SUELTAS: sin union, sin apoyarse en otra y sin nadie
+    # encima. Solo esas se pueden arrastrar con el raton; mover una pieza
+    # enganchada arrancaria medio modelo.
+    con_soporte: set[str] = set()
+    enganchadas: set[str] = set()
+    for item in model.instances:
+        if model.connected_to(item.instance_id):
+            enganchadas.add(item.instance_id)
+        debajo = model.resting_on(item.instance_id)
+        if debajo:
+            enganchadas.add(item.instance_id)
+            con_soporte.update(p.instance_id for p in debajo)
+    enganchadas |= con_soporte
+
     piezas = []
     for item in model.instances:
         definition = model.catalog.get(item.part_id)
@@ -141,6 +155,7 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
                 "transparente": item.transparent,
                 "nombre": definition.name,
                 "flotante": item.instance_id in flotantes,
+                "suelta": item.instance_id not in enganchadas,
                 "linea": lineas.get(item.instance_id),
                 # Qué malla dibujar y dónde. Sin malla, el visor cae a la caja.
                 "malla": definition.metadata.get("malla", definition.part_id),
