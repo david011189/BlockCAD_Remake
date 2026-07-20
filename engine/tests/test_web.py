@@ -246,6 +246,20 @@ class InventarioTests(unittest.TestCase):
         self.assertIn("PageDown: 1 / 0.9", html)
         self.assertIn("esfera.radius = Math.min(400, Math.max(0.5", html)
 
+    def test_mouse_verbs_refuse_on_broken_code(self) -> None:
+        """Con el codigo roto, el visor es una foto vieja y los numeros de
+        linea no casan con el texto: mover el motor reescribia un comentario
+        y respondia «No he sabido reescribir esa linea». Lo encontro un
+        usuario con un modelo a medio editar. La consola ya se protegia con
+        codigoValido; ahora el raton tambien.
+        """
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("function escenaAlDia()", html)
+        mudar = html.split("async function mudarPieza")[1].split("const hermanas")[0]
+        self.assertIn("escenaAlDia()", mudar)
+        girar = html.split("opcionGirar.addEventListener")[1].split("cerrarMenu();\n")[0]
+        self.assertIn("escenaAlDia", html.split("opcionGirar.addEventListener")[1][:200])
+
     def test_the_footer_reports_it(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn("datos.agotadas", html)

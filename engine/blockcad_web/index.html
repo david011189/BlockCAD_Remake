@@ -763,7 +763,17 @@ let piezaDelMenu = null;
 
 function cerrarMenu() { menuCtx.style.display = 'none'; piezaDelMenu = null; }
 
+function escenaAlDia() {
+  // Con el codigo roto, el visor enseña la ULTIMA FOTO que compilo y los
+  // numeros de linea de las piezas ya no casan con el texto: editar por
+  // numero tocaria lineas equivocadas. La consola ya se protegia asi.
+  if (codigoValido) return true;
+  decir('El codigo no compila (mira la linea roja): arreglalo antes de mover piezas con el raton.', 'fallo');
+  return false;
+}
+
 async function mudarPieza(cual, sx, sy, sz, verbo, fallo) {
+  if (!escenaAlDia()) return false;
   // La mudanza: reescribir la linea de la pieza a una posicion absoluta.
   // La usan desconectar (sitio automatico) y conectar (sitio elegido).
   const hermanas = dibujadas.filter((d) => d.linea === cual.linea).length;
@@ -833,6 +843,7 @@ opcionConectar.addEventListener('click', () => {
 
 opcionGirar.addEventListener('click', async () => {
   if (!piezaDelMenu) return cerrarMenu();
+  if (!escenaAlDia()) return cerrarMenu();
   const numero = piezaDelMenu.linea;
   cerrarMenu();
   const lineas = areaCodigo.value.split('\n');
@@ -941,6 +952,7 @@ lienzo.addEventListener('pointerup', (evento) => {
 
   if (modoQuitar) {
     modoQuitar = false;
+    if (!escenaAlDia()) return;
     for (const b of paleta.querySelectorAll('.armada')) b.classList.remove('armada');
     if (pieza && pieza.linea != null) {
       // Por el camino de la consola: borrar registra el deshacer.
