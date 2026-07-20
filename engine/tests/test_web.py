@@ -165,14 +165,12 @@ class InventarioTests(unittest.TestCase):
     def test_the_basic_catalog_has_no_box(self) -> None:
         self.assertIsNone(compile_source("ladrillo 2x4 en 0,0,0")["inventario"])
 
-    def test_removing_goes_through_the_console_too(self) -> None:
-        # Quitar con el ratón borra la LÍNEA por el mismo camino que Supr y
-        # que la consola: el deshacer sigue valiendo.
+    def test_the_palette_has_no_remove_button(self) -> None:
+        # El «quitar pieza…» de la paleta duplicaba lo que ya hacen el clic
+        # derecho (desconectar) y Supr; quien lo usa pidió jubilarlo.
         html = (_WEB / "index.html").read_text(encoding="utf-8")
-        # El primer return del bloque es la guarda de código roto; el borrar
-        # viene después, así que se mira el bloque entero.
-        quitar = html.split("if (modoQuitar) {")[1][:600]
-        self.assertIn("borrar(String(pieza.linea))", quitar)
+        self.assertNotIn("quitar pieza", html)
+        self.assertNotIn("modoQuitar", html)
 
     def test_right_click_opens_the_menu(self) -> None:
         # Clic derecho quieto abre el menu de la pieza; arrastrar con el

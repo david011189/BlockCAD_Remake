@@ -599,7 +599,6 @@ function elegir(pieza) {
 
 const paleta = document.getElementById('paleta');
 let armada = null;   // la pieza elegida en la paleta, o null
-let modoQuitar = false; // el siguiente clic sobre una pieza la borra
 let moviendo = null; // la pieza que se esta reconectando, con su silueta
 let ultimoInventario = null; // lo dijo el ultimo compilado
 let fantasma = null; // la caja translúcida que sigue al puntero
@@ -639,16 +638,6 @@ async function abrirPaleta() {
     });
     cabecera.append(document.createElement('br'), cambiar);
   }
-  const quitar = document.createElement('button');
-  quitar.textContent = 'quitar pieza…';
-  quitar.addEventListener('click', () => {
-    desarmar();
-    modoQuitar = true;
-    quitar.classList.add('armada');
-    decir('Pincha la pieza que quieres quitar. Esc cancela.');
-  });
-  cabecera.append(document.createElement('br'), quitar);
-
   paleta.replaceChildren(cabecera, ...datos.piezas.map((pieza) => {
     const boton = document.createElement('button');
     boton.textContent = pieza.cantidad
@@ -728,7 +717,7 @@ lienzo.addEventListener('pointermove', (evento) => {
 addEventListener('keydown', (evento) => {
   if (evento.key === 'Escape') {
     cerrarMenu();
-    if (armada || moviendo || modoQuitar) { desarmar(); modoQuitar = false; decir(''); }
+    if (armada || moviendo) { desarmar(); decir(''); }
   }
 
   // Mientras se coloca una pieza el clic esta ocupado confirmando, asi que
@@ -1002,19 +991,6 @@ lienzo.addEventListener('pointerup', (evento) => {
   if (pieza && pieza.linea == null) {
     elegir(null);
     decir('Esta pieza no viene del código, así que no puedo llevarte a ella.', 'fallo');
-    return;
-  }
-
-  if (modoQuitar) {
-    modoQuitar = false;
-    if (!escenaAlDia()) return;
-    for (const b of paleta.querySelectorAll('.armada')) b.classList.remove('armada');
-    if (pieza && pieza.linea != null) {
-      // Por el camino de la consola: borrar registra el deshacer.
-      borrar(String(pieza.linea));
-    } else {
-      decir('Ahí no hay ninguna pieza que quitar.');
-    }
     return;
   }
 
