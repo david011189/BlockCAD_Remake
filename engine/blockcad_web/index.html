@@ -763,6 +763,32 @@ let piezaDelMenu = null;
 
 function cerrarMenu() { menuCtx.style.display = 'none'; piezaDelMenu = null; }
 
+function resaltarProblema(lineasProblema) {
+  // Las piezas que estorban, en rojo: se ve QUE hay que quitar primero.
+  // Cualquier repintado de la seleccion lo limpia, y si no, el tiempo.
+  for (const d of dibujadas) {
+    if (lineasProblema.includes(d.linea)) {
+      d.aristas.material.color.set(0xff6b6b);
+      d.aristas.material.opacity = 1;
+      d.cuerpo.material.emissive.set(0x5a1a1a);
+    }
+  }
+  setTimeout(pintarSeleccion, 4000);
+}
+
+function avisarChoque(prefijo, mensaje) {
+  // El motor nombra las lineas culpables; aqui se convierten en remedio.
+  const numeros = [...mensaje.matchAll(/l\u00ednea (\d+)/g)].map((m) => parseInt(m[1], 10));
+  if (numeros.length) {
+    resaltarProblema(numeros);
+    const cuales = numeros.join(', ');
+    decir(prefijo + ': choca con la pieza de la linea ' + cuales
+      + ' (resaltada en rojo). Quita o mueve esa primero.', 'fallo');
+  } else {
+    decir(prefijo + ': ' + mensaje, 'fallo');
+  }
+}
+
 function escenaAlDia() {
   // Con el codigo roto, el visor enseña la ULTIMA FOTO que compilo y los
   // numeros de linea de las piezas ya no casan con el texto: editar por
@@ -803,7 +829,7 @@ async function mudarPieza(cual, sx, sy, sz, verbo, fallo) {
     return false;
   }
   if (!datos.ok) {
-    decir(fallo + ': ' + datos.mensaje, 'fallo');
+    avisarChoque(fallo, datos.mensaje);
     return false;
   }
   registrar();
@@ -870,7 +896,7 @@ opcionGirar.addEventListener('click', async () => {
     return;
   }
   if (!datos.ok) {
-    decir(`Girada choca: ${datos.mensaje}`, 'fallo');
+    avisarChoque('Girada choca', datos.mensaje);
     return;
   }
   registrar();

@@ -262,6 +262,23 @@ class InventarioTests(unittest.TestCase):
         girar = html.split("opcionGirar.addEventListener")[1].split("cerrarMenu();\n")[0]
         self.assertIn("escenaAlDia", html.split("opcionGirar.addEventListener")[1][:200])
 
+    def test_a_blocked_move_highlights_the_prerequisite(self) -> None:
+        """Si mover choca, la pieza que estorba se resalta en rojo.
+
+        El motor ya nombraba las lineas culpables en su mensaje; el visor
+        las convierte en remedio: las pinta de rojo y dice «quita o mueve
+        esa primero». Lo pidio quien construye: con muchas piezas
+        entrelazadas, saber CUAL estorba es la mitad del trabajo.
+        """
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("function resaltarProblema", html)
+        self.assertIn("function avisarChoque", html)
+        # Desconectar/conectar y girar pasan por el aviso que enseña.
+        self.assertIn("avisarChoque(fallo, datos.mensaje)", html)
+        self.assertIn("avisarChoque('Girada choca', datos.mensaje)", html)
+        # El resaltado se limpia solo: cualquier repintado o el tiempo.
+        self.assertIn("setTimeout(pintarSeleccion, 4000)", html)
+
     def test_the_footer_reports_it(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn("datos.agotadas", html)
