@@ -248,6 +248,15 @@ class InventarioTests(unittest.TestCase):
         mudar = html.split("async function mudarPieza")[1].split("opcionQuitar.addEventListener")[0]
         self.assertNotIn("borrar(", mudar)
         self.assertIn("' en ' + sx", mudar)
+
+    def test_disconnect_lands_nearby(self) -> None:
+        # La pieza separada se queda cerca: anillos de candidatos alrededor
+        # de donde estaba, validados en silencio hasta el primero que
+        # compila. Lo pidio quien la veia salir volando al borde del modelo.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        quitar = html.split("opcionQuitar.addEventListener")[1].split("});")[0]
+        self.assertIn("candidatos.push([c.x + c.ancho + 20 * k, c.y])", quitar)
+        self.assertIn("false,", quitar)
         self.assertIn("color", mudar)
         self.assertIn("no se puede mover una sola", mudar)
         self.assertLess(mudar.index("fetch('/api/modelo'"), mudar.index("aplicar(propuesta)"))
