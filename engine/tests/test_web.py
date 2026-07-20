@@ -210,8 +210,7 @@ class InventarioTests(unittest.TestCase):
         cazo la comparacion byte a byte.
         """
         html = (_WEB / "index.html").read_text(encoding="utf-8")
-        raros = {c for c in html if ord(c) < 32 and c not in "
-	"}
+        raros = {c for c in html if ord(c) < 32 and c not in '\n\r\t'}
         self.assertEqual(raros, set())
 
     def test_the_footer_reports_it(self) -> None:
