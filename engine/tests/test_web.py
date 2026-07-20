@@ -211,6 +211,21 @@ class PaletaTests(unittest.TestCase):
         self.assertIn("otra.acoge.includes(moviendo.molde)", html)
         self.assertIn("bocaCercana(otra.bocas, moviendo.agarreEje)", html)
 
+    def test_the_rack_magnet_is_tangent(self) -> None:
+        # Cada rueda dentada publica su engrane (eje mundial y radio
+        # primitivo) y la cremallera su normal con su paso: el visor hace
+        # la tangente, que a ojo no se acierta. Y voltear existe, porque
+        # una cremallera muerde por donde miran sus dientes.
+        escena = compile_source('catalogo "wedo"\n24505 en 5,5,0\n3743 en 20,20,0 rot x 180')
+        rueda, barra = escena["piezas"]
+        self.assertEqual(rueda["engrane"]["radio"], 30.0)
+        self.assertEqual(barra["cremallera"], {"normal": [0, 0, -1], "paso": 12})
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("moviendo.cremallera && tocado.object !== suelo", html)
+        self.assertIn("otra.engrane.radio + moviendo.cremallera.paso", html)
+        self.assertIn("opcionVoltear", html)
+        self.assertIn("rot x 180", html)
+
     def test_escape_disarms(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         # Esc cancela el soltado, el modo quitar y el menú contextual.

@@ -104,5 +104,58 @@ class LaBocaTests(unittest.TestCase):
         self.assertFalse(modelo.floating())
 
 
+class CremalleraTests(unittest.TestCase):
+    """La cremallera es una rueda de radio infinito: linea de paso a 12
+    LDU de su base (dientes de 9 a 14 en su malla, perfil complementario
+    del engranaje). Muerde cuando sus crestas corren paralelas al eje de
+    la rueda, sus dientes la MIRAN, y el eje queda al radio primitivo de
+    la linea."""
+
+    #: El tren del sinfin entero: caja, gusano dentro, engranaje coronando.
+    def setUp(self) -> None:
+        self.modelo = BlockModel(catalog=cargar("wedo"))
+        self.modelo.add("28698", GridPosition(100, 100, 40))
+        self.modelo.add(
+            "32905", GridPosition(138, 107, 49), orientation=Orientation.z(90)
+        )
+        self.modelo.add("24505", GridPosition(108, 110, 70))
+
+    #: Media vuelta sobre x: los dientes miran al suelo.
+    VOLTEADA = Orientation.around("x", 180)
+
+    def test_the_rack_rides_the_crowned_gear(self) -> None:
+        # Volteada sobre el engranaje que asoma de la caja: su linea de
+        # paso (a 12 de la base, ahora hacia abajo) tangente al circulo de
+        # radio 30. Eje de la rueda en z=102, cremallera en z=130: 102 =
+        # 130 + 2 - 30. Se solapan de verdad y quedan UNIDAS: no flota.
+        barra = self.modelo.add(
+            "3743", GridPosition(100, 110, 130), orientation=self.VOLTEADA
+        )
+        unidas = self.modelo.connected_to(barra.instance_id)
+        self.assertEqual([p.part_id for p in unidas], ["24505"])
+        self.assertFalse(self.modelo.floating())
+
+    def test_one_ldu_closer_the_teeth_crash(self) -> None:
+        with self.assertRaises(CollisionError):
+            self.modelo.add(
+                "3743", GridPosition(100, 110, 129), orientation=self.VOLTEADA
+            )
+
+    def test_teeth_must_face_the_wheel(self) -> None:
+        # Sin voltear, a la misma altura: los dientes miran al cielo y lo
+        # que toca la rueda es la espalda de la barra. Choque.
+        with self.assertRaises(CollisionError):
+            self.modelo.add("3743", GridPosition(100, 110, 130))
+
+    def test_crossed_ridges_do_not_mesh(self) -> None:
+        # Volteada pero girada un cuarto: las crestas cruzan el eje de la
+        # rueda en vez de correr paralelas. Asi no muerde nada.
+        cruzada = Orientation.around("x", 180).then(Orientation.z(90))
+        with self.assertRaises(CollisionError):
+            self.modelo.add(
+                "3743", GridPosition(110, 100, 130), orientation=cruzada
+            )
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -161,6 +161,8 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
                 **_acogida(item, definition),
                 **_agarre(item, definition),
                 **_machos(item, definition),
+                **_engrane(item, definition),
+                **_cremallera(item, definition),
                 **_bocas(item, definition),
                 "linea": lineas.get(item.instance_id),
                 # Qué malla dibujar y dónde. Sin malla, el visor cae a la caja.
@@ -290,6 +292,44 @@ def _bocas(item, definition) -> dict:
         centro = [sum(c.punto[k] for c in g) / len(g) for k in range(3)]
         bocas.append({"centro": centro, "eje": list(g[0].eje)})
     return {"bocas": bocas}
+
+
+def _engrane(item, definition) -> dict:
+    """Si la pieza es una rueda dentada, su eje en el mundo y su radio.
+
+    Es lo que necesita el iman de la cremallera: la tangente al circulo
+    primitivo no se acierta a ojo.
+    """
+    dientes = definition.metadata.get("dientes")
+    if not dientes:
+        return {}
+    ejes = [
+        c for c in item.world_connections(definition)
+        if c.tipo == "agujero_eje"
+    ]
+    if len(ejes) != 1:
+        return {}
+    return {"engrane": {
+        "punto": list(ejes[0].punto),
+        "eje": list(ejes[0].eje),
+        "radio": int(dientes) * 1.25,
+    }}
+
+
+def _cremallera(item, definition) -> dict:
+    """Si la pieza es una cremallera, hacia donde miran sus dientes.
+
+    La normal va girada al mundo; el paso es la altura de su linea de
+    paso sobre la base. Con eso el visor sabe hacerla tangente.
+    """
+    paso = definition.metadata.get("cremallera")
+    if not paso:
+        return {}
+    filas = item.orientation.filas
+    return {"cremallera": {
+        "normal": [filas[i][2] for i in range(3)],
+        "paso": int(paso),
+    }}
 
 
 def _inventario(model: BlockModel) -> dict | None:

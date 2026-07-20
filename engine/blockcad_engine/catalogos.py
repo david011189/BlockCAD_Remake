@@ -187,6 +187,20 @@ def _dientes(nombre_ldraw: str) -> dict[str, str]:
     return {"dientes": encontrado.group(1)} if encontrado else {}
 
 
+def _cremallera(nombre_ldraw: str) -> dict[str, str]:
+    """Si la pieza es una cremallera, con su linea de paso.
+
+    Una cremallera es una rueda dentada de radio infinito: en vez de radio
+    primitivo tiene LINEA de paso, a 12 LDU de su base. Lo dice su malla:
+    dientes de 9 a 14, el perfil complementario del engranaje (raiz a -3,
+    punta a +2.5 del primitivo). Y lo confirma el montaje clasico: pinon
+    de 8 (radio 10) con el eje a 22 de la base de la cremallera.
+    """
+    if "Gear Rack" in re.sub(r"\s+", " ", nombre_ldraw):
+        return {"cremallera": "12"}
+    return {}
+
+
 def _sinfin(nombre_ldraw: str) -> dict[str, str]:
     """Si la pieza es un tornillo sin fin, por su nombre de LDraw.
 
@@ -241,6 +255,7 @@ def _definicion(pieza: dict) -> PartDefinition:
             **malla_giro,
             **_dientes(pieza["nombre_ldraw"]),
             **_sinfin(pieza["nombre_ldraw"]),
+            **_cremallera(pieza["nombre_ldraw"]),
             **_rueda(pieza["nombre_ldraw"]),
             **({"acoge": _ACOGE[pieza["diseno"]]} if pieza["diseno"] in _ACOGE else {}),
         },

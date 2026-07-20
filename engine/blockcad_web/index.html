@@ -567,6 +567,7 @@ function anotar(p, cuerpos, aristas, color, opacidad) {
     rueda: p.rueda,
     molde: p.molde, acoge: p.acoge, acogeCentro: p.acoge_centro,
     agarre: p.agarre, agarreEje: p.agarre_eje,
+    engrane: p.engrane, cremallera: p.cremallera,
     machoCentro: p.macho_centro, machoEje: p.macho_eje, bocas: p.bocas,
     caja: { x: p.x, y: p.y, z: p.z, ancho: p.ancho, fondo: p.fondo, alto: p.alto },
   });
@@ -850,6 +851,35 @@ function sitioParaSoltar(evento) {
     }
   }
 
+  // El iman de la cremallera: arrastrandola sobre una rueda dentada, su
+  // linea de paso se hace tangente al circulo primitivo de la rueda. Los
+  // dientes deben MIRAR a la rueda (voltear si hace falta) y sus crestas
+  // correr paralelas al eje; a lo largo manda el puntero, a studs.
+  if (moviendo && moviendo.cremallera && tocado.object !== suelo) {
+    const otra = dibujadas[tocado.object.userData.pieza];
+    if (otra && otra.engrane) {
+      const n = moviendo.cremallera.normal;
+      const e = otra.engrane.eje;
+      const perpendiculares = Math.abs(n[0] * e[0] + n[1] * e[1] + n[2] * e[2]) < 1e-6;
+      if (perpendiculares) {
+        let k = 0;
+        for (let i = 0; i < 3; i++) if (Math.abs(n[i]) > Math.abs(n[k])) k = i;
+        let j = 0;
+        for (let i = 0; i < 3; i++) if (Math.abs(e[i]) > Math.abs(e[j])) j = i;
+        const i = [0, 1, 2].find((v) => v !== k && v !== j);
+        const mias = [moviendo.caja.ancho, moviendo.caja.fondo, moviendo.caja.alto];
+        const punto = [local.x, local.y, local.z];
+        const sitio = [0, 0, 0];
+        sitio[k] = n[k] > 0
+          ? otra.engrane.punto[k] - otra.engrane.radio - moviendo.cremallera.paso
+          : otra.engrane.punto[k] + otra.engrane.radio + moviendo.cremallera.paso - mias[k];
+        sitio[j] = otra.engrane.punto[j] - mias[j] / 2;
+        sitio[i] = Math.round((punto[i] - mias[i] / 2) / 20) * 20;
+        return { x: sitio[0], y: sitio[1], z: sitio[2] };
+      }
+    }
+  }
+
   // El iman del contenedor: arrastrando un huesped sobre su caja, su
   // agujero se ancla sobre la boca paralela mas cercana al puntero. El
   // sinfin cae a la recta baja; el engranaje, a la ranura de arriba: cada
@@ -992,11 +1022,13 @@ menuCtx.style.cssText = 'position:fixed;z-index:10;display:none;background:#171a
   'border:1px solid #2a3040;border-radius:8px;padding:4px;min-width:150px;';
 const opcionGirar = document.createElement('button');
 opcionGirar.textContent = 'girar 90°';
+const opcionVoltear = document.createElement('button');
+opcionVoltear.textContent = 'voltear';
 const opcionQuitar = document.createElement('button');
 opcionQuitar.textContent = 'desconectar';
 const opcionConectar = document.createElement('button');
 opcionConectar.textContent = 'conectar…';
-for (const b of [opcionGirar, opcionConectar, opcionQuitar]) {
+for (const b of [opcionGirar, opcionVoltear, opcionConectar, opcionQuitar]) {
   b.style.cssText = 'display:block;width:100%;text-align:left;margin:2px 0;';
   menuCtx.append(b);
 }
@@ -1184,6 +1216,36 @@ opcionGirar.addEventListener('click', async () => {
   registrar();
   aplicar(propuesta);
   decir(`Girada la pieza de la línea ${numero}.`, 'hecho');
+});
+
+opcionVoltear.addEventListener('click', async () => {
+  if (!piezaDelMenu) return cerrarMenu();
+  if (!escenaAlDia()) return cerrarMenu();
+  const numero = piezaDelMenu.linea;
+  cerrarMenu();
+  const lineas = areaCodigo.value.split('\n');
+  const vieja = lineas[numero - 1];
+  // Voltear es media vuelta sobre x: boca arriba, boca abajo. Dos veces
+  // seguidas se anulan, y el codigo vuelve a quedar limpio.
+  const acaba = vieja.match(/^(.*?)\s+rot\s+x\s+180\s*$/);
+  const nueva = acaba ? acaba[1] : `${vieja} rot x 180`;
+  lineas[numero - 1] = nueva;
+  const propuesta = lineas.join('\n');
+  let datos;
+  try {
+    const respuesta = await fetch('/api/modelo', { method: 'POST', body: propuesta });
+    datos = await respuesta.json();
+  } catch (error) {
+    decir('No se pudo hablar con el servidor: ' + error.message, 'fallo');
+    return;
+  }
+  if (!datos.ok) {
+    avisarChoque('Volteada choca', datos.mensaje);
+    return;
+  }
+  registrar();
+  aplicar(propuesta);
+  decir(`Volteada la pieza de la línea ${numero}.`, 'hecho');
 });
 
 addEventListener('pointerdown', (evento) => {

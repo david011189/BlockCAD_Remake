@@ -188,6 +188,49 @@ def _muerde_sinfin(
     return False
 
 
+def _muerde_cremallera(
+    a: PlacedPart,
+    def_a: PartDefinition,
+    b: PlacedPart,
+    def_b: PartDefinition,
+) -> bool:
+    """¿Muerde esta rueda dentada a la cremallera?
+
+    La cremallera es una rueda de radio infinito: su circulo primitivo es
+    una LINEA, paralela a su base a la altura que declara su catalogo. La
+    mordida exige tres cosas: las crestas de sus dientes paralelas al eje
+    de la rueda, los dientes MIRANDO a la rueda (una cremallera boca abajo
+    muerde por debajo), y el eje de la rueda exactamente a su radio
+    primitivo de la linea de paso. Convierte giro en carrera: es la
+    direccion asistida de todo LEGO Technic.
+    """
+    for barra, rueda, def_c, def_r in ((a, b, def_a, def_b), (b, a, def_b, def_a)):
+        paso = def_c.metadata.get("cremallera")
+        dientes = def_r.metadata.get("dientes")
+        if not paso or not dientes:
+            continue
+        ejes = [c for c in rueda.world_connections(def_r) if c.tipo == "agujero_eje"]
+        if not ejes:
+            continue
+        eje = ejes[0]
+        filas = barra.orientation.filas
+        # Sin girar, los dientes miran a +z y sus crestas corren por y.
+        normal = tuple(filas[i][2] for i in range(3))
+        crestas = tuple(filas[i][1] for i in range(3))
+        if not _paralelas(eje.eje, crestas):
+            continue
+        k = max(range(3), key=lambda i: abs(normal[i]))
+        caja = barra.bounds(def_c)
+        minimo = (caja.min_x, caja.min_y, caja.min_z)[k]
+        maximo = (caja.max_x, caja.max_y, caja.max_z)[k]
+        linea = minimo + int(paso) if normal[k] > 0 else maximo - int(paso)
+        # Con signo: la rueda tiene que estar DEL LADO de los dientes.
+        distancia = (eje.punto[k] - linea) * normal[k]
+        if abs(distancia - int(dientes) * _LDU_POR_DIENTE) < 1e-6:
+            return True
+    return False
+
+
 def _calzan(
     a: PlacedPart,
     def_a: PartDefinition,
@@ -629,6 +672,9 @@ class BlockModel:
             # Y el sinfin muerde a su rueda en angulo recto.
             if _muerde_sinfin(candidate, definition, existing, existing_definition):
                 continue
+            # Y la rueda muerde a la cremallera sobre su linea de paso.
+            if _muerde_cremallera(candidate, definition, existing, existing_definition):
+                continue
             # Y el sinfin vive dentro de su caja.
             if _acoge(candidate, definition, existing, existing_definition):
                 continue
@@ -681,6 +727,12 @@ class BlockModel:
                     self.catalog.get(otra.part_id),
                 )
                 or _muerde_sinfin(
+                    pieza,
+                    self.catalog.get(pieza.part_id),
+                    otra,
+                    self.catalog.get(otra.part_id),
+                )
+                or _muerde_cremallera(
                     pieza,
                     self.catalog.get(pieza.part_id),
                     otra,
