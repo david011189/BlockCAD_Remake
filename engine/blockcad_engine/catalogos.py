@@ -150,11 +150,12 @@ def _giradas_90(conexiones, fondo: float) -> list[dict]:
 _DIENTES_RE = re.compile(r"Gear (\d+) Tooth")
 
 
-#: Contenedores: piezas cuyo oficio es alojar a otra en su hueco. La caja
-#: del tornillo sin fin (Technic Gearbox) existe para el sinfin: el gusano
-#: vive dentro y un eje los atraviesa a los dos. La pareja es un hecho de
-#: las piezas, no una preferencia.
-_ACOGE = {"28698": "32905"}
+#: Contenedores: piezas cuyo oficio es alojar a otras en su hueco. La caja
+#: del tornillo sin fin (Technic Gearbox) existe para su pareja completa:
+#: el gusano vive dentro y el engranaje de 24 entra por la ranura de arriba
+#: hasta morderlo en angulo recto. Los huespedes son un hecho de las
+#: piezas, no una preferencia.
+_ACOGE = {"28698": "32905 24505"}
 
 
 def _rueda(nombre_ldraw: str) -> dict[str, str]:
@@ -184,6 +185,18 @@ def _dientes(nombre_ldraw: str) -> dict[str, str]:
     # normaliza antes de buscar, igual que hace el nombre de la pieza.
     encontrado = _DIENTES_RE.search(re.sub(r"\s+", " ", nombre_ldraw))
     return {"dientes": encontrado.group(1)} if encontrado else {}
+
+
+def _sinfin(nombre_ldraw: str) -> dict[str, str]:
+    """Si la pieza es un tornillo sin fin, por su nombre de LDraw.
+
+    El sinfin no dice dientes: muerde en angulo recto, con su radio
+    primitivo de medio stud, y el motor necesita saber quien es para
+    aplicarle su propia regla de mordida.
+    """
+    if "Worm Gear" in re.sub(r"\s+", " ", nombre_ldraw):
+        return {"sinfin": "1"}
+    return {}
 
 
 def _color(colores: list[str]) -> str:
@@ -227,6 +240,7 @@ def _definicion(pieza: dict) -> PartDefinition:
             "cantidad_en_el_set": str(pieza.get("cantidad", 0)),
             **malla_giro,
             **_dientes(pieza["nombre_ldraw"]),
+            **_sinfin(pieza["nombre_ldraw"]),
             **_rueda(pieza["nombre_ldraw"]),
             **({"acoge": _ACOGE[pieza["diseno"]]} if pieza["diseno"] in _ACOGE else {}),
         },

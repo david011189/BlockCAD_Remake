@@ -525,12 +525,66 @@ class AcogidaTests(unittest.TestCase):
         with self.assertRaises(CollisionError):
             self.modelo.add("32905", GridPosition(138, 100, 49))
 
+    def test_the_gear_crowns_the_box(self) -> None:
+        # El segundo huesped: el engranaje de 24 entra por la ranura de
+        # arriba, ASOMA por ella (la boca del contenedor esta abierta al
+        # cielo) y muerde al gusano en angulo recto. Queda unido a los dos.
+        self.modelo.add(
+            "32905", GridPosition(138, 107, 49), orientation=self.GIRADO
+        )
+        engranaje = self.modelo.add("24505", GridPosition(108, 110, 70))
+        unidas = self.modelo.connected_to(engranaje.instance_id)
+        self.assertEqual(
+            sorted(p.part_id for p in unidas), ["28698", "32905"]
+        )
+        self.assertFalse(self.modelo.floating())
+
+    def test_through_a_wall_is_still_a_crash(self) -> None:
+        # Asomar por arriba es legal; atravesar un costado no. Corrido dos
+        # studs, el engranaje sale por la pared y ya no hay recta de boca
+        # que lo salve.
+        with self.assertRaises(CollisionError):
+            self.modelo.add("24505", GridPosition(148, 110, 70))
+
     def test_the_box_does_not_host_other_pieces(self) -> None:
         # El contenedor declara a QUIEN acoge: un ladrillo dentro de la caja
         # sigue siendo un choque. (Un pin, en cambio, SI puede insertarse en
         # las bocas de la caja: eso es una insercion legitima, no acogida.)
         with self.assertRaises(CollisionError):
             self.modelo.add("3004", GridPosition(120, 110, 50))
+
+
+class MordidaSinfinTests(unittest.TestCase):
+    """El tornillo sin fin muerde en angulo recto: su propia geometria."""
+
+    def setUp(self) -> None:
+        self.modelo = BlockModel(catalog=cargar("wedo"))
+        self.modelo.add("32905", GridPosition(0, 0, 0))
+
+    def test_perpendicular_at_the_sum_of_radii_bites(self) -> None:
+        # Ejes cruzados a 90 grados, separados 40 LDU: el radio primitivo
+        # de la rueda de 24 (30) mas el del sinfin (medio stud). Las cajas
+        # se solapan de verdad y aun asi es legal — y cuenta como union.
+        rueda = self.modelo.add(
+            "24505", GridPosition(3, 0, 21), orientation=Orientation.z(90)
+        )
+        unidas = self.modelo.connected_to(rueda.instance_id)
+        self.assertEqual([p.part_id for p in unidas], ["32905"])
+        self.assertFalse(self.modelo.floating())
+
+    def test_too_close_the_teeth_crash(self) -> None:
+        # Dos LDU mas cerca los dientes chocan de frente.
+        with self.assertRaises(CollisionError):
+            self.modelo.add(
+                "24505", GridPosition(3, 0, 19), orientation=Orientation.z(90)
+            )
+
+    def test_parallel_axes_are_not_a_worm_bite(self) -> None:
+        # Sin girar, los ejes corren paralelos: asi muerden dos ruedas,
+        # no un sinfin. Y como el sinfin no cuenta dientes, no hay mordida
+        # que valga: es choque.
+        with self.assertRaises(CollisionError):
+            self.modelo.add("24505", GridPosition(3, 0, 21))
 
 
 if __name__ == "__main__":

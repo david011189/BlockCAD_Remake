@@ -195,7 +195,7 @@ def _acogida(item, definition) -> dict:
     baja = min(c.punto[2] for c in bocas)
     linea = [c.punto for c in bocas if c.punto[2] == baja]
     centro = [round(sum(p[k] for p in linea) / len(linea), 1) for k in range(3)]
-    return {"acoge": acoge, "acoge_centro": centro}
+    return {"acoge": acoge.split(), "acoge_centro": centro}
 
 
 def _agarre(item, definition) -> dict:
@@ -213,9 +213,14 @@ def _agarre(item, definition) -> dict:
     if len(agujeros) != 1:
         return {}
     p = agujeros[0].punto
-    return {"agarre": [
-        p[0] - item.position.x, p[1] - item.position.y, p[2] - item.position.z,
-    ]}
+    return {
+        "agarre": [
+            p[0] - item.position.x,
+            p[1] - item.position.y,
+            p[2] - item.position.z,
+        ],
+        "agarre_eje": list(agujeros[0].eje),
+    }
 
 
 def _misma_recta(p1, e1, p2, e2) -> bool:

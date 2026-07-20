@@ -92,6 +92,10 @@ def _hay_insercion(
 #: todas las parejas del sistema salen de esta constante.
 _LDU_POR_DIENTE = 1.25
 
+#: Radio primitivo del tornillo sin fin: medio stud. No sale de dientes
+#: porque el sinfin no los cuenta como una rueda: es una rosca.
+_RADIO_SINFIN = 10
+
 
 def _muerden(
     a: PlacedPart,
@@ -109,8 +113,9 @@ def _muerden(
     La condición es geométrica y estrecha: ejes paralelos (no la misma
     recta) y separados EXACTAMENTE por la suma de los radios primitivos,
     1,25 LDU por diente. Más cerca los dientes chocan de frente; más lejos
-    no se tocan. El tornillo sin fin y las parejas en ángulo quedan fuera:
-    muerden con otra geometría, y fingir que esta las cubre sería mentir.
+    no se tocan. El tornillo sin fin muerde en angulo recto y tiene su
+    propia regla (`_muerde_sinfin`); las parejas conicas en angulo siguen
+    fuera, y fingir que esta las cubre seria mentir.
     """
     dientes_a = def_a.metadata.get("dientes")
     dientes_b = def_b.metadata.get("dientes")
@@ -138,6 +143,49 @@ def _muerden(
 
     primitivos = (int(dientes_a) + int(dientes_b)) * _LDU_POR_DIENTE
     return abs(distancia - primitivos) < 1e-6
+
+
+def _muerde_sinfin(
+    a: PlacedPart,
+    def_a: PartDefinition,
+    b: PlacedPart,
+    def_b: PartDefinition,
+) -> bool:
+    """¿Muerde el tornillo sin fin a esta rueda dentada?
+
+    El sinfin muerde EN ANGULO RECTO: su eje y el de la rueda se cruzan
+    perpendiculares, separados exactamente por el radio primitivo de la
+    rueda (1,25 LDU por diente) mas el del sinfin (medio stud). Es la
+    mordida que reduce despacio: cada vuelta del gusano avanza un diente
+    de la rueda, y la rueda no puede devolverle el giro.
+    """
+    for sinfin, rueda, def_s, def_r in ((a, b, def_a, def_b), (b, a, def_b, def_a)):
+        if not def_s.metadata.get("sinfin"):
+            continue
+        dientes = def_r.metadata.get("dientes")
+        if not dientes:
+            continue
+        ejes_s = [c for c in sinfin.world_connections(def_s) if c.tipo == "agujero_eje"]
+        ejes_r = [c for c in rueda.world_connections(def_r) if c.tipo == "agujero_eje"]
+        if not ejes_s or not ejes_r:
+            continue
+        es, er = ejes_s[0], ejes_r[0]
+        if abs(sum(x * y for x, y in zip(es.eje, er.eje))) > 1e-6:
+            continue  # No perpendiculares: asi no muerde un sinfin.
+        # Distancia entre dos rectas que se cruzan: lo que separa sus
+        # puntos, proyectado sobre la normal comun (el producto cruz).
+        normal = (
+            es.eje[1] * er.eje[2] - es.eje[2] * er.eje[1],
+            es.eje[2] * er.eje[0] - es.eje[0] * er.eje[2],
+            es.eje[0] * er.eje[1] - es.eje[1] * er.eje[0],
+        )
+        largo = sum(v * v for v in normal) ** 0.5
+        entre = tuple(p - q for p, q in zip(er.punto, es.punto))
+        distancia = abs(sum(e * n for e, n in zip(entre, normal))) / largo
+        objetivo = int(dientes) * _LDU_POR_DIENTE + _RADIO_SINFIN
+        if abs(distancia - objetivo) < 1e-6:
+            return True
+    return False
 
 
 def _calzan(
@@ -195,13 +243,16 @@ def _acoge(
     """¿Es este el huesped dentro de su contenedor?
 
     La caja del sinfin es hueca: el gusano vive dentro, alineado con los
-    agujeros bajos por los que luego entra el eje que mueve a los dos. La
-    regla es estrecha como sus hermanas: el contenedor declara a QUIEN
+    agujeros bajos, y el engranaje de 24 entra por la ranura de arriba. La
+    regla es estrecha como sus hermanas: el contenedor declara a QUIENES
     acoge, el agujero de eje del huesped debe compartir recta con una boca
-    del contenedor, y el huesped debe caber ENTERO dentro de su caja.
+    del contenedor, y el huesped debe estar dentro de la caja por los
+    costados y por abajo. Por ARRIBA puede asomar: la boca del contenedor
+    esta abierta al cielo, y el engranaje corona por ella. Atravesar una
+    pared o el suelo sigue siendo choque.
     """
     for cont, huesped, def_c, def_h in ((a, b, def_a, def_b), (b, a, def_b, def_a)):
-        if def_c.metadata.get("acoge") != huesped.part_id:
+        if huesped.part_id not in def_c.metadata.get("acoge", "").split():
             continue
         ejes = [
             x for x in huesped.world_connections(def_h)
@@ -214,7 +265,7 @@ def _acoge(
         if (
             ch.min_x >= cc.min_x and ch.max_x <= cc.max_x
             and ch.min_y >= cc.min_y and ch.max_y <= cc.max_y
-            and ch.min_z >= cc.min_z and ch.max_z <= cc.max_z
+            and ch.min_z >= cc.min_z
         ):
             return True
     return False
@@ -575,6 +626,9 @@ class BlockModel:
             # Y el neumatico abraza a su llanta.
             if _calzan(candidate, definition, existing, existing_definition):
                 continue
+            # Y el sinfin muerde a su rueda en angulo recto.
+            if _muerde_sinfin(candidate, definition, existing, existing_definition):
+                continue
             # Y el sinfin vive dentro de su caja.
             if _acoge(candidate, definition, existing, existing_definition):
                 continue
@@ -621,6 +675,12 @@ class BlockModel:
                     self.catalog.get(otra.part_id),
                 )
                 or _acoge(
+                    pieza,
+                    self.catalog.get(pieza.part_id),
+                    otra,
+                    self.catalog.get(otra.part_id),
+                )
+                or _muerde_sinfin(
                     pieza,
                     self.catalog.get(pieza.part_id),
                     otra,

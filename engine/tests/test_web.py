@@ -196,7 +196,20 @@ class PaletaTests(unittest.TestCase):
         self.assertEqual(eje["macho_centro"], [6.0, 60.0, 6.0])
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn("moviendo.machoCentro", html)
-        self.assertIn("paralelos(boca.eje, moviendo.machoEje)", html)
+        self.assertIn("bocaCercana(otra.bocas, moviendo.machoEje)", html)
+
+    def test_the_host_magnet_anchors_hole_on_mouth(self) -> None:
+        # La caja declara a sus huespedes en lista y cada huesped trae su
+        # agujero CON direccion: el iman lo ancla sobre la boca paralela
+        # mas cercana. Asi el gusano cae a la recta baja y el engranaje a
+        # la ranura de arriba, sin centros especiales.
+        escena = compile_source('catalogo "wedo"\n28698 en 5,5,5\n24505 en 20,20,0')
+        caja, engranaje = escena["piezas"]
+        self.assertEqual(caja["acoge"], ["32905", "24505"])
+        self.assertEqual(engranaje["agarre_eje"], [0.0, 1.0, 0.0])
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("otra.acoge.includes(moviendo.molde)", html)
+        self.assertIn("bocaCercana(otra.bocas, moviendo.agarreEje)", html)
 
     def test_escape_disarms(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
