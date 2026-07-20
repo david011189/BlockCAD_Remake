@@ -186,6 +186,40 @@ def _calzan(
     return True
 
 
+def _acoge(
+    a: PlacedPart,
+    def_a: PartDefinition,
+    b: PlacedPart,
+    def_b: PartDefinition,
+) -> bool:
+    """¿Es este el huesped dentro de su contenedor?
+
+    La caja del sinfin es hueca: el gusano vive dentro, alineado con los
+    agujeros bajos por los que luego entra el eje que mueve a los dos. La
+    regla es estrecha como sus hermanas: el contenedor declara a QUIEN
+    acoge, el agujero de eje del huesped debe compartir recta con una boca
+    del contenedor, y el huesped debe caber ENTERO dentro de su caja.
+    """
+    for cont, huesped, def_c, def_h in ((a, b, def_a, def_b), (b, a, def_b, def_a)):
+        if def_c.metadata.get("acoge") != huesped.part_id:
+            continue
+        ejes = [
+            x for x in huesped.world_connections(def_h)
+            if x.tipo == "agujero_eje"
+        ]
+        bocas = [x for x in cont.world_connections(def_c) if x.es_hembra]
+        if not any(e.misma_recta_que(bc) for e in ejes for bc in bocas):
+            continue
+        ch, cc = huesped.bounds(def_h), cont.bounds(def_c)
+        if (
+            ch.min_x >= cc.min_x and ch.max_x <= cc.max_x
+            and ch.min_y >= cc.min_y and ch.max_y <= cc.max_y
+            and ch.min_z >= cc.min_z and ch.max_z <= cc.max_z
+        ):
+            return True
+    return False
+
+
 def _eje_redondo(pieza: PlacedPart, definicion: PartDefinition) -> int | None:
     """Por que eje corre el ancho de una pieza redonda: su dimension impar.
 
@@ -541,6 +575,9 @@ class BlockModel:
             # Y el neumatico abraza a su llanta.
             if _calzan(candidate, definition, existing, existing_definition):
                 continue
+            # Y el sinfin vive dentro de su caja.
+            if _acoge(candidate, definition, existing, existing_definition):
+                continue
             collisions.append(existing)
 
         return tuple(collisions)
@@ -562,7 +599,7 @@ class BlockModel:
         pieza = self.get(instance_id)
         definicion = self.catalog.get(pieza.part_id)
         mias = pieza.world_connections(definicion)
-        if not mias and not definicion.metadata.get('rueda'):
+        if not mias and not definicion.metadata.get('rueda') and not definicion.metadata.get('acoge'):
             # Sin conexiones no hay nada que compartir... salvo que la pieza
             # sea neumatico o llanta: esas se unen abrazando.
             return ()
@@ -578,6 +615,12 @@ class BlockModel:
                 comparten_punto
                 or _hay_insercion(mias, suyas)
                 or _calzan(
+                    pieza,
+                    self.catalog.get(pieza.part_id),
+                    otra,
+                    self.catalog.get(otra.part_id),
+                )
+                or _acoge(
                     pieza,
                     self.catalog.get(pieza.part_id),
                     otra,

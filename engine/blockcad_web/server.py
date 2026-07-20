@@ -157,6 +157,9 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
                 "flotante": item.instance_id in flotantes,
                 "suelta": item.instance_id not in enganchadas,
                 "rueda": definition.metadata.get("rueda"),
+                "molde": item.part_id,
+                **_acogida(item, definition),
+                **_agarre(item, definition),
                 "linea": lineas.get(item.instance_id),
                 # Qué malla dibujar y dónde. Sin malla, el visor cae a la caja.
                 "malla": definition.metadata.get("malla", definition.part_id),
@@ -172,6 +175,45 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
         "agotadas": _sobreuso(model),
         "inventario": _inventario(model),
     }
+
+
+def _acogida(item, definition) -> dict:
+    """Si la pieza es un contenedor, donde deja el iman a su huesped.
+
+    El centro de acogida es el punto medio de la recta baja de sus bocas:
+    por ahi entrara el eje, y ahi se centra el huesped. Va en coordenadas
+    del mundo, con la pieza ya girada y colocada.
+    """
+    acoge = definition.metadata.get("acoge")
+    if not acoge:
+        return {}
+    bocas = [c for c in item.world_connections(definition) if c.es_hembra]
+    if not bocas:
+        return {}
+    baja = min(c.punto[2] for c in bocas)
+    linea = [c.punto for c in bocas if c.punto[2] == baja]
+    centro = [round(sum(p[k] for p in linea) / len(linea), 1) for k in range(3)]
+    return {"acoge": acoge, "acoge_centro": centro}
+
+
+def _agarre(item, definition) -> dict:
+    """Donde agarrar la pieza al imantarla: su agujero de eje, si tiene uno.
+
+    El iman de la acogida no puede anclar por el centro de la caja: el
+    agujero del sinfin no esta en su centro, y anclarlo mal lo dejaria
+    fuera de la recta por la que luego entra el eje. Es el desplazamiento
+    del agujero respecto a la esquina de la pieza, ya girada.
+    """
+    agujeros = [
+        c for c in item.world_connections(definition)
+        if c.tipo == "agujero_eje"
+    ]
+    if len(agujeros) != 1:
+        return {}
+    p = agujeros[0].punto
+    return {"agarre": [
+        p[0] - item.position.x, p[1] - item.position.y, p[2] - item.position.z,
+    ]}
 
 
 def _inventario(model: BlockModel) -> dict | None:

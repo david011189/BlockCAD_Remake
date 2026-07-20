@@ -565,6 +565,8 @@ function anotar(p, cuerpos, aristas, color, opacidad) {
     linea: p.linea, orden, cuerpos, aristas, color, opacidad, nombre: p.nombre,
     suelta: p.suelta,
     rueda: p.rueda,
+    molde: p.molde, acoge: p.acoge, acogeCentro: p.acoge_centro,
+    agarre: p.agarre,
     caja: { x: p.x, y: p.y, z: p.z, ancho: p.ancho, fondo: p.fondo, alto: p.alto },
   });
 }
@@ -807,6 +809,29 @@ function sitioParaSoltar(evento) {
   // El iman de la rueda: si lo que se mueve es un neumatico y debajo hay
   // una llanta (o al reves), el sitio es EL montaje: concentrico en el
   // plano de la rueda, centrado dentro del tambor.
+  // El iman del contenedor: arrastrando el huesped sobre su caja, el
+  // sitio es el centro de acogida — donde luego entrara el eje.
+  if (moviendo && tocado.object !== suelo) {
+    const otra = dibujadas[tocado.object.userData.pieza];
+    if (otra && otra.acoge === moviendo.molde && otra.acogeCentro && moviendo.agarre) {
+      // Por el agujero en el plano de la recta, centrado a lo largo: el
+      // agujero del sinfin no esta en su centro, y la esquina si miente.
+      const mia = [moviendo.caja.ancho, moviendo.caja.fondo, moviendo.caja.alto];
+      let eje = 0;
+      for (let k = 0; k < 3; k++) {
+        const otras = [0, 1, 2].filter((j) => j !== k).map((j) => mia[j]);
+        if (otras[0] === otras[1] && mia[k] !== otras[0]) eje = k;
+      }
+      const sitio = [0, 0, 0];
+      for (let k = 0; k < 3; k++) {
+        sitio[k] = k === eje
+          ? otra.acogeCentro[k] - mia[k] / 2
+          : otra.acogeCentro[k] - moviendo.agarre[k];
+      }
+      return { x: sitio[0], y: sitio[1], z: sitio[2] };
+    }
+  }
+
   if (moviendo && moviendo.rueda && tocado.object !== suelo) {
     const otra = dibujadas[tocado.object.userData.pieza];
     if (otra && otra.rueda && otra.rueda !== moviendo.rueda) {

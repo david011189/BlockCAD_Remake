@@ -493,5 +493,45 @@ class CalzadoTests(unittest.TestCase):
             )
 
 
+class AcogidaTests(unittest.TestCase):
+    """La caja del sinfin acoge al sinfin: quinta manera legal de solaparse."""
+
+    def setUp(self) -> None:
+        self.modelo = BlockModel(catalog=cargar("wedo"))
+        self.modelo.add("28698", GridPosition(100, 100, 40))
+
+    GIRADO = Orientation.z(90)
+
+    def test_the_worm_lives_inside_its_box(self) -> None:
+        # Girado para alinear su agujero con las bocas bajas, y ENTERO
+        # dentro. Queda unido: ni flota ni esta suelto.
+        gusano = self.modelo.add(
+            "32905", GridPosition(138, 107, 49), orientation=self.GIRADO
+        )
+        unidas = self.modelo.connected_to(gusano.instance_id)
+        self.assertEqual([p.part_id for p in unidas], ["28698"])
+        self.assertFalse(self.modelo.floating())
+
+    def test_off_the_line_still_collides(self) -> None:
+        # Dentro de la caja pero fuera de la recta de las bocas: por ahi no
+        # entraria el eje, y no hay acogida que valga.
+        with self.assertRaises(CollisionError):
+            self.modelo.add(
+                "32905", GridPosition(138, 107, 57), orientation=self.GIRADO
+            )
+
+    def test_crossed_the_worm_does_not_fit(self) -> None:
+        # Sin girar, su agujero corre perpendicular a las bocas.
+        with self.assertRaises(CollisionError):
+            self.modelo.add("32905", GridPosition(138, 100, 49))
+
+    def test_the_box_does_not_host_other_pieces(self) -> None:
+        # El contenedor declara a QUIEN acoge: un ladrillo dentro de la caja
+        # sigue siendo un choque. (Un pin, en cambio, SI puede insertarse en
+        # las bocas de la caja: eso es una insercion legitima, no acogida.)
+        with self.assertRaises(CollisionError):
+            self.modelo.add("3004", GridPosition(120, 110, 50))
+
+
 if __name__ == "__main__":
     unittest.main()

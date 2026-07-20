@@ -150,6 +150,13 @@ def _giradas_90(conexiones, fondo: float) -> list[dict]:
 _DIENTES_RE = re.compile(r"Gear (\d+) Tooth")
 
 
+#: Contenedores: piezas cuyo oficio es alojar a otra en su hueco. La caja
+#: del tornillo sin fin (Technic Gearbox) existe para el sinfin: el gusano
+#: vive dentro y un eje los atraviesa a los dos. La pareja es un hecho de
+#: las piezas, no una preferencia.
+_ACOGE = {"28698": "32905"}
+
+
 def _rueda(nombre_ldraw: str) -> dict[str, str]:
     """Si la pieza es neumatico o llanta, por su nombre de LDraw.
 
@@ -221,6 +228,7 @@ def _definicion(pieza: dict) -> PartDefinition:
             **malla_giro,
             **_dientes(pieza["nombre_ldraw"]),
             **_rueda(pieza["nombre_ldraw"]),
+            **({"acoge": _ACOGE[pieza["diseno"]]} if pieza["diseno"] in _ACOGE else {}),
         },
         aliases=tuple(aliases),
         connections=tuple(
