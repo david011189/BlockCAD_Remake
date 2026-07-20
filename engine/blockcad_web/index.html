@@ -699,8 +699,33 @@ lienzo.addEventListener('pointermove', (evento) => {
 addEventListener('keydown', (evento) => {
   if (evento.key === 'Escape') {
     cerrarMenu();
-    if (armada || modoQuitar) { desarmar(); modoQuitar = false; decir(''); }
+    if (armada || moviendo || modoQuitar) { desarmar(); modoQuitar = false; decir(''); }
   }
+
+  // Mientras se coloca una pieza el clic esta ocupado confirmando, asi que
+  // la camara se orbita con las flechas. Solo en ese modo: el resto del
+  // tiempo ya existe el arrastre, y las flechas del editor son del texto.
+  if (!armada && !moviendo) return;
+  const donde = document.activeElement;
+  if (donde === areaCodigo || donde === areaOrden) return;
+  const PASO = 0.08;
+  const giros = {
+    ArrowLeft: [PASO, 0],
+    ArrowRight: [-PASO, 0],
+    ArrowUp: [0, -PASO],
+    ArrowDown: [0, PASO],
+  };
+  const giro = giros[evento.key];
+  if (!giro) return;
+  evento.preventDefault();
+  const desde = camara.position.clone().sub(controles.target);
+  const esfera = new THREE.Spherical().setFromVector3(desde);
+  esfera.theta += giro[0];
+  esfera.phi = Math.min(Math.PI - 0.05, Math.max(0.05, esfera.phi + giro[1]));
+  desde.setFromSpherical(esfera);
+  camara.position.copy(controles.target).add(desde);
+  camara.lookAt(controles.target);
+  controles.update();
 });
 
 // Orbitar es arrastrar, y arrastrar termina en un clic. Lo que separa las dos
@@ -794,7 +819,7 @@ opcionConectar.addEventListener('click', () => {
   );
   fantasma.visible = false;
   modelo.add(fantasma);
-  decir('Mueve el raton y pincha donde conectarla. Esc cancela.');
+  decir('Mueve el raton y pincha donde conectarla. Flechas: girar la camara. Esc cancela.');
 });
 
 opcionGirar.addEventListener('click', async () => {

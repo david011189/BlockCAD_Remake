@@ -226,6 +226,18 @@ class InventarioTests(unittest.TestCase):
         raros = {c for c in html if ord(c) < 32 and c not in '\n\r\t'}
         self.assertEqual(raros, set())
 
+    def test_arrows_orbit_only_while_placing(self) -> None:
+        # Colocando una pieza el clic esta ocupado confirmando, asi que la
+        # camara se orbita con las flechas. Solo en ese modo, y nunca
+        # robandole las flechas al texto.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("if (!armada && !moviendo) return;", html)
+        flechas = html.split("const giros = {")[1].split("});")[0]
+        self.assertIn("ArrowLeft", flechas)
+        self.assertIn("Spherical", flechas)
+        antes = html.split("const giros = {")[0]
+        self.assertIn("donde === areaCodigo || donde === areaOrden", antes)
+
     def test_the_footer_reports_it(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn("datos.agotadas", html)
