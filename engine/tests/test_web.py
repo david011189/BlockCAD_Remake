@@ -279,6 +279,16 @@ class InventarioTests(unittest.TestCase):
         # El resaltado se limpia solo: cualquier repintado o el tiempo.
         self.assertIn("setTimeout(pintarSeleccion, 4000)", html)
 
+    def test_the_header_counts_remaining_pieces(self) -> None:
+        # La etiqueta fija de la cabecera: «tienes X piezas restantes de
+        # 277», roja cuando la caja no alcanza, oculta con el catalogo
+        # basico (que no viene de ninguna caja).
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn('id="restantes"', html)
+        self.assertIn("piezas restantes de", html)
+        self.assertIn("classList.toggle('agotado', quedan < 0)", html)
+        self.assertIn("restantes.hidden = true", html)
+
     def test_the_footer_reports_it(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn("datos.agotadas", html)

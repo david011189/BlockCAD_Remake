@@ -47,6 +47,8 @@
     transition: opacity .25s;
   }
   .guardado.visible { opacity: 1; }
+  #restantes { color: var(--suave); font-size: 12px; }
+  #restantes.agotado { color: var(--error); }
   button {
     background: #222735;
     color: var(--texto);
@@ -204,6 +206,7 @@
 <header>
   <h1>BlockCAD <span>— escribe código, mira el modelo</span></h1>
   <div class="acciones">
+    <span id="restantes" hidden></span>
     <span class="guardado" id="guardado">guardado</span>
     <button id="nuevo" title="Vaciar el editor para empezar un modelo nuevo">Nuevo</button>
     <button id="abrir" title="Abrir un archivo .blockcad o un modelo .json">Abrir</button>
@@ -1058,7 +1061,21 @@ async function compilar() {
   }
 
   codigoValido = datos.ok;
-  if (datos.ok) ultimoInventario = datos.inventario || null;
+  if (datos.ok) {
+    ultimoInventario = datos.inventario || null;
+    const restantes = document.getElementById('restantes');
+    if (ultimoInventario) {
+      const quedan = ultimoInventario.total - ultimoInventario.usadas;
+      restantes.hidden = false;
+      restantes.textContent = 'tienes ' + quedan + ' piezas restantes de '
+        + ultimoInventario.total;
+      // En rojo cuando la caja no alcanza: quedan menos que cero.
+      restantes.classList.toggle('agotado', quedan < 0);
+    } else {
+      // El catalogo basico no viene de ninguna caja.
+      restantes.hidden = true;
+    }
+  }
 
   if (!datos.ok) {
     estado.className = 'fallo';
