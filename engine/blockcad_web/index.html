@@ -747,8 +747,14 @@ opcionQuitar.addEventListener('click', async () => {
     + (opciones ? ' ' + opciones : '');
   const propuesta = lineas.join('\n');
 
-  const respuesta = await fetch('/api/modelo', { method: 'POST', body: propuesta });
-  const datos = await respuesta.json();
+  let datos;
+  try {
+    const respuesta = await fetch('/api/modelo', { method: 'POST', body: propuesta });
+    datos = await respuesta.json();
+  } catch (error) {
+    decir('No se pudo hablar con el servidor: ' + error.message, 'fallo');
+    return;
+  }
   if (!datos.ok) {
     decir('Al separarla choca: ' + datos.mensaje, 'fallo');
     return;
@@ -777,8 +783,14 @@ opcionGirar.addEventListener('click', async () => {
   lineas[numero - 1] = nueva;
   const propuesta = lineas.join('\n');
   // Validar antes de tocar: si girada choca, el codigo queda intacto.
-  const respuesta = await fetch('/api/modelo', { method: 'POST', body: propuesta });
-  const datos = await respuesta.json();
+  let datos;
+  try {
+    const respuesta = await fetch('/api/modelo', { method: 'POST', body: propuesta });
+    datos = await respuesta.json();
+  } catch (error) {
+    decir('No se pudo hablar con el servidor: ' + error.message, 'fallo');
+    return;
+  }
   if (!datos.ok) {
     decir(`Girada choca: ${datos.mensaje}`, 'fallo');
     return;
