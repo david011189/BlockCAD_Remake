@@ -169,7 +169,9 @@ class InventarioTests(unittest.TestCase):
         # Quitar con el ratón borra la LÍNEA por el mismo camino que Supr y
         # que la consola: el deshacer sigue valiendo.
         html = (_WEB / "index.html").read_text(encoding="utf-8")
-        quitar = html.split("if (modoQuitar) {")[1].split("return;")[0]
+        # El primer return del bloque es la guarda de código roto; el borrar
+        # viene después, así que se mira el bloque entero.
+        quitar = html.split("if (modoQuitar) {")[1][:600]
         self.assertIn("borrar(String(pieza.linea))", quitar)
 
     def test_right_click_opens_the_menu(self) -> None:
