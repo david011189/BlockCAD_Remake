@@ -248,6 +248,9 @@ class InventarioTests(unittest.TestCase):
         mudar = html.split("async function mudarPieza")[1].split("opcionQuitar.addEventListener")[0]
         self.assertNotIn("borrar(", mudar)
         self.assertIn("' en ' + sx", mudar)
+        self.assertIn("color", mudar)
+        self.assertIn("no se puede mover una sola", mudar)
+        self.assertLess(mudar.index("fetch('/api/modelo'"), mudar.index("aplicar(propuesta)"))
 
     def test_disconnect_lands_nearby(self) -> None:
         # La pieza separada se queda cerca: anillos de candidatos alrededor
@@ -257,9 +260,6 @@ class InventarioTests(unittest.TestCase):
         quitar = html.split("opcionQuitar.addEventListener")[1].split("});")[0]
         self.assertIn("candidatos.push([c.x + c.ancho + 20 * k, c.y])", quitar)
         self.assertIn("false,", quitar)
-        self.assertIn("color", mudar)
-        self.assertIn("no se puede mover una sola", mudar)
-        self.assertLess(mudar.index("fetch('/api/modelo'"), mudar.index("aplicar(propuesta)"))
 
     def test_connect_previews_with_a_silhouette_and_confirms(self) -> None:
         # Conectar arma una silueta que sigue al puntero (la caja de la
