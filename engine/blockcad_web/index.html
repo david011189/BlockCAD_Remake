@@ -567,7 +567,7 @@ function anotar(p, cuerpos, aristas, color, opacidad) {
     rueda: p.rueda,
     molde: p.molde, acoge: p.acoge, acogeCentro: p.acoge_centro,
     agarre: p.agarre, agarreEje: p.agarre_eje,
-    engrane: p.engrane, cremallera: p.cremallera,
+    engrane: p.engrane, cremallera: p.cremallera, conjunto: p.conjunto,
     machoCentro: p.macho_centro, machoEje: p.macho_eje, bocas: p.bocas,
     caja: { x: p.x, y: p.y, z: p.z, ancho: p.ancho, fondo: p.fondo, alto: p.alto },
   });
@@ -800,7 +800,8 @@ function sitioParaSoltar(evento) {
   puntero.y = -((evento.clientY - caja.top) / caja.height) * 2 + 1;
   rayo.setFromCamera(puntero, camara);
   const blancos = [suelo, ...dibujadas
-    .filter((d) => !moviendo || d !== moviendo)
+    .filter((d) => !moviendo
+      || (d !== moviendo && !(moviendo.piezas && moviendo.piezas.includes(d))))
     .flatMap((d) => d.cuerpos)];
   const tocado = rayo.intersectObjects(blancos, false)[0];
   if (!tocado) return null;
@@ -1024,11 +1025,15 @@ const opcionGirar = document.createElement('button');
 opcionGirar.textContent = 'girar 90°';
 const opcionVoltear = document.createElement('button');
 opcionVoltear.textContent = 'voltear';
+const opcionMoverGrupo = document.createElement('button');
+opcionMoverGrupo.textContent = 'mover grupo';
+const opcionGirarGrupo = document.createElement('button');
+opcionGirarGrupo.textContent = 'girar grupo';
 const opcionQuitar = document.createElement('button');
 opcionQuitar.textContent = 'desconectar';
 const opcionConectar = document.createElement('button');
 opcionConectar.textContent = 'conectar…';
-for (const b of [opcionGirar, opcionVoltear, opcionConectar, opcionQuitar]) {
+for (const b of [opcionGirar, opcionVoltear, opcionConectar, opcionQuitar, opcionMoverGrupo, opcionGirarGrupo]) {
   b.style.cssText = 'display:block;width:100%;text-align:left;margin:2px 0;';
   menuCtx.append(b);
 }
@@ -1160,6 +1165,147 @@ function iniciarMovimiento(cual, verbo) {
   modelo.add(fantasma);
 }
 
+function iniciarMovimientoGrupo(piezas, verbo) {
+  desarmar();
+  // Un grupo se mueve como UNA pieza: su caja es la que envuelve a todas
+  // y su silueta lleva los clones de cada una en su sitio relativo.
+  const minX = Math.min(...piezas.map((p) => p.caja.x));
+  const minY = Math.min(...piezas.map((p) => p.caja.y));
+  const minZ = Math.min(...piezas.map((p) => p.caja.z));
+  moviendo = {
+    esGrupo: true,
+    piezas,
+    caja: {
+      x: minX, y: minY, z: minZ,
+      ancho: Math.max(...piezas.map((p) => p.caja.x + p.caja.ancho)) - minX,
+      fondo: Math.max(...piezas.map((p) => p.caja.y + p.caja.fondo)) - minY,
+      alto: Math.max(...piezas.map((p) => p.caja.z + p.caja.alto)) - minZ,
+    },
+  };
+  verboMovimiento = verbo;
+  fantasma = new THREE.Group();
+  for (const pieza of piezas) {
+    for (const cuerpo of pieza.cuerpos) {
+      const copia = new THREE.Mesh(cuerpo.geometry, new THREE.MeshBasicMaterial({
+        color: 0x63b3ed, transparent: true, opacity: 0.45, depthWrite: false,
+        side: THREE.DoubleSide,
+      }));
+      copia.matrixAutoUpdate = false;
+      copia.matrix.copy(cuerpo.matrix);
+      fantasma.add(copia);
+    }
+  }
+  fantasma.visible = false;
+  modelo.add(fantasma);
+}
+
+async function mudarGrupo(grupo, sitio) {
+  // Mover un grupo es reescribir TODAS sus lineas con el mismo paso, y
+  // validar una sola vez: o se muda entero o no se muda nada. Las lineas
+  // relacionales (en el agujero de...) no se tocan: siguen a su ancla.
+  if (!escenaAlDia()) return;
+  const dx = sitio.x - grupo.caja.x;
+  const dy = sitio.y - grupo.caja.y;
+  const dz = sitio.z - grupo.caja.z;
+  if (!dx && !dy && !dz) { decir(''); return; }
+  const numeros = [...new Set(grupo.piezas.map((p) => p.linea))];
+  if (numeros.some((n) => n == null)) {
+    decir('Alguna pieza del grupo no viene del codigo: no puedo moverlo.', 'fallo');
+    return;
+  }
+  const lineas = areaCodigo.value.split('\n');
+  const re = /(\sen\s+)(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)/;
+  for (const n of numeros) {
+    const vieja = lineas[n - 1];
+    const donde = vieja.match(re);
+    if (!donde) continue;
+    const nx = (Math.round(parseFloat(donde[2]) * 20) + dx) / 20;
+    const ny = (Math.round(parseFloat(donde[3]) * 20) + dy) / 20;
+    const nz = (Math.round(parseFloat(donde[4]) * 8) + dz) / 8;
+    lineas[n - 1] = vieja.replace(re, `$1${nx},${ny},${nz}`);
+  }
+  const propuesta = lineas.join('\n');
+  let datos;
+  try {
+    const respuesta = await fetch('/api/modelo', { method: 'POST', body: propuesta });
+    datos = await respuesta.json();
+  } catch (error) {
+    decir('No se pudo hablar con el servidor: ' + error.message, 'fallo');
+    return;
+  }
+  if (!datos.ok) {
+    avisarChoque('Ahi el grupo choca', datos.mensaje);
+    return;
+  }
+  registrar();
+  aplicar(propuesta);
+  decir(`Movido el grupo entero: ${grupo.piezas.length} piezas.`, 'hecho');
+}
+
+async function girarGrupo(piezas) {
+  // Girar un grupo es girarlo RIGIDO: un cuarto de vuelta del mundo
+  // alrededor de la esquina del grupo, que se queda donde estaba. Cada
+  // caja gira de posicion ((x,y) pasa a (-y,x)) y cada linea encadena su
+  // rot 90; se valida todo junto.
+  if (!escenaAlDia()) return;
+  const numeros = [...new Set(piezas.map((p) => p.linea))];
+  if (numeros.some((n) => n == null)) {
+    decir('Alguna pieza del grupo no viene del codigo: no puedo girarlo.', 'fallo');
+    return;
+  }
+  for (const n of numeros) {
+    if (piezas.filter((p) => p.linea === n).length > 1) {
+      decir('Ese grupo tiene un repetir: girarlo entero cambiaria el bucle. Edita el codigo.', 'fallo');
+      return;
+    }
+  }
+  const minX = Math.min(...piezas.map((p) => p.caja.x));
+  const minY = Math.min(...piezas.map((p) => p.caja.y));
+  const giradas = piezas.map((p) => ({
+    pieza: p,
+    x: -(p.caja.y - minY + p.caja.fondo),
+    y: p.caja.x - minX,
+  }));
+  const desX = Math.min(...giradas.map((g) => g.x));
+  const desY = Math.min(...giradas.map((g) => g.y));
+  const lineas = areaCodigo.value.split('\n');
+  const re = /(\sen\s+)(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)/;
+  const conGiro = (vieja) => {
+    const acaba = vieja.match(/^(.*?)\s+rot\s+(90|180|270)\s*$/);
+    if (acaba) {
+      const grados = (parseInt(acaba[2], 10) + 90) % 360;
+      return grados ? `${acaba[1]} rot ${grados}` : acaba[1];
+    }
+    return `${vieja} rot 90`;
+  };
+  for (const g of giradas) {
+    const n = g.pieza.linea;
+    let vieja = lineas[n - 1];
+    const donde = vieja.match(re);
+    if (!donde) continue; // relacional: que lo resuelva su ancla
+    const nx = (minX + g.x - desX) / 20;
+    const ny = (minY + g.y - desY) / 20;
+    vieja = vieja.replace(re, `$1${nx},${ny},$4`);
+    lineas[n - 1] = conGiro(vieja);
+  }
+  const propuesta = lineas.join('\n');
+  let datos;
+  try {
+    const respuesta = await fetch('/api/modelo', { method: 'POST', body: propuesta });
+    datos = await respuesta.json();
+  } catch (error) {
+    decir('No se pudo hablar con el servidor: ' + error.message, 'fallo');
+    return;
+  }
+  if (!datos.ok) {
+    avisarChoque('Girado, el grupo choca', datos.mensaje);
+    return;
+  }
+  registrar();
+  aplicar(propuesta);
+  decir(`Girado el grupo entero: ${piezas.length} piezas.`, 'hecho');
+}
+
 function borrarFantasma() {
   if (!fantasma) return;
   modelo.remove(fantasma);
@@ -1248,6 +1394,22 @@ opcionVoltear.addEventListener('click', async () => {
   decir(`Volteada la pieza de la línea ${numero}.`, 'hecho');
 });
 
+opcionMoverGrupo.addEventListener('click', () => {
+  if (!piezaDelMenu) return cerrarMenu();
+  if (!escenaAlDia()) return cerrarMenu();
+  const grupo = dibujadas.filter((d) => d.conjunto === piezaDelMenu.conjunto);
+  cerrarMenu();
+  iniciarMovimientoGrupo(grupo, 'Movido');
+  decir(`Mueves ${grupo.length} piezas unidas. Suelta con un clic; Esc cancela.`);
+});
+
+opcionGirarGrupo.addEventListener('click', () => {
+  if (!piezaDelMenu) return cerrarMenu();
+  const grupo = dibujadas.filter((d) => d.conjunto === piezaDelMenu.conjunto);
+  cerrarMenu();
+  girarGrupo(grupo);
+});
+
 addEventListener('pointerdown', (evento) => {
   if (!menuCtx.contains(evento.target)) cerrarMenu();
 });
@@ -1301,8 +1463,12 @@ lienzo.addEventListener('pointerup', (evento) => {
     const eraArrastre = arrastrable !== null;
     const sitio = sitioParaSoltar(evento);
     if (sitio) {
-      mudarPieza(moviendo, sitio.x / 20, sitio.y / 20, sitio.z / 8,
-        verboMovimiento, 'Ahi choca');
+      if (moviendo.esGrupo) {
+        mudarGrupo(moviendo, sitio);
+      } else {
+        mudarPieza(moviendo, sitio.x / 20, sitio.y / 20, sitio.z / 8,
+          verboMovimiento, 'Ahi choca');
+      }
       moviendo = null;
       borrarFantasma();
     } else if (eraArrastre) {

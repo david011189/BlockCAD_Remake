@@ -139,6 +139,8 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
             con_soporte.update(p.instance_id for p in debajo)
     enganchadas |= con_soporte
 
+    conjuntos = _conjuntos(model)
+
     piezas = []
     for item in model.instances:
         definition = model.catalog.get(item.part_id)
@@ -158,6 +160,7 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
                 "suelta": item.instance_id not in enganchadas,
                 "rueda": definition.metadata.get("rueda"),
                 "molde": item.part_id,
+                "conjunto": conjuntos[item.instance_id],
                 **_acogida(item, definition),
                 **_agarre(item, definition),
                 **_machos(item, definition),
@@ -223,6 +226,38 @@ def _agarre(item, definition) -> dict:
         ],
         "agarre_eje": list(agujeros[0].eje),
     }
+
+
+def _conjuntos(model: BlockModel) -> dict[str, int]:
+    """A que conjunto pertenece cada pieza: su componente conectada.
+
+    Dos piezas estan en el mismo conjunto si una cadena de uniones o de
+    apoyos las junta. Es lo que el visor necesita para mover o girar un
+    bloque entero como una sola cosa: la caja del sinfin y todo su tren
+    son UN conjunto, y el muro de al lado es otro.
+    """
+    vecinos: dict[str, set[str]] = {p.instance_id: set() for p in model.instances}
+    for item in model.instances:
+        for otra in model.connected_to(item.instance_id):
+            vecinos[item.instance_id].add(otra.instance_id)
+            vecinos[otra.instance_id].add(item.instance_id)
+        for otra in model.resting_on(item.instance_id):
+            vecinos[item.instance_id].add(otra.instance_id)
+            vecinos[otra.instance_id].add(item.instance_id)
+    conjunto: dict[str, int] = {}
+    numero = 0
+    for item in model.instances:
+        if item.instance_id in conjunto:
+            continue
+        frontera = [item.instance_id]
+        while frontera:
+            actual = frontera.pop()
+            if actual in conjunto:
+                continue
+            conjunto[actual] = numero
+            frontera.extend(vecinos[actual])
+        numero += 1
+    return conjunto
 
 
 def _misma_recta(p1, e1, p2, e2) -> bool:

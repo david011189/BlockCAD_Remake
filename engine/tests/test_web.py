@@ -211,6 +211,29 @@ class PaletaTests(unittest.TestCase):
         self.assertIn("otra.acoge.includes(moviendo.molde)", html)
         self.assertIn("bocaCercana(otra.bocas, moviendo.agarreEje)", html)
 
+    def test_pieces_declare_their_connected_set(self) -> None:
+        # Cada pieza dice a que CONJUNTO pertenece: su componente conectada
+        # (uniones y apoyos, transitivo). Es lo que hace posible mover o
+        # girar un bloque entero como una sola cosa desde el menu.
+        escena = compile_source(
+            'catalogo "wedo"\n'
+            '28698 en 5,5,5\n'
+            '32905 en 6.9,5.35,6.125 rot 90\n'
+            'ladrillo 2x4 en 30,30,0'
+        )
+        caja, gusano, ladrillo = escena["piezas"]
+        self.assertEqual(caja["conjunto"], gusano["conjunto"])
+        self.assertNotEqual(caja["conjunto"], ladrillo["conjunto"])
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("opcionMoverGrupo", html)
+        self.assertIn("opcionGirarGrupo", html)
+        # Mover el grupo reescribe todas sus lineas con el mismo paso y
+        # valida UNA vez; girarlo gira las posiciones ((x,y) a (-y,x)) y
+        # encadena el rot 90 de cada linea.
+        self.assertIn("async function mudarGrupo", html)
+        self.assertIn("async function girarGrupo", html)
+        self.assertIn("x: -(p.caja.y - minY + p.caja.fondo)", html)
+
     def test_the_rack_magnet_is_tangent(self) -> None:
         # Cada rueda dentada publica su engrane (eje mundial y radio
         # primitivo) y la cremallera su normal con su paso: el visor hace
@@ -318,7 +341,7 @@ class InventarioTests(unittest.TestCase):
         self.assertIn("fantasma", mover)
         clic = html.split("if (moviendo) {")[1].split("return;")[0]
         self.assertIn("mudarPieza(moviendo", clic)
-        self.assertIn("!moviendo || d !== moviendo", html)
+        self.assertIn("!(moviendo.piezas && moviendo.piezas.includes(d))", html)
 
     def test_the_page_has_no_control_characters(self) -> None:
         """Un retroceso invisible (x08) vivio dentro de un regex del visor.
