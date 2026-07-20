@@ -567,6 +567,7 @@ function anotar(p, cuerpos, aristas, color, opacidad) {
     rueda: p.rueda,
     molde: p.molde, acoge: p.acoge, acogeCentro: p.acoge_centro,
     agarre: p.agarre,
+    machoCentro: p.macho_centro, machoEje: p.macho_eje, bocas: p.bocas,
     caja: { x: p.x, y: p.y, z: p.z, ancho: p.ancho, fondo: p.fondo, alto: p.alto },
   });
 }
@@ -809,6 +810,43 @@ function sitioParaSoltar(evento) {
   // El iman de la rueda: si lo que se mueve es un neumatico y debajo hay
   // una llanta (o al reves), el sitio es EL montaje: concentrico en el
   // plano de la rueda, centrado dentro del tambor.
+  // El iman de la INSERCION: arrastrando un eje o un pin sobre una pieza
+  // con agujeros, la silueta salta a la boca mas cercana cuya recta corra
+  // paralela al macho — casar la recta a mano es punteria imposible. La
+  // rotacion la pone el usuario (girar); si nada es paralelo, no hay iman.
+  if (moviendo && moviendo.machoCentro && tocado.object !== suelo) {
+    const otra = dibujadas[tocado.object.userData.pieza];
+    if (otra && otra.bocas && otra !== moviendo) {
+      const paralelos = (a, b) => {
+        const cruz = [
+          a[1] * b[2] - a[2] * b[1],
+          a[2] * b[0] - a[0] * b[2],
+          a[0] * b[1] - a[1] * b[0],
+        ];
+        return cruz.every((v) => Math.abs(v) < 1e-6);
+      };
+      const local = modelo.worldToLocal(tocado.point.clone());
+      let mejor = null;
+      let distancia = Infinity;
+      for (const boca of otra.bocas) {
+        if (!paralelos(boca.eje, moviendo.machoEje)) continue;
+        const d = Math.hypot(
+          boca.centro[0] - local.x,
+          boca.centro[1] - local.y,
+          boca.centro[2] - local.z,
+        );
+        if (d < distancia) { distancia = d; mejor = boca; }
+      }
+      if (mejor) {
+        return {
+          x: mejor.centro[0] - moviendo.machoCentro[0],
+          y: mejor.centro[1] - moviendo.machoCentro[1],
+          z: mejor.centro[2] - moviendo.machoCentro[2],
+        };
+      }
+    }
+  }
+
   // El iman del contenedor: arrastrando el huesped sobre su caja, el
   // sitio es el centro de acogida — donde luego entrara el eje.
   if (moviendo && tocado.object !== suelo) {

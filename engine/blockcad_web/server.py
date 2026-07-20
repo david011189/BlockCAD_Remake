@@ -160,6 +160,8 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
                 "molde": item.part_id,
                 **_acogida(item, definition),
                 **_agarre(item, definition),
+                **_machos(item, definition),
+                **_bocas(item, definition),
                 "linea": lineas.get(item.instance_id),
                 # Qué malla dibujar y dónde. Sin malla, el visor cae a la caja.
                 "malla": definition.metadata.get("malla", definition.part_id),
@@ -214,6 +216,75 @@ def _agarre(item, definition) -> dict:
     return {"agarre": [
         p[0] - item.position.x, p[1] - item.position.y, p[2] - item.position.z,
     ]}
+
+
+def _misma_recta(p1, e1, p2, e2) -> bool:
+    def paralelos(a, b):
+        cruz = (
+            a[1] * b[2] - a[2] * b[1],
+            a[2] * b[0] - a[0] * b[2],
+            a[0] * b[1] - a[1] * b[0],
+        )
+        return all(abs(c) < 1e-6 for c in cruz)
+
+    if not paralelos(e1, e2):
+        return False
+    entre = tuple(a - b for a, b in zip(p1, p2))
+    return not any(entre) or paralelos(entre, e1)
+
+
+def _machos(item, definition) -> dict:
+    """El asa del iman: los machos de la pieza, si forman una sola recta.
+
+    Un eje son dos puntas de la misma recta; su centro es donde el iman lo
+    agarra para casarlo con un agujero. Va relativo a la esquina, girado.
+    """
+    machos = [c for c in item.world_connections(definition) if c.es_macho]
+    if not machos:
+        return {}
+    primero = machos[0]
+    if any(
+        not _misma_recta(primero.punto, primero.eje, m.punto, m.eje)
+        for m in machos[1:]
+    ):
+        return {}
+    centro = [
+        sum(m.punto[k] for m in machos) / len(machos) for k in range(3)
+    ]
+    return {
+        "macho_centro": [
+            centro[0] - item.position.x,
+            centro[1] - item.position.y,
+            centro[2] - item.position.z,
+        ],
+        "macho_eje": list(primero.eje),
+    }
+
+
+def _bocas(item, definition) -> dict:
+    """Los agujeros de la pieza, agrupados por recta: centro y direccion.
+
+    Es lo que el iman necesita para dejar caer un eje o un pin DENTRO: la
+    recta exacta ya girada y colocada, que ninguna punteria de raton
+    acertaria sola.
+    """
+    grupos: list[list] = []
+    for c in item.world_connections(definition):
+        if not c.es_hembra:
+            continue
+        for g in grupos:
+            if _misma_recta(g[0].punto, g[0].eje, c.punto, c.eje):
+                g.append(c)
+                break
+        else:
+            grupos.append([c])
+    if not grupos:
+        return {}
+    bocas = []
+    for g in grupos:
+        centro = [sum(c.punto[k] for c in g) / len(g) for k in range(3)]
+        bocas.append({"centro": centro, "eje": list(g[0].eje)})
+    return {"bocas": bocas}
 
 
 def _inventario(model: BlockModel) -> dict | None:

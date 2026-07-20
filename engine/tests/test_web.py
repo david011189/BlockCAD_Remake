@@ -184,6 +184,20 @@ class PaletaTests(unittest.TestCase):
         self.assertIn("controles.enabled = false", html)
         self.assertIn("verboMovimiento", html)
 
+    def test_the_scene_publishes_mouths_and_males(self) -> None:
+        # El iman de la insercion casa rectas: la escena publica las BOCAS
+        # de cada pieza (agujeros agrupados por recta, centro y direccion)
+        # y el asa de sus machos si forman una sola recta. Un eje de 6: dos
+        # puntas, un asa en su centro.
+        escena = compile_source('catalogo "wedo"\n3701 en 0,0,0\neje 6 en 10,10,0')
+        viga, eje = escena["piezas"]
+        self.assertEqual(len(viga["bocas"]), 3)
+        self.assertEqual(viga["bocas"][0]["eje"], [1.0, 0.0, 0.0])
+        self.assertEqual(eje["macho_centro"], [6.0, 60.0, 6.0])
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("moviendo.machoCentro", html)
+        self.assertIn("paralelos(boca.eje, moviendo.machoEje)", html)
+
     def test_escape_disarms(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         # Esc cancela el soltado, el modo quitar y el menú contextual.
