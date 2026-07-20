@@ -153,6 +153,14 @@ class PaletaTests(unittest.TestCase):
         # Y la tecla H la alterna, salvo escribiendo: ahi la h es una letra.
         self.assertIn("evento.key === 'h' || evento.key === 'H'", html)
 
+    def test_the_code_panel_can_hide(self) -> None:
+        # Para ver el diseño entero sin distraccion: se esconde el panel,
+        # no el texto — que sigue mandando — y el visor recalcula su ancho.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn('id="codigo-visible"', html)
+        self.assertIn("editor.classList.toggle('oculto')", html)
+        self.assertIn("dispatchEvent(new Event('resize'))", html)
+
     def test_escape_disarms(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         # Esc cancela el soltado, el modo quitar y el menú contextual.

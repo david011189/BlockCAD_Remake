@@ -183,6 +183,8 @@
   #paleta button:hover { border-color: #3a4560; }
   #paleta button.armada { border-color: #63b3ed; color: #63b3ed; }
   #mano.armada { border-color: #63b3ed; color: #63b3ed; }
+  .editor.oculto { display: none; }
+  #codigo-visible.armada { border-color: #63b3ed; color: #63b3ed; }
   #barra-x, #barra-y {
     position: absolute;
     margin: 0;
@@ -242,6 +244,7 @@
     <span class="separador"></span>
     <button id="piezas">Piezas</button>
     <button id="ejemplo">Ejemplo</button>
+    <button id="codigo-visible" title="Ocultar o mostrar el panel de codigo, para ver el diseño entero">Codigo</button>
     <button id="mano" title="Con la mano, el clic izquierdo agarra el plano y lo arrastra (tecla H)">✋ Mano</button>
     <button id="centrar">Centrar</button>
   </div>
@@ -1271,6 +1274,16 @@ function alternarMano(activa) {
   sincronizarBarras();
 }
 botonMano.addEventListener('click', () => alternarMano());
+
+// Ocultar el codigo para ver el diseño entero, sin distraccion. El texto
+// sigue mandando —solo se esconde el panel— y el visor se queda el ancho.
+const botonCodigo = document.getElementById('codigo-visible');
+botonCodigo.addEventListener('click', () => {
+  const editor = document.querySelector('.editor');
+  editor.classList.toggle('oculto');
+  botonCodigo.classList.toggle('armada', editor.classList.contains('oculto'));
+  dispatchEvent(new Event('resize'));
+});
 
 // Sustituir lo escrito sin avisar sería destruir trabajo de un clic.
 function puedoReemplazar() {
