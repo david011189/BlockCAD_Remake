@@ -289,6 +289,17 @@ class InventarioTests(unittest.TestCase):
         self.assertIn("classList.toggle('agotado', quedan < 0)", html)
         self.assertIn("restantes.hidden = true", html)
 
+    def test_the_viewer_has_scrollbars_that_pan(self) -> None:
+        # Las barras pasean la vista por la extension del modelo moviendo
+        # objetivo Y camara juntos: paneo, no orbita. Centrar las resincroniza.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn('id="barra-x"', html)
+        self.assertIn('id="barra-y"', html)
+        pan = html.split("function desplazarVista")[1].split("}")[0]
+        self.assertIn("controles.target[eje] += delta", pan)
+        self.assertIn("camara.position[eje] += delta", pan)
+        self.assertIn("sincronizarBarras();", html.split("function centrar()")[1][:600])
+
     def test_the_footer_reports_it(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn("datos.agotadas", html)

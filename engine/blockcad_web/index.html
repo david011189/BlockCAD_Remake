@@ -180,6 +180,25 @@
   }
   #paleta button:hover { border-color: #3a4560; }
   #paleta button.armada { border-color: #63b3ed; color: #63b3ed; }
+  #barra-x, #barra-y {
+    position: absolute;
+    accent-color: #4a5468;
+    opacity: 0.7;
+  }
+  #barra-x:hover, #barra-y:hover { opacity: 1; }
+  #barra-x {
+    left: 210px;
+    right: 30px;
+    bottom: 28px;
+    width: auto;
+  }
+  #barra-y {
+    right: -22px;
+    top: 50%;
+    width: 45%;
+    transform: rotate(90deg);
+    transform-origin: 26px 50%;
+  }
   .pista {
     position: absolute;
     left: 12px;
@@ -243,6 +262,8 @@ ladrillo 2x4 en 2,0,0 color amarillo'></textarea>
   <section class="visor">
     <canvas id="lienzo"></canvas>
     <div id="paleta" hidden></div>
+    <input type="range" id="barra-x" min="0" max="100" value="50" title="Desplazar la vista a lo ancho">
+    <input type="range" id="barra-y" min="0" max="100" value="50" title="Desplazar la vista en profundidad">
     <div class="pista">Arrastra para girar · rueda para acercar · clic en una pieza para ver su línea · clic derecho: girar o desconectar · arrastrar con el derecho desplaza</div>
   </section>
 </main>
@@ -1007,6 +1028,33 @@ addEventListener('keydown', (evento) => {
 });
 
 
+// Las barras pasean la vista por la extension del modelo: paneo, no
+// orbita. Mover el objetivo sin mover la camara giraria la escena.
+function desplazarVista(eje, valor) {
+  const caja = new THREE.Box3().setFromObject(modelo);
+  if (caja.isEmpty()) return;
+  const destino = caja.min[eje] + (valor / 100) * (caja.max[eje] - caja.min[eje]);
+  const delta = destino - controles.target[eje];
+  controles.target[eje] += delta;
+  camara.position[eje] += delta;
+  controles.update();
+}
+
+const barraX = document.getElementById('barra-x');
+const barraY = document.getElementById('barra-y');
+barraX.addEventListener('input', () => desplazarVista('x', Number(barraX.value)));
+barraY.addEventListener('input', () => desplazarVista('z', Number(barraY.value)));
+
+function sincronizarBarras() {
+  const caja = new THREE.Box3().setFromObject(modelo);
+  if (caja.isEmpty()) return;
+  for (const [barra, eje] of [[barraX, 'x'], [barraY, 'z']]) {
+    const ancho = caja.max[eje] - caja.min[eje];
+    const v = ancho > 0 ? ((controles.target[eje] - caja.min[eje]) / ancho) * 100 : 50;
+    barra.value = Math.min(100, Math.max(0, v));
+  }
+}
+
 function centrar() {
   if (!modelo.children.length) return;
   const caja = new THREE.Box3().setFromObject(modelo);
@@ -1021,6 +1069,7 @@ function centrar() {
     centro.z + radio * 1.9,
   );
   controles.update();
+  sincronizarBarras();
 }
 
 // Cuál es la línea rota, para que repintar por otro motivo —elegir una pieza—
