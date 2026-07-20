@@ -41,7 +41,7 @@ modelo "Camion de reciclaje"
 // agujero de ARRIBA de la torre; el eje largo, por el de ABAJO. Entre ellos
 // hay dos modulos justos: la de 8 y la de 24 muerden a 40 LDU (10+30).
 3737 en el agujero 1 de torre desplazado -3 llamado transmision
-24505 en el eje de transmision desplazado 2 color amarillo llamado corona
+24505 en el eje de transmision desplazado 2 color celeste llamado corona
 
 // Los medios bujes retienen la corona en su eje.
 42136 en el eje de transmision desplazado 0.95 color gris
@@ -70,10 +70,10 @@ modelo "Camion de reciclaje"
 // Cuelgan en columna al costado delantero, mirando al bastidor. El agarre
 // real —el tubo del transparente pisado en el pin— es una union que el
 // motor no conoce todavia, asi que la columna apoya en el suelo.
-92013 en -3,-3.5,0 rot 180 color celeste llamado gancho_bajo
-57909 en -5.55,-3.5,0 color negro
-92013 en -3,-3.5,3 rot 180 color celeste llamado gancho_alto
-57909 en -5.55,-3.5,3 color negro
+92013 en -1,-3.5,0 rot 180 color celeste llamado gancho_bajo
+57909 en -3.55,-3.5,0 color negro
+92013 en -1,-3.5,3 rot 180 color celeste llamado gancho_alto
+57909 en -3.55,-3.5,3 color negro
 
 // ---------- El bastidor volcador (pasos 22 a 31) ----------
 // Un marco en U que se arrastra por el suelo. Se construye aparte, a la
