@@ -62,6 +62,14 @@ CONEXIONES = {
     "axl3hole.dat": "agujero_eje",  # Technic Axle Hole Semi-Reduced
     "axl4hole.dat": "agujero_eje",  # Technic Axle Hole Two-toothed Sliding
     "axlehol5.dat": "agujero_eje",  # Technic Axle Hole Open Two Opposite Sides
+    # La SUPERFICIE del diente también afirma: es el plástico interior del
+    # agujero, y un eje macizo no la tiene. Algunas piezas —los conectores
+    # angulares, la cazoleta— dibujan su cruz con la familia descompuesta en
+    # vez del agujero cerrado, y sin esto quedaban ciegas. El punto cae en la
+    # boca del agujero y no en su centro; para insertar da igual: lo que se
+    # comparte es la recta.
+    "axl2ho10.dat": "agujero_eje",  # Technic Axle Hole Reduced Tooth Surface
+    "axl3ho10.dat": "agujero_eje",  # Technic Axle Hole Semi-Reduced Tooth Surface
     # La rueda de 24 dientes (3648b, alias 24505) dibuja su agujero a mano,
     # en octavos de geometría cruda, sin pasar por ninguna primitiva. El
     # título del subarchivo sí lo afirma: «Eighth of Centre Axlehole». Los

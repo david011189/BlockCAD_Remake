@@ -110,6 +110,23 @@ class MachoYHembraTests(unittest.TestCase):
         # En el centro de la rueda, no en un diente.
         self.assertEqual(agujeros[0], [0.0, 0.0, 0.0])
 
+    def test_the_angle_connectors_have_their_cross(self) -> None:
+        """Los conectores angulares dibujan su cruz con la familia descompuesta.
+
+        Sin el agujero cerrado no había nada que detectar, y los brazos del
+        camión no podían encajarse en su eje. La superficie del diente
+        (axl2ho10/axl3ho10) también afirma: es el plástico interior del
+        agujero, y un eje macizo no la tiene. Los ocho usuarios del set
+        tienen cruz de verdad: ni un fantasma.
+        """
+        for numero in ("42127", "42128", "42156", "32474", "39223"):
+            with self.subTest(pieza=numero):
+                self.assertTrue(self.conexiones(numero, "agujero_eje"))
+        # Y los ejes macizos siguen sin agujeros: la leccion del perimetro.
+        for numero in ("3706", "4519", "3737"):
+            with self.subTest(pieza=numero):
+                self.assertEqual(self.conexiones(numero, "agujero_eje"), [])
+
     def test_the_ball_is_at_the_centre_of_its_sphere(self) -> None:
         """La bola no se detecta por la esfera: por el cuello que la afirma.
 

@@ -6249,6 +6249,19 @@
             1.0,
             0.0
           ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            17.0,
+            20.0,
+            17.0
+          ],
+          "eje": [
+            0.0,
+            1.0,
+            0.0
+          ]
         }
       ],
       "caja_ldu": {
@@ -6276,6 +6289,14 @@
             0.0,
             -10.0
           ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            10.0
+          ]
         }
       ]
     },
@@ -6295,7 +6316,21 @@
         25.62,
         22.06
       ],
-      "conexiones_motor": [],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            12.81,
+            12.81,
+            4.0
+          ],
+          "eje": [
+            0.0,
+            0.0,
+            1.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -12.81,
@@ -6313,7 +6348,16 @@
         22.06,
         25.62
       ],
-      "conexiones": []
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            5.25,
+            0.0
+          ]
+        }
+      ]
     },
     {
       "diseno": "32524",
@@ -12095,7 +12139,34 @@
         40.0,
         28.0
       ],
-      "conexiones_motor": [],
+      "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            20.0,
+            20.0,
+            6.0
+          ],
+          "eje": [
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            20.0,
+            20.0,
+            24.0
+          ],
+          "eje": [
+            0.0,
+            0.0,
+            1.0
+          ]
+        }
+      ],
       "caja_ldu": {
         "min": [
           -20.0,
@@ -12113,7 +12184,24 @@
         28.0,
         40.0
       ],
-      "conexiones": []
+      "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            18.0,
+            0.0
+          ]
+        }
+      ]
     },
     {
       "diseno": "4032",
@@ -12434,6 +12522,19 @@
       ],
       "conexiones_motor": [
         {
+          "tipo": "agujero_eje",
+          "punto": [
+            10.0,
+            1.0,
+            9.0
+          ],
+          "eje": [
+            0.0,
+            1.0,
+            0.0
+          ]
+        },
+        {
           "tipo": "agujero_pin",
           "punto": [
             0.0,
@@ -12479,6 +12580,14 @@
       ],
       "conexiones": [
         {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            -29.0
+          ]
+        },
+        {
           "tipo": "agujero_pin",
           "punto": [
             -10.0,
@@ -12513,6 +12622,32 @@
         28.54
       ],
       "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            10.0,
+            1.0,
+            9.0
+          ],
+          "eje": [
+            0.0,
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            10.0,
+            56.79,
+            20.1
+          ],
+          "eje": [
+            0.0,
+            0.9239,
+            0.3827
+          ]
+        },
         {
           "tipo": "agujero_pin",
           "punto": [
@@ -12558,6 +12693,22 @@
         61.06
       ],
       "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            -11.1,
+            26.79
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            -29.0
+          ]
+        },
         {
           "tipo": "agujero_pin",
           "punto": [
@@ -12605,6 +12756,19 @@
             1.0,
             0.0
           ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            9.0,
+            10.0,
+            9.0
+          ],
+          "eje": [
+            0.0,
+            1.0,
+            0.0
+          ]
         }
       ],
       "caja_ldu": {
@@ -12632,6 +12796,14 @@
             0.0,
             -5.0
           ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            5.0
+          ]
         }
       ]
     },
@@ -12652,6 +12824,32 @@
         36.38
       ],
       "conexiones_motor": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            10.0,
+            1.0,
+            9.0
+          ],
+          "eje": [
+            0.0,
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            10.0,
+            50.51,
+            29.51
+          ],
+          "eje": [
+            0.0,
+            0.7071,
+            0.7071
+          ]
+        },
         {
           "tipo": "agujero_pin",
           "punto": [
@@ -12697,6 +12895,22 @@
         57.38
       ],
       "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            -20.51,
+            20.51
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            -29.0
+          ]
+        },
         {
           "tipo": "agujero_pin",
           "punto": [
@@ -17021,6 +17235,32 @@
       ],
       "conexiones_motor": [
         {
+          "tipo": "agujero_eje",
+          "punto": [
+            20.0,
+            20.0,
+            8.0
+          ],
+          "eje": [
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            20.0,
+            20.0,
+            24.0
+          ],
+          "eje": [
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
           "tipo": "cazoleta",
           "punto": [
             60.0,
@@ -17104,6 +17344,22 @@
         40.0
       ],
       "conexiones": [
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "tipo": "agujero_eje",
+          "punto": [
+            0.0,
+            16.0,
+            0.0
+          ]
+        },
         {
           "tipo": "cazoleta",
           "punto": [

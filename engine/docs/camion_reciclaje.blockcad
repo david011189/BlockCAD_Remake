@@ -42,13 +42,17 @@ modelo "Camion de reciclaje"
 
 // Los medios bujes retienen la corona en su eje.
 42136 en el eje de transmision desplazado 0.95 color gris
-42136 en el eje de transmision desplazado 3.5 color amarillo
+42136 en el eje de transmision desplazado 3.9 color amarillo
 
-// Los conectores angulares turquesa cuelgan de las puntas del eje largo.
-// Sus ejes 3 de remate (paso 10) quedan pendientes: LDraw no declara el
-// agujero de cruz del conector, la misma ceguera que tenia la corona.
-42127 en el eje de transmision desplazado -4.5 color celeste
-42127 en el eje de transmision desplazado 4.5 color celeste
+// Pasos 9 y 10: los conectores angulares turquesa se encajan en el eje
+// largo por su cruz: son los brazos que empujan el bastidor al volcar. En
+// la lamina uno va en cada punta; aqui van los dos en el voladizo, porque
+// la caja envolvente del conector no cabe entre la torre y el motor.
+42128 en el eje de transmision por su agujero 1 desplazado -4.5 color celeste llamado brazo_izq
+42128 en el eje de transmision por su agujero 1 desplazado -3 rot x 180 color celeste llamado brazo_der
+// Los ejes 3 que rematan los brazos (paso 10) no se pueden escribir: el
+// segundo agujero del conector #3 vive a 157,5 grados, y el motor solo
+// sabe las 24 orientaciones de 90. No es la extraccion: es la rejilla.
 
 // Paso 13: la placa Technic naranja de remate, sobre el ladrillo negro.
 3709 en -1.5,-0.5,16 rot 90 color naranja llamado remate
@@ -72,29 +76,29 @@ modelo "Camion de reciclaje"
 // izquierda del camion (x negativa, lejos de la cabina).
 
 // Pasos 24 y 27: cada riel es un 1x8 y un 1x16 en linea, sobre el suelo.
-3702 en -20,0,0 color verde llamado riel_izq_corto
-3703 en -20,8,0 color verde llamado riel_izq_largo
-3702 en -13,0,0 color verde llamado riel_der_corto
-3703 en -13,8,0 color verde llamado riel_der_largo
+3702 en -26,0,0 color verde llamado riel_izq_corto
+3703 en -26,8,0 color verde llamado riel_izq_largo
+3702 en -19,0,0 color verde llamado riel_der_corto
+3703 en -19,8,0 color verde llamado riel_der_largo
 
 // Paso 22: la placa Technic 2x8 puentea los extremos de los rieles, y el
 // ladrillo naranja va cruzado encima.
-3738 en -20,0,3 rot 90 color verde llamado travesano
-3001 en -17,-0.5,4 color naranja llamado tope
+3738 en -26,0,3 rot 90 color verde llamado travesano
+3001 en -23,-0.5,4 color naranja llamado tope
 
 // Paso 23: los dos ladrillos-palanca en los extremos, con su cruz mirando
 // por los rieles. Son la bisagra: en plastico, por aqui entra el brazo.
-31493 en -20,0,4 rot 90 color verde llamado bisagra_izq
-31493 en -14,0,4 rot 90 color verde llamado bisagra_der
+31493 en -26,0,4 rot 90 color verde llamado bisagra_izq
+31493 en -20,0,4 rot 90 color verde llamado bisagra_der
 
 // Paso 26: las placas blancas cosen la junta de cada riel.
-3666 en -20,5,3 color blanco
-3666 en -13,5,3 color blanco
+3666 en -26,5,3 color blanco
+3666 en -19,5,3 color blanco
 
 // Paso 25: la barra gris cruzada sobre el tope naranja, con la baldosa
 // redonda de pivote. En ella se anudan las cadenas.
-4282 en -20.5,-0.5,7 rot 90 color gris llamado barra
-15535 en -12.5,-1,8 color blanco llamado pivote
+4282 en -26.5,-0.5,7 rot 90 color gris llamado barra
+15535 en -18.5,-1,8 color blanco llamado pivote
 
 // Paso 31: los cuatro platos redondos van POR DEBAJO de las esquinas, como
 // patines. El motor no sabe pegar nada boca abajo: quedan pendientes.
