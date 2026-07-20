@@ -143,6 +143,14 @@ class PaletaTests(unittest.TestCase):
         self.assertIn("pedirMallas(datos.piezas.map", html)
         self.assertIn("miniaturas.set(nombreMalla", html)
 
+    def test_the_hand_tool_swaps_left_drag_to_pan(self) -> None:
+        # La mano no es un modo nuevo del visor: es decirle a OrbitControls
+        # que el boton izquierdo desplace en vez de orbitar. Esc la suelta.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn('id="mano"', html)
+        self.assertIn("controles.mouseButtons.LEFT = manoActiva ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE", html)
+        self.assertIn("if (manoActiva) alternarMano(false);", html)
+
     def test_escape_disarms(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         # Esc cancela el soltado, el modo quitar y el menú contextual.

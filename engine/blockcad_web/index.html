@@ -182,6 +182,7 @@
   }
   #paleta button:hover { border-color: #3a4560; }
   #paleta button.armada { border-color: #63b3ed; color: #63b3ed; }
+  #mano.armada { border-color: #63b3ed; color: #63b3ed; }
   #barra-x, #barra-y {
     position: absolute;
     margin: 0;
@@ -241,6 +242,7 @@
     <span class="separador"></span>
     <button id="piezas">Piezas</button>
     <button id="ejemplo">Ejemplo</button>
+    <button id="mano" title="Con la mano, el clic izquierdo agarra el plano y lo arrastra">✋ Mano</button>
     <button id="centrar">Centrar</button>
   </div>
   <input type="file" id="archivo" accept=".blockcad,.json,.txt" hidden>
@@ -770,6 +772,7 @@ addEventListener('keydown', (evento) => {
   if (evento.key === 'Escape') {
     cerrarMenu();
     if (armada || moviendo) { desarmar(); decir(''); }
+    if (manoActiva) alternarMano(false);
   }
 
   // Mientras se coloca una pieza el clic esta ocupado confirmando, asi que
@@ -1245,6 +1248,21 @@ areaCodigo.addEventListener('input', alEscribir);
 areaCodigo.addEventListener('scroll', () => { gutter.scrollTop = areaCodigo.scrollTop; });
 document.getElementById('centrar').addEventListener('click', centrar);
 document.getElementById('piezas').addEventListener('click', abrirPaleta);
+
+// La mano: el clic izquierdo deja de orbitar y AGARRA el plano, como en un
+// mapa. No es un modo nuevo del visor: es decirle a OrbitControls que el
+// boton izquierdo desplace. Pinchar piezas sigue funcionando: un clic
+// quieto no arrastra nada.
+let manoActiva = false;
+const botonMano = document.getElementById('mano');
+function alternarMano(activa) {
+  manoActiva = activa === undefined ? !manoActiva : activa;
+  controles.mouseButtons.LEFT = manoActiva ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE;
+  botonMano.classList.toggle('armada', manoActiva);
+  lienzo.style.cursor = manoActiva ? 'grab' : '';
+  sincronizarBarras();
+}
+botonMano.addEventListener('click', () => alternarMano());
 
 // Sustituir lo escrito sin avisar sería destruir trabajo de un clic.
 function puedoReemplazar() {
