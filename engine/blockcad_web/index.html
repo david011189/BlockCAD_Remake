@@ -571,6 +571,7 @@ function elegir(pieza) {
 const paleta = document.getElementById('paleta');
 let armada = null;   // la pieza elegida en la paleta, o null
 let modoQuitar = false; // el siguiente clic sobre una pieza la borra
+let moviendo = null; // la pieza que se esta reconectando, con su silueta
 let ultimoInventario = null; // lo dijo el ultimo compilado
 let fantasma = null; // la caja translúcida que sigue al puntero
 
@@ -647,24 +648,33 @@ function armar(pieza, boton) {
 
 function desarmar() {
   armada = null;
+  moviendo = null;
   if (fantasma) { modelo.remove(fantasma); fantasma.geometry.dispose(); fantasma = null; }
   for (const b of paleta.querySelectorAll('.armada')) b.classList.remove('armada');
 }
 
 // Dónde caería la pieza: sobre el suelo o sobre la tapa de lo pinchado,
 // con la esquina ajustada a studs enteros. Devuelve LDU.
+function medidasEnJuego() {
+  if (armada) return { ancho: armada.ancho, fondo: armada.fondo };
+  return { ancho: moviendo.caja.ancho, fondo: moviendo.caja.fondo };
+}
+
 function sitioParaSoltar(evento) {
   const caja = lienzo.getBoundingClientRect();
   puntero.x = ((evento.clientX - caja.left) / caja.width) * 2 - 1;
   puntero.y = -((evento.clientY - caja.top) / caja.height) * 2 + 1;
   rayo.setFromCamera(puntero, camara);
-  const blancos = [suelo, ...dibujadas.map((d) => d.cuerpo)];
+  const blancos = [suelo, ...dibujadas
+    .filter((d) => !moviendo || d !== moviendo)
+    .map((d) => d.cuerpo)];
   const tocado = rayo.intersectObjects(blancos, false)[0];
   if (!tocado) return null;
 
+  const medidas = medidasEnJuego();
   const local = modelo.worldToLocal(tocado.point.clone());
-  const x = Math.round((local.x - armada.ancho / 2) / 20) * 20;
-  const y = Math.round((local.y - armada.fondo / 2) / 20) * 20;
+  const x = Math.round((local.x - medidas.ancho / 2) / 20) * 20;
+  const y = Math.round((local.y - medidas.fondo / 2) / 20) * 20;
   let z = 0;
   if (tocado.object !== suelo) {
     const encima = dibujadas[tocado.object.userData.pieza];
@@ -674,12 +684,14 @@ function sitioParaSoltar(evento) {
 }
 
 lienzo.addEventListener('pointermove', (evento) => {
-  if (!armada || !fantasma) return;
+  if ((!armada && !moviendo) || !fantasma) return;
   const sitio = sitioParaSoltar(evento);
   fantasma.visible = sitio !== null;
   if (sitio) {
+    const alto = armada ? armada.alto : moviendo.caja.alto;
+    const medidas = medidasEnJuego();
     fantasma.position.set(
-      sitio.x + armada.ancho / 2, sitio.y + armada.fondo / 2, sitio.z + armada.alto / 2,
+      sitio.x + medidas.ancho / 2, sitio.y + medidas.fondo / 2, sitio.z + alto / 2,
     );
   }
 });
@@ -706,7 +718,9 @@ const opcionGirar = document.createElement('button');
 opcionGirar.textContent = 'girar 90°';
 const opcionQuitar = document.createElement('button');
 opcionQuitar.textContent = 'desconectar';
-for (const b of [opcionGirar, opcionQuitar]) {
+const opcionConectar = document.createElement('button');
+opcionConectar.textContent = 'conectar…';
+for (const b of [opcionGirar, opcionConectar, opcionQuitar]) {
   b.style.cssText = 'display:block;width:100%;text-align:left;margin:2px 0;';
   menuCtx.append(b);
 }
@@ -715,35 +729,24 @@ let piezaDelMenu = null;
 
 function cerrarMenu() { menuCtx.style.display = 'none'; piezaDelMenu = null; }
 
-opcionQuitar.addEventListener('click', async () => {
-  if (!piezaDelMenu) return cerrarMenu();
-  const cual = piezaDelMenu;
-  cerrarMenu();
-
-  // Desconectar SEPARA, no elimina: la pieza se aparta al suelo, junto al
-  // modelo, y las dos partes sobreviven. En codigo: su linea se reescribe
-  // con una posicion absoluta.
+async function mudarPieza(cual, sx, sy, sz, verbo, fallo) {
+  // La mudanza: reescribir la linea de la pieza a una posicion absoluta.
+  // La usan desconectar (sitio automatico) y conectar (sitio elegido).
   const hermanas = dibujadas.filter((d) => d.linea === cual.linea).length;
   if (hermanas > 1) {
-    decir('Esa linea pone ' + hermanas + ' piezas (un repetir): no se puede separar una sola. Edita el bucle en el codigo.', 'fallo');
-    return;
+    decir('Esa linea pone ' + hermanas + ' piezas (un repetir): no se puede mover una sola. Edita el bucle en el codigo.', 'fallo');
+    return false;
   }
-
   const lineas = areaCodigo.value.split('\n');
   const vieja = lineas[cual.linea - 1];
   const partes = vieja.match(/^(\s*)(\S+(?:\s+\d+(?:x\d+)?)?)\s+((?:encima|en).*)$/);
   if (!partes) {
     decir('No he sabido reescribir esa linea.', 'fallo');
-    return;
+    return false;
   }
   // Las opciones sobreviven a la mudanza; el lugar no.
   const opciones = (partes[3].match(/(color\s+\S+|rot(?:ado)?(?:\s+[xyz])?\s+\d+|llamado\s+\S+|grupo\s+\d+|paso\s+\d+|transparente)/g) || []).join(' ');
-
-  // El sitio: a dos studs a la derecha de todo el modelo, en el suelo.
-  const maxX = Math.max(...dibujadas.map((d) => d.caja.x + d.caja.ancho));
-  const sx = Math.ceil((maxX + 40) / 20);
-  const sy = cual.caja.y / 20;
-  lineas[cual.linea - 1] = partes[1] + partes[2] + ' en ' + sx + ',' + sy + ',0'
+  lineas[cual.linea - 1] = partes[1] + partes[2] + ' en ' + sx + ',' + sy + ',' + sz
     + (opciones ? ' ' + opciones : '');
   const propuesta = lineas.join('\n');
 
@@ -753,15 +756,45 @@ opcionQuitar.addEventListener('click', async () => {
     datos = await respuesta.json();
   } catch (error) {
     decir('No se pudo hablar con el servidor: ' + error.message, 'fallo');
-    return;
+    return false;
   }
   if (!datos.ok) {
-    decir('Al separarla choca: ' + datos.mensaje, 'fallo');
-    return;
+    decir(fallo + ': ' + datos.mensaje, 'fallo');
+    return false;
   }
   registrar();
   aplicar(propuesta);
-  decir('Separada: la pieza de la linea ' + cual.linea + ' quedo aparte, en ' + sx + ',' + sy + ',0.', 'hecho');
+  decir(verbo + ': la pieza de la linea ' + cual.linea + ' quedo en ' + sx + ',' + sy + ',' + sz + '.', 'hecho');
+  return true;
+}
+
+opcionQuitar.addEventListener('click', () => {
+  if (!piezaDelMenu) return cerrarMenu();
+  const cual = piezaDelMenu;
+  cerrarMenu();
+  // Desconectar SEPARA, no elimina: al suelo, junto al modelo.
+  const maxX = Math.max(...dibujadas.map((d) => d.caja.x + d.caja.ancho));
+  mudarPieza(cual, Math.ceil((maxX + 40) / 20), cual.caja.y / 20, 0,
+    'Separada', 'Al separarla choca');
+});
+
+opcionConectar.addEventListener('click', () => {
+  if (!piezaDelMenu) return cerrarMenu();
+  const cual = piezaDelMenu;
+  cerrarMenu();
+  desarmar();
+  // La silueta: la caja de la pieza, siguiendo al puntero como en la
+  // paleta. El clic confirma; Esc cancela.
+  moviendo = cual;
+  fantasma = new THREE.Mesh(
+    new THREE.BoxGeometry(cual.caja.ancho, cual.caja.fondo, cual.caja.alto),
+    new THREE.MeshBasicMaterial({
+      color: 0x63b3ed, transparent: true, opacity: 0.45, depthWrite: false,
+    }),
+  );
+  fantasma.visible = false;
+  modelo.add(fantasma);
+  decir('Mueve el raton y pincha donde conectarla. Esc cancela.');
 });
 
 opcionGirar.addEventListener('click', async () => {
@@ -828,6 +861,17 @@ lienzo.addEventListener('pointerup', (evento) => {
       menuCtx.style.left = evento.clientX + 'px';
       menuCtx.style.top = evento.clientY + 'px';
       menuCtx.style.display = 'block';
+    }
+    return;
+  }
+
+  if (moviendo) {
+    const sitio = sitioParaSoltar(evento);
+    if (sitio) {
+      mudarPieza(moviendo, sitio.x / 20, sitio.y / 20, sitio.z / 8,
+        'Conectada', 'Ahi choca');
+      moviendo = null;
+      if (fantasma) { modelo.remove(fantasma); fantasma.geometry.dispose(); fantasma = null; }
     }
     return;
   }

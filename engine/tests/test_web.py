@@ -187,18 +187,31 @@ class InventarioTests(unittest.TestCase):
         girar = html.split("opcionGirar.addEventListener")[1].split("opcionQuitar.addEventListener")[0]
         self.assertLess(girar.index("fetch('/api/modelo'"), girar.index("aplicar(propuesta)"))
 
-    def test_disconnect_separates_it_does_not_delete(self) -> None:
-        # Desconectar SEPARA: reescribe la linea de la pieza a una posicion
-        # absoluta en el suelo, junto al modelo. Las dos piezas sobreviven,
-        # las opciones (color, nombre...) viajan con la mudanza, y tambien
-        # valida antes de tocar. Un `repetir` se rehusa explicando.
+    def test_moving_rewrites_the_line_and_validates_first(self) -> None:
+        # La mudanza compartida (desconectar y conectar): reescribe la linea
+        # a posicion absoluta, las opciones viajan, valida ANTES de aplicar,
+        # nunca borra, y un `repetir` se rehusa explicando.
         html = (_WEB / "index.html").read_text(encoding="utf-8")
-        sep = html.split("opcionQuitar.addEventListener")[1].split("addEventListener('pointerdown'")[0]
-        self.assertNotIn("borrar(", sep)
-        self.assertIn("' en ' + sx", sep)
-        self.assertIn("color", sep)
-        self.assertIn("no se puede separar una sola", sep)
-        self.assertLess(sep.index("fetch('/api/modelo'"), sep.index("aplicar(propuesta)"))
+        mudar = html.split("async function mudarPieza")[1].split("opcionQuitar.addEventListener")[0]
+        self.assertNotIn("borrar(", mudar)
+        self.assertIn("' en ' + sx", mudar)
+        self.assertIn("color", mudar)
+        self.assertIn("no se puede mover una sola", mudar)
+        self.assertLess(mudar.index("fetch('/api/modelo'"), mudar.index("aplicar(propuesta)"))
+
+    def test_connect_previews_with_a_silhouette_and_confirms(self) -> None:
+        # Conectar arma una silueta que sigue al puntero (la caja de la
+        # pieza) y el clic confirma la mudanza. El rayo no choca contra la
+        # propia pieza en movimiento: si no, siempre se conectaria a si
+        # misma.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("opcionConectar", html)
+        conectar = html.split("opcionConectar.addEventListener")[1].split("});")[0]
+        self.assertIn("moviendo = cual", conectar)
+        self.assertIn("fantasma", conectar)
+        clic = html.split("if (moviendo) {")[1].split("return;")[0]
+        self.assertIn("mudarPieza(moviendo", clic)
+        self.assertIn("!moviendo || d !== moviendo", html)
 
     def test_the_page_has_no_control_characters(self) -> None:
         """Un retroceso invisible (x08) vivio dentro de un regex del visor.
