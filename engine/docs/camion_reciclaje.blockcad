@@ -26,8 +26,11 @@ modelo "Camion de reciclaje"
 87083 en el agujero 3 de motor desplazado -2 llamado eje_motor
 10928 en el eje de eje_motor color gris llamado pinon
 
-// Paso 5: el primer ladrillo negro sobre los studs del motor.
-3003 en -1.5,-0.5,13 color negro
+// Pasos 5, 9 y 13: la placa naranja va sobre los studs del motor, y los
+// dos ladrillos negros en fila encima de ella.
+3709 en -1.5,-0.5,13 rot 90 color naranja llamado remate
+3003 en -1.5,-0.5,14 color negro
+3003 en 0.5,-0.5,14 color negro
 
 // Paso 8: el segundo ladrillo de agujeros, DE PIE delante del morro: es la
 // pared de la caja de cambios. No se apoya en nada; lo atraviesan los dos
@@ -54,11 +57,9 @@ modelo "Camion de reciclaje"
 // segundo agujero del conector #3 vive a 157,5 grados, y el motor solo
 // sabe las 24 orientaciones de 90. No es la extraccion: es la rejilla.
 
-// Paso 13: la placa Technic naranja de remate, sobre el ladrillo negro.
-3709 en -1.5,-0.5,16 rot 90 color naranja llamado remate
-
-// Pasos 11-15: el hub se conecta y se monta atras, sobre el motor.
-19071 en -1.5,-1,17 rot 270 color blanco llamado hub
+// Pasos 11-15: el hub se monta sobre los negros y VUELA hacia delante,
+// con el morro sobre el tren de engranajes, como en la lamina final.
+19071 en -4.5,-1,17 rot 270 color blanco llamado hub
 
 // Pasos 16 a 19: los dos ganchos de remolque, armados aparte como en su
 // lamina: la bola del ladrillo negro se asienta en la cazoleta transparente
@@ -66,10 +67,13 @@ modelo "Camion de reciclaje"
 // bola ES el centro de la copa—. En plastico, de estas cazoletas cuelgan
 // las cadenas. El montaje exacto sobre el camion y los ojos de encima
 // quedan pendientes de sus laminas.
-92013 en 0,-8,0 color celeste llamado gancho_delantero
-57909 en 2.35,-8,0 rot 180 color negro
-92013 en 0,-5.5,0 color celeste llamado gancho_trasero
-57909 en 2.35,-5.5,0 rot 180 color negro
+// Cuelgan en columna al costado delantero, mirando al bastidor. El agarre
+// real —el tubo del transparente pisado en el pin— es una union que el
+// motor no conoce todavia, asi que la columna apoya en el suelo.
+92013 en -3,-3.5,0 rot 180 color celeste llamado gancho_bajo
+57909 en -5.55,-3.5,0 color negro
+92013 en -3,-3.5,3 rot 180 color celeste llamado gancho_alto
+57909 en -5.55,-3.5,3 color negro
 
 // ---------- El bastidor volcador (pasos 22 a 31) ----------
 // Un marco en U que se arrastra por el suelo. Se construye aparte, a la
