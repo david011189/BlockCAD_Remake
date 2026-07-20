@@ -150,6 +150,20 @@ def _giradas_90(conexiones, fondo: float) -> list[dict]:
 _DIENTES_RE = re.compile(r"Gear (\d+) Tooth")
 
 
+def _rueda(nombre_ldraw: str) -> dict[str, str]:
+    """Si la pieza es neumatico o llanta, por su nombre de LDraw.
+
+    El neumatico no tiene conexiones —abraza, no se enchufa— asi que la
+    unica manera de saber que calza en una llanta es saber quien es quien.
+    """
+    limpio = re.sub(r"\s+", " ", nombre_ldraw)
+    if "Tyre" in limpio:
+        return {"rueda": "neumatico"}
+    if "Wheel Rim" in limpio or "Wedge Belt Wheel" in limpio:
+        return {"rueda": "llanta"}
+    return {}
+
+
 def _dientes(nombre_ldraw: str) -> dict[str, str]:
     """Cuántos dientes tiene la pieza, si es una rueda dentada.
 
@@ -206,6 +220,7 @@ def _definicion(pieza: dict) -> PartDefinition:
             "cantidad_en_el_set": str(pieza.get("cantidad", 0)),
             **malla_giro,
             **_dientes(pieza["nombre_ldraw"]),
+            **_rueda(pieza["nombre_ldraw"]),
         },
         aliases=tuple(aliases),
         connections=tuple(

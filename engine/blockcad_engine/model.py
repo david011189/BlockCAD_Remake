@@ -140,6 +140,67 @@ def _muerden(
     return abs(distancia - primitivos) < 1e-6
 
 
+def _calzan(
+    a: PlacedPart,
+    def_a: PartDefinition,
+    b: PlacedPart,
+    def_b: PartDefinition,
+) -> bool:
+    """¿Es este el neumatico montado en su llanta?
+
+    El neumatico ABRAZA: no tiene conexiones que compartir ni macho que
+    meter, y aun asi el montaje real solapa las cajas de verdad. Es la
+    cuarta manera legal de solaparse, y la mas estrecha de todas: uno debe
+    ser neumatico y el otro llanta, sus centros deben COINCIDIR, y sus
+    anchos —la dimension impar de una pieza redonda— deben correr por el
+    mismo eje. Un neumatico cruzado no calza aunque este centrado.
+    """
+    tipos = {def_a.metadata.get("rueda"), def_b.metadata.get("rueda")}
+    if tipos != {"neumatico", "llanta"}:
+        return False
+
+    eje = _eje_redondo(a, def_a)
+    if eje is None or eje != _eje_redondo(b, def_b):
+        return False
+
+    ca, cb = a.bounds(def_a), b.bounds(def_b)
+    minimos_a = (ca.min_x, ca.min_y, ca.min_z)
+    maximos_a = (ca.max_x, ca.max_y, ca.max_z)
+    minimos_b = (cb.min_x, cb.min_y, cb.min_z)
+    maximos_b = (cb.max_x, cb.max_y, cb.max_z)
+    for k in range(3):
+        if k == eje:
+            # A lo largo del eje de giro basta con que el mas estrecho quede
+            # DENTRO del otro: la caja de una llanta es asimetrica (el cubo
+            # sobresale) y exigir centros exactos caia en medio LDU.
+            dentro = (
+                minimos_a[k] >= minimos_b[k] and maximos_a[k] <= maximos_b[k]
+            ) or (
+                minimos_b[k] >= minimos_a[k] and maximos_b[k] <= maximos_a[k]
+            )
+            if not dentro:
+                return False
+        elif minimos_a[k] + maximos_a[k] != minimos_b[k] + maximos_b[k]:
+            # En el plano de la rueda, concentricos de verdad.
+            return False
+    return True
+
+
+def _eje_redondo(pieza: PlacedPart, definicion: PartDefinition) -> int | None:
+    """Por que eje corre el ancho de una pieza redonda: su dimension impar.
+
+    Una rueda mide diametro x diametro x ancho: dos medidas iguales y una
+    distinta. La distinta dice hacia donde apunta el eje de giro.
+    """
+    d = definicion.dimensions.rotated(pieza.orientation)
+    medidas = (d.width, d.depth, d.height)
+    for i in range(3):
+        otras = [medidas[j] for j in range(3) if j != i]
+        if otras[0] == otras[1] and medidas[i] != otras[0]:
+            return i
+    return None
+
+
 def _recta_canonica(eje: tuple[float, ...]) -> tuple[float, float, float]:
     """La misma recta, siempre escrita igual.
 
@@ -477,6 +538,9 @@ class BlockModel:
             # los dientes de una entran en los huecos de la otra.
             if _muerden(candidate, definition, existing, existing_definition):
                 continue
+            # Y el neumatico abraza a su llanta.
+            if _calzan(candidate, definition, existing, existing_definition):
+                continue
             collisions.append(existing)
 
         return tuple(collisions)
@@ -496,8 +560,11 @@ class BlockModel:
           podía estar dentro de una viga y el motor los daba por desconocidos.
         """
         pieza = self.get(instance_id)
-        mias = pieza.world_connections(self.catalog.get(pieza.part_id))
-        if not mias:
+        definicion = self.catalog.get(pieza.part_id)
+        mias = pieza.world_connections(definicion)
+        if not mias and not definicion.metadata.get('rueda'):
+            # Sin conexiones no hay nada que compartir... salvo que la pieza
+            # sea neumatico o llanta: esas se unen abrazando.
             return ()
 
         puntos = {c.punto for c in mias}
@@ -507,7 +574,16 @@ class BlockModel:
                 continue
             suyas = otra.world_connections(self.catalog.get(otra.part_id))
             comparten_punto = puntos & {c.punto for c in suyas}
-            if comparten_punto or _hay_insercion(mias, suyas):
+            if (
+                comparten_punto
+                or _hay_insercion(mias, suyas)
+                or _calzan(
+                    pieza,
+                    self.catalog.get(pieza.part_id),
+                    otra,
+                    self.catalog.get(otra.part_id),
+                )
+            ):
                 unidas.append(otra)
         return tuple(unidas)
 

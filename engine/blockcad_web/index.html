@@ -564,6 +564,7 @@ function anotar(p, cuerpos, aristas, color, opacidad) {
   dibujadas.push({
     linea: p.linea, orden, cuerpos, aristas, color, opacidad, nombre: p.nombre,
     suelta: p.suelta,
+    rueda: p.rueda,
     caja: { x: p.x, y: p.y, z: p.z, ancho: p.ancho, fondo: p.fondo, alto: p.alto },
   });
 }
@@ -778,7 +779,7 @@ function desarmar() {
   moviendo = null;
   arrastrable = null;
   controles.enabled = true;
-  if (fantasma) { modelo.remove(fantasma); fantasma.geometry.dispose(); fantasma = null; }
+  borrarFantasma();
   for (const b of paleta.querySelectorAll('.armada')) b.classList.remove('armada');
 }
 
@@ -802,6 +803,32 @@ function sitioParaSoltar(evento) {
 
   const medidas = medidasEnJuego();
   const local = modelo.worldToLocal(tocado.point.clone());
+
+  // El iman de la rueda: si lo que se mueve es un neumatico y debajo hay
+  // una llanta (o al reves), el sitio es EL montaje: concentrico en el
+  // plano de la rueda, centrado dentro del tambor.
+  if (moviendo && moviendo.rueda && tocado.object !== suelo) {
+    const otra = dibujadas[tocado.object.userData.pieza];
+    if (otra && otra.rueda && otra.rueda !== moviendo.rueda) {
+      const mia = [moviendo.caja.ancho, moviendo.caja.fondo, moviendo.caja.alto];
+      const suya = [otra.caja.ancho, otra.caja.fondo, otra.caja.alto];
+      const base = [otra.caja.x, otra.caja.y, otra.caja.z];
+      // El eje de giro: la dimension impar de la pieza redonda.
+      let eje = 1;
+      for (let k = 0; k < 3; k++) {
+        const otras = [0, 1, 2].filter((j) => j !== k).map((j) => mia[j]);
+        if (otras[0] === otras[1] && mia[k] !== otras[0]) eje = k;
+      }
+      const sitio = [0, 0, 0];
+      for (let k = 0; k < 3; k++) {
+        sitio[k] = k === eje
+          ? base[k] + Math.floor((suya[k] - mia[k]) / 2)
+          : base[k] + (suya[k] - mia[k]) / 2;
+      }
+      return { x: sitio[0], y: sitio[1], z: sitio[2] };
+    }
+  }
+
   const x = Math.round((local.x - medidas.ancho / 2) / 20) * 20;
   const y = Math.round((local.y - medidas.fondo / 2) / 20) * 20;
   let z = 0;
@@ -824,11 +851,19 @@ lienzo.addEventListener('pointermove', (evento) => {
   const sitio = sitioParaSoltar(evento);
   fantasma.visible = sitio !== null;
   if (sitio) {
-    const alto = armada ? armada.alto : moviendo.caja.alto;
-    const medidas = medidasEnJuego();
-    fantasma.position.set(
-      sitio.x + medidas.ancho / 2, sitio.y + medidas.fondo / 2, sitio.z + alto / 2,
-    );
+    if (fantasma.isGroup) {
+      // El grupo lleva las mallas en sus posiciones de origen: se desplaza
+      // por la diferencia con la esquina de la pieza.
+      fantasma.position.set(
+        sitio.x - moviendo.caja.x, sitio.y - moviendo.caja.y, sitio.z - moviendo.caja.z,
+      );
+    } else {
+      const alto = armada ? armada.alto : moviendo.caja.alto;
+      const medidas = medidasEnJuego();
+      fantasma.position.set(
+        sitio.x + medidas.ancho / 2, sitio.y + medidas.fondo / 2, sitio.z + alto / 2,
+      );
+    }
   }
 });
 
@@ -999,14 +1034,31 @@ function iniciarMovimiento(cual, verbo) {
   // paleta. Conectar confirma con un clic; arrastrar, al soltar el boton.
   moviendo = cual;
   verboMovimiento = verbo;
-  fantasma = new THREE.Mesh(
-    new THREE.BoxGeometry(cual.caja.ancho, cual.caja.fondo, cual.caja.alto),
-    new THREE.MeshBasicMaterial({
+  fantasma = new THREE.Group();
+  for (const cuerpo of cual.cuerpos) {
+    const copia = new THREE.Mesh(cuerpo.geometry, new THREE.MeshBasicMaterial({
       color: 0x63b3ed, transparent: true, opacity: 0.45, depthWrite: false,
-    }),
-  );
+      side: THREE.DoubleSide,
+    }));
+    copia.matrixAutoUpdate = false;
+    copia.matrix.copy(cuerpo.matrix);
+    fantasma.add(copia);
+  }
   fantasma.visible = false;
   modelo.add(fantasma);
+}
+
+function borrarFantasma() {
+  if (!fantasma) return;
+  modelo.remove(fantasma);
+  // La geometria es la de las piezas de verdad: solo se tiran los
+  // materiales del clon. La caja de la paleta si es propia.
+  if (fantasma.isGroup) {
+    for (const hijo of fantasma.children) hijo.material.dispose();
+  } else {
+    fantasma.geometry.dispose();
+  }
+  fantasma = null;
 }
 
 opcionConectar.addEventListener('click', () => {
@@ -1110,7 +1162,7 @@ lienzo.addEventListener('pointerup', (evento) => {
       mudarPieza(moviendo, sitio.x / 20, sitio.y / 20, sitio.z / 8,
         verboMovimiento, 'Ahi choca');
       moviendo = null;
-      if (fantasma) { modelo.remove(fantasma); fantasma.geometry.dispose(); fantasma = null; }
+      borrarFantasma();
     } else if (eraArrastre) {
       // Soltar fuera del plano cancela el arrastre.
       desarmar();

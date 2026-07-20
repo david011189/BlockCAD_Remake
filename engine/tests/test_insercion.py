@@ -460,5 +460,38 @@ class ApilarSigueIgualTests(unittest.TestCase):
         self.modelo.add("3001", GridPosition(80, 0, 0))
 
 
+class CalzadoTests(unittest.TestCase):
+    """El neumatico abraza a su llanta: cuarta manera legal de solaparse."""
+
+    def setUp(self) -> None:
+        self.modelo = BlockModel(catalog=cargar("wedo"))
+        self.modelo.add("55982", GridPosition(100, 100, 40))
+
+    def test_the_tyre_mounts_and_is_connected(self) -> None:
+        # Concentrico en el plano de la rueda y dentro del tambor. Y cuenta
+        # como unido: la rueda montada no flota ni esta suelta.
+        neumatico = self.modelo.add("92402", GridPosition(83, 101, 23))
+        unidas = self.modelo.connected_to(neumatico.instance_id)
+        self.assertEqual([p.part_id for p in unidas], ["55982"])
+        self.assertFalse(self.modelo.floating())
+
+    def test_off_centre_still_collides(self) -> None:
+        with self.assertRaises(CollisionError):
+            self.modelo.add("92402", GridPosition(87, 101, 23))
+
+    def test_outside_the_barrel_collides(self) -> None:
+        with self.assertRaises(CollisionError):
+            self.modelo.add("92402", GridPosition(83, 90, 23))
+
+    def test_a_crossed_tyre_does_not_mount(self) -> None:
+        # Centrado pero girado un cuarto de vuelta: el ancho corre por otro
+        # eje y no hay calzado que valga.
+        with self.assertRaises(CollisionError):
+            self.modelo.add(
+                "92402", GridPosition(83, 80, 44),
+                orientation=Orientation.around("x", 90),
+            )
+
+
 if __name__ == "__main__":
     unittest.main()

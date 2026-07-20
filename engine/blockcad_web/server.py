@@ -156,6 +156,7 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
                 "nombre": definition.name,
                 "flotante": item.instance_id in flotantes,
                 "suelta": item.instance_id not in enganchadas,
+                "rueda": definition.metadata.get("rueda"),
                 "linea": lineas.get(item.instance_id),
                 # Qué malla dibujar y dónde. Sin malla, el visor cae a la caja.
                 "malla": definition.metadata.get("malla", definition.part_id),
