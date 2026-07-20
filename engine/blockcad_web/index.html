@@ -242,7 +242,7 @@
     <span class="separador"></span>
     <button id="piezas">Piezas</button>
     <button id="ejemplo">Ejemplo</button>
-    <button id="mano" title="Con la mano, el clic izquierdo agarra el plano y lo arrastra">✋ Mano</button>
+    <button id="mano" title="Con la mano, el clic izquierdo agarra el plano y lo arrastra (tecla H)">✋ Mano</button>
     <button id="centrar">Centrar</button>
   </div>
   <input type="file" id="archivo" accept=".blockcad,.json,.txt" hidden>
@@ -773,6 +773,14 @@ addEventListener('keydown', (evento) => {
     cerrarMenu();
     if (armada || moviendo) { desarmar(); decir(''); }
     if (manoActiva) alternarMano(false);
+  }
+
+  // H alterna la mano, como en los editores de mapas. Solo fuera del texto:
+  // escribiendo, la h es una letra.
+  if (evento.key === 'h' || evento.key === 'H') {
+    const donde = document.activeElement;
+    if (donde === areaCodigo || donde === areaOrden) return;
+    alternarMano();
   }
 
   // Mientras se coloca una pieza el clic esta ocupado confirmando, asi que

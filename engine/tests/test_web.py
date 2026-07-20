@@ -150,6 +150,8 @@ class PaletaTests(unittest.TestCase):
         self.assertIn('id="mano"', html)
         self.assertIn("controles.mouseButtons.LEFT = manoActiva ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE", html)
         self.assertIn("if (manoActiva) alternarMano(false);", html)
+        # Y la tecla H la alterna, salvo escribiendo: ahi la h es una letra.
+        self.assertIn("evento.key === 'h' || evento.key === 'H'", html)
 
     def test_escape_disarms(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
