@@ -234,6 +234,19 @@ class PaletaTests(unittest.TestCase):
         self.assertIn("async function girarGrupo", html)
         self.assertIn("x: -(p.caja.y - minY + p.caja.fondo)", html)
 
+    def test_shift_click_marks_several_pieces(self) -> None:
+        # Shift+clic suma piezas a la seleccion (o las resta); el clic
+        # normal la reduce a una. Con varias marcadas, el menu del boton
+        # derecho ofrece moverlas y girarlas juntas, por el mismo camino
+        # validado de los grupos. Un repetir a medias se niega.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("evento.shiftKey && pieza", html)
+        self.assertIn("function marcar(pieza)", html)
+        self.assertIn("esLaElegida(d) || esMarcada(d)", html)
+        self.assertIn("opcionMoverMarcadas", html)
+        self.assertIn("mover seleccion (${marcadas.length})", html)
+        self.assertIn("la seleccion no las lleva todas", html)
+
     def test_the_rack_magnet_is_tangent(self) -> None:
         # Cada rueda dentada publica su engrane (eje mundial y radio
         # primitivo) y la cremallera su normal con su paso: el visor hace

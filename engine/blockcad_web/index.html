@@ -594,13 +594,24 @@ function esLaElegida(d) {
   return seleccion !== null && d.linea === seleccion.linea && d.orden === seleccion.orden;
 }
 
+// La seleccion multiple: shift+clic añade una pieza, o la quita si ya
+// estaba. El clic normal la reduce a una sola, como siempre.
+let marcadas = [];
+
+function esMarcada(d) {
+  return marcadas.some((m) => d.linea === m.linea && d.orden === m.orden);
+}
+
 function pintarSeleccion() {
   // La pieza puede haber desaparecido al recompilar. Si ya no la pone nadie,
   // no hay nada elegido.
   if (seleccion !== null && !dibujadas.some(esLaElegida)) seleccion = null;
+  marcadas = marcadas.filter((m) => dibujadas.some(
+    (d) => d.linea === m.linea && d.orden === m.orden,
+  ));
 
   for (const d of dibujadas) {
-    const elegida = esLaElegida(d);
+    const elegida = esLaElegida(d) || esMarcada(d);
     d.aristas.material.color.set(elegida ? 0x63b3ed : d.color);
     d.aristas.material.opacity = elegida ? 1 : d.opacidad;
     // El borde solo se ve por fuera; el relleno dice cuál es sin taparla.
@@ -625,6 +636,7 @@ function elegir(pieza) {
   seleccion = pieza && pieza.linea != null
     ? { linea: pieza.linea, orden: pieza.orden }
     : null;
+  marcadas = seleccion ? [seleccion] : [];
   pintarSeleccion();
   pintarGutter(lineaRota);
 
@@ -648,6 +660,30 @@ function elegir(pieza) {
       ? `${pieza.nombre} — línea ${linea}: ${texto} · pone ${hermanas} piezas, y Supr borra la línea entera.`
       : `${pieza.nombre} — línea ${linea}: ${texto} · Supr la borra.`) + pista,
   );
+}
+
+function marcar(pieza) {
+  // Shift+clic: la pieza entra en la seleccion, o sale si ya estaba. La
+  // ultima marcada pasa a ser la elegida, para que Supr y la consola
+  // sigan hablando de una.
+  if (pieza.linea == null) return;
+  if (esMarcada(pieza)) {
+    marcadas = marcadas.filter(
+      (m) => !(m.linea === pieza.linea && m.orden === pieza.orden),
+    );
+  } else {
+    marcadas.push({ linea: pieza.linea, orden: pieza.orden });
+  }
+  seleccion = marcadas.length ? marcadas[marcadas.length - 1] : null;
+  pintarSeleccion();
+  pintarGutter(lineaRota);
+  if (marcadas.length > 1) {
+    decir(`${marcadas.length} piezas marcadas. Clic derecho para moverlas o girarlas juntas; shift+clic suma o resta.`);
+  } else if (marcadas.length === 1) {
+    decir('1 pieza marcada. Shift+clic sobre otras para sumarlas.');
+  } else {
+    decir('');
+  }
 }
 
 // --- Soltar piezas ----------------------------------------------------------
@@ -1025,6 +1061,8 @@ const opcionGirar = document.createElement('button');
 opcionGirar.textContent = 'girar 90°';
 const opcionVoltear = document.createElement('button');
 opcionVoltear.textContent = 'voltear';
+const opcionMoverMarcadas = document.createElement('button');
+const opcionGirarMarcadas = document.createElement('button');
 const opcionMoverGrupo = document.createElement('button');
 opcionMoverGrupo.textContent = 'mover grupo';
 const opcionGirarGrupo = document.createElement('button');
@@ -1033,7 +1071,7 @@ const opcionQuitar = document.createElement('button');
 opcionQuitar.textContent = 'desconectar';
 const opcionConectar = document.createElement('button');
 opcionConectar.textContent = 'conectar…';
-for (const b of [opcionGirar, opcionVoltear, opcionConectar, opcionQuitar, opcionMoverGrupo, opcionGirarGrupo]) {
+for (const b of [opcionGirar, opcionVoltear, opcionConectar, opcionQuitar, opcionMoverGrupo, opcionGirarGrupo, opcionMoverMarcadas, opcionGirarMarcadas]) {
   b.style.cssText = 'display:block;width:100%;text-align:left;margin:2px 0;';
   menuCtx.append(b);
 }
@@ -1213,6 +1251,14 @@ async function mudarGrupo(grupo, sitio) {
     decir('Alguna pieza del grupo no viene del codigo: no puedo moverlo.', 'fallo');
     return;
   }
+  for (const n of numeros) {
+    const enLista = grupo.piezas.filter((p) => p.linea === n).length;
+    const enTotal = dibujadas.filter((d) => d.linea === n).length;
+    if (enLista < enTotal) {
+      decir(`La linea ${n} pone ${enTotal} piezas (un repetir) y la seleccion no las lleva todas. Marca todas o edita el codigo.`, 'fallo');
+      return;
+    }
+  }
   const lineas = areaCodigo.value.split('\n');
   const re = /(\sen\s+)(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)/;
   for (const n of numeros) {
@@ -1254,8 +1300,8 @@ async function girarGrupo(piezas) {
     return;
   }
   for (const n of numeros) {
-    if (piezas.filter((p) => p.linea === n).length > 1) {
-      decir('Ese grupo tiene un repetir: girarlo entero cambiaria el bucle. Edita el codigo.', 'fallo');
+    if (dibujadas.filter((d) => d.linea === n).length > 1) {
+      decir('Ahi hay un repetir: girarlo cambiaria el bucle. Edita el codigo.', 'fallo');
       return;
     }
   }
@@ -1394,6 +1440,22 @@ opcionVoltear.addEventListener('click', async () => {
   decir(`Volteada la pieza de la línea ${numero}.`, 'hecho');
 });
 
+opcionMoverMarcadas.addEventListener('click', () => {
+  if (!escenaAlDia()) return cerrarMenu();
+  const piezas = dibujadas.filter(esMarcada);
+  cerrarMenu();
+  if (piezas.length < 2) return;
+  iniciarMovimientoGrupo(piezas, 'Movida');
+  decir(`Mueves ${piezas.length} piezas marcadas. Suelta con un clic; Esc cancela.`);
+});
+
+opcionGirarMarcadas.addEventListener('click', () => {
+  const piezas = dibujadas.filter(esMarcada);
+  cerrarMenu();
+  if (piezas.length < 2) return;
+  girarGrupo(piezas);
+});
+
 opcionMoverGrupo.addEventListener('click', () => {
   if (!piezaDelMenu) return cerrarMenu();
   if (!escenaAlDia()) return cerrarMenu();
@@ -1450,6 +1512,12 @@ lienzo.addEventListener('pointerup', (evento) => {
     const cual = tocada ? dibujadas[tocada.object.userData.pieza] : null;
     if (cual && cual.linea != null) {
       piezaDelMenu = cual;
+      // Las opciones de la seleccion solo aparecen cuando hay varias.
+      const varias = marcadas.length > 1;
+      opcionMoverMarcadas.style.display = varias ? '' : 'none';
+      opcionGirarMarcadas.style.display = varias ? '' : 'none';
+      opcionMoverMarcadas.textContent = `mover seleccion (${marcadas.length})`;
+      opcionGirarMarcadas.textContent = `girar seleccion (${marcadas.length})`;
       menuCtx.style.left = evento.clientX + 'px';
       menuCtx.style.top = evento.clientY + 'px';
       menuCtx.style.display = 'block';
@@ -1513,6 +1581,10 @@ lienzo.addEventListener('pointerup', (evento) => {
     return;
   }
 
+  if (evento.shiftKey && pieza) {
+    marcar(pieza);
+    return;
+  }
   elegir(pieza && esLaElegida(pieza) ? null : pieza);
 });
 
