@@ -385,7 +385,11 @@ class RatonTests(unittest.TestCase):
 
     def test_only_bodies_are_clickable(self) -> None:
         # Los bordes son líneas de un pixel: pinchar uno es pinchar un pelo.
-        self.assertIn("rayo.intersectObjects(dibujadas.map((d) => d.cuerpo)", self.html)
+        # Los cuerpos son varios por pieza —uno por grupo de color— y todos
+        # cuentan: pinchar la pupila de un ojo es pinchar el ojo.
+        self.assertIn(
+            "rayo.intersectObjects(dibujadas.flatMap((d) => d.cuerpos)", self.html
+        )
 
     def test_what_lights_up_is_the_piece_you_clicked(self) -> None:
         # Y solo esa. Una línea con `repetir` pone cuatro ladrillos iguales:

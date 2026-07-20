@@ -364,8 +364,14 @@ modelo.scale.setScalar(LDU);
 escena.add(modelo);
 
 // Las mallas se piden una vez y se quedan: un modelo repite pocas piezas
-// muchas veces.
+// muchas veces. Cada entrada trae sus grupos de color: el grupo "16" es el
+// cuerpo pintable (colorFijo null) y el resto son dibujos de color fijo,
+// como la pupila de los ojos, que es negra la pinte quien la pinte.
 const mallas = new Map();
+
+// Qué hex pinta cada código fijo de LDraw. Lo manda el servidor junto con
+// las mallas que lo usan.
+const coloresLdraw = {};
 
 async function pedirMallas(nombres) {
   const faltan = [...new Set(nombres)].filter((n) => n && !mallas.has(n));
@@ -376,31 +382,54 @@ async function pedirMallas(nombres) {
     body: JSON.stringify(faltan),
   });
   const recibidas = await respuesta.json();
+  Object.assign(coloresLdraw, recibidas.colores_ldraw || {});
 
   for (const nombre of faltan) {
-    const triangulos = recibidas[nombre];
-    if (!triangulos) {
+    const porColor = (recibidas.mallas || {})[nombre];
+    if (!porColor) {
       // Sin malla no se dibuja una caja mal: se dibuja la caja, y punto.
       mallas.set(nombre, null);
       continue;
     }
-    const geometria = new THREE.BufferGeometry();
-    geometria.setAttribute(
-      'position',
-      new THREE.BufferAttribute(new Float32Array(triangulos), 3),
-    );
-    // LDraw no trae normales; se calculan una vez por pieza, no por copia.
-    geometria.computeVertexNormals();
+
+    const grupos = [];
+    const union = [];
+    for (const [codigo, triangulos] of Object.entries(porColor)) {
+      const geometria = new THREE.BufferGeometry();
+      geometria.setAttribute(
+        'position',
+        new THREE.BufferAttribute(new Float32Array(triangulos), 3),
+      );
+      // LDraw no trae normales; se calculan una vez por pieza, no por copia.
+      geometria.computeVertexNormals();
+      grupos.push({
+        cuerpo: geometria,
+        // El "16" es el cuerpo pintable: su color lo pone cada pieza.
+        colorFijo: codigo === '16' ? null : (coloresLdraw[codigo] || null),
+      });
+      for (const v of triangulos) union.push(v);
+    }
 
     // Los bordes, para que dos piezas del mismo color pegadas no parezcan una
     // sola. El umbral de 30 grados deja fuera los tramos de un cilindro
     // —los studs se tesela en trozos de unos 22 grados— y se queda con las
     // aristas de verdad. Se calcula una vez por pieza, no por copia: en un
     // hub son 6.348 triángulos.
-    mallas.set(nombre, {
-      cuerpo: geometria,
-      bordes: new THREE.EdgesGeometry(geometria, 30),
-    });
+    //
+    // Se calculan sobre la UNIÓN de los grupos, no sobre el grupo "16": la
+    // silueta es de la pieza entera, y EdgesGeometry junta los vértices por
+    // posición, así que la unión da exactamente las mismas aristas que daba
+    // la malla de una pieza en el formato 1. La geometría de la unión solo
+    // vive para esto: EdgesGeometry copia lo que necesita.
+    const geometria = new THREE.BufferGeometry();
+    geometria.setAttribute(
+      'position',
+      new THREE.BufferAttribute(new Float32Array(union), 3),
+    );
+    const bordes = new THREE.EdgesGeometry(geometria, 30);
+    geometria.dispose();
+
+    mallas.set(nombre, { grupos, bordes });
   }
 }
 
@@ -434,8 +463,13 @@ function construir(piezas) {
 
   for (const p of piezas) {
     const oscura = esOscura(p.color);
-    const material = new THREE.MeshLambertMaterial({
-      color: p.color,
+    // Cada grupo de color lleva su propio material: el cuerpo (colorFijo
+    // null) se pinta del color de la pieza, y los dibujos —la pupila de un
+    // ojo, el «8» de la baldosa— de su color fijo, elija lo que elija quien
+    // construye. La transparencia sí es de la pieza entera: unos ojos opacos
+    // flotando en una pieza fantasma serían más raros que útiles.
+    const materialDe = (colorFijo) => new THREE.MeshLambertMaterial({
+      color: colorFijo || p.color,
       transparent: p.transparente,
       opacity: p.transparente ? 0.45 : 1,
       // Las dos caras, y no solo la de delante.
@@ -472,7 +506,8 @@ function construir(piezas) {
         return objeto;
       };
 
-      const cuerpoMalla = colocar(new THREE.Mesh(malla.cuerpo, material));
+      const cuerposMalla = malla.grupos.map((grupo) =>
+        colocar(new THREE.Mesh(grupo.cuerpo, materialDe(grupo.colorFijo))));
 
       // Los bordes no son adorno: dos piezas del mismo color pegadas son
       // caras coplanares con la misma luz, así que sin ellos una pared de
@@ -486,13 +521,13 @@ function construir(piezas) {
         opacity: opacidadBorde,
       })));
 
-      anotar(p, cuerpoMalla, aristasMalla, colorBorde, opacidadBorde);
+      anotar(p, cuerposMalla, aristasMalla, colorBorde, opacidadBorde);
       continue;
     }
 
     // Sin malla, una caja. Es lo que pasa con una pieza que LDraw no tenga.
     const caja = new THREE.BoxGeometry(p.ancho, p.fondo, p.alto);
-    const cuerpo = new THREE.Mesh(caja, material);
+    const cuerpo = new THREE.Mesh(caja, materialDe(null));
     cuerpo.position.set(p.x + p.ancho / 2, p.y + p.fondo / 2, p.z + p.alto / 2);
     modelo.add(cuerpo);
 
@@ -509,21 +544,25 @@ function construir(piezas) {
     aristas.position.copy(cuerpo.position);
     modelo.add(aristas);
 
-    anotar(p, cuerpo, aristas, colorCaja, opacidadCaja);
+    anotar(p, [cuerpo], aristas, colorCaja, opacidadCaja);
   }
 
   pintarSeleccion();
 }
 
-function anotar(p, cuerpo, aristas, color, opacidad) {
+function anotar(p, cuerpos, aristas, color, opacidad) {
   // Una línea puede poner varias piezas —eso hace `repetir`—, así que el
   // número de línea no basta para saber cuál es cuál: hace falta además qué
   // puesto ocupa dentro de su línea. Las dos cosas juntas sobreviven a un
   // recompilado, que es cuando se tira todo lo dibujado y se vuelve a hacer.
+  //
+  // `cuerpos` son las mallas de la pieza, una por grupo de color: pinchar la
+  // pupila de un ojo es pinchar el ojo, así que todas apuntan a la misma
+  // entrada.
   const orden = dibujadas.filter((d) => d.linea === p.linea).length;
-  cuerpo.userData.pieza = dibujadas.length;
+  for (const cuerpo of cuerpos) cuerpo.userData.pieza = dibujadas.length;
   dibujadas.push({
-    linea: p.linea, orden, cuerpo, aristas, color, opacidad, nombre: p.nombre,
+    linea: p.linea, orden, cuerpos, aristas, color, opacidad, nombre: p.nombre,
     caja: { x: p.x, y: p.y, z: p.z, ancho: p.ancho, fondo: p.fondo, alto: p.alto },
   });
 }
@@ -559,7 +598,10 @@ function pintarSeleccion() {
     d.aristas.material.color.set(elegida ? 0x63b3ed : d.color);
     d.aristas.material.opacity = elegida ? 1 : d.opacidad;
     // El borde solo se ve por fuera; el relleno dice cuál es sin taparla.
-    d.cuerpo.material.emissive.set(elegida ? 0x14344f : 0x000000);
+    // Se encienden todos los grupos de color: la pieza es una.
+    for (const cuerpo of d.cuerpos) {
+      cuerpo.material.emissive.set(elegida ? 0x14344f : 0x000000);
+    }
   }
 }
 
@@ -635,9 +677,13 @@ function miniatura(nombreMalla, color) {
   const escenita = new THREE.Scene();
   const grupo = new THREE.Group();
   grupo.rotation.x = -Math.PI / 2;
-  grupo.add(new THREE.Mesh(malla.cuerpo, new THREE.MeshLambertMaterial({
-    color, side: THREE.DoubleSide,
-  })));
+  // Los mismos grupos de color que en el visor: la miniatura de los ojos
+  // enseña sus pupilas, no un cuadrado liso.
+  for (const parte of malla.grupos) {
+    grupo.add(new THREE.Mesh(parte.cuerpo, new THREE.MeshLambertMaterial({
+      color: parte.colorFijo || color, side: THREE.DoubleSide,
+    })));
+  }
   grupo.add(new THREE.LineSegments(malla.bordes, new THREE.LineBasicMaterial({
     color: 0x1a1d24, transparent: true, opacity: 0.4,
   })));
@@ -742,7 +788,7 @@ function sitioParaSoltar(evento) {
   rayo.setFromCamera(puntero, camara);
   const blancos = [suelo, ...dibujadas
     .filter((d) => !moviendo || d !== moviendo)
-    .map((d) => d.cuerpo)];
+    .flatMap((d) => d.cuerpos)];
   const tocado = rayo.intersectObjects(blancos, false)[0];
   if (!tocado) return null;
 
@@ -854,7 +900,7 @@ function resaltarProblema(lineasProblema) {
     if (lineasProblema.includes(d.linea)) {
       d.aristas.material.color.set(0xff6b6b);
       d.aristas.material.opacity = 1;
-      d.cuerpo.material.emissive.set(0x5a1a1a);
+      for (const cuerpo of d.cuerpos) cuerpo.material.emissive.set(0x5a1a1a);
     }
   }
   setTimeout(pintarSeleccion, 4000);
@@ -1009,7 +1055,7 @@ lienzo.addEventListener('pointerup', (evento) => {
     puntero.x = ((evento.clientX - caja2.left) / caja2.width) * 2 - 1;
     puntero.y = -((evento.clientY - caja2.top) / caja2.height) * 2 + 1;
     rayo.setFromCamera(puntero, camara);
-    const tocada = rayo.intersectObjects(dibujadas.map((d) => d.cuerpo), false)[0];
+    const tocada = rayo.intersectObjects(dibujadas.flatMap((d) => d.cuerpos), false)[0];
     const cual = tocada ? dibujadas[tocada.object.userData.pieza] : null;
     if (cual && cual.linea != null) {
       piezaDelMenu = cual;
@@ -1049,7 +1095,7 @@ lienzo.addEventListener('pointerup', (evento) => {
   rayo.setFromCamera(puntero, camara);
 
   // Solo los cuerpos: pinchar un borde es pinchar un pelo.
-  const tocadas = rayo.intersectObjects(dibujadas.map((d) => d.cuerpo), false);
+  const tocadas = rayo.intersectObjects(dibujadas.flatMap((d) => d.cuerpos), false);
   const pieza = tocadas.length ? dibujadas[tocadas[0].object.userData.pieza] : null;
 
   // Una pieza importada de un JSON no viene de ninguna línea. Se dibuja, pero

@@ -18,6 +18,14 @@ líneas numeradas por tipo. Solo interesan dos:
 La línea 1 coloca otro archivo con una matriz de 3x3 y una traslación. Es
 recursiva: una viga referencia una subpieza que referencia los agujeros.
 
+El color: el campo que sigue al tipo de línea. El código 16 significa
+«hereda del padre»: al bajar por una línea 1, un triángulo con 16 acaba del
+color con que se referenció el subarchivo. En el nivel raíz, 16 es «el color
+principal de la pieza», el que elige quien construye. El 24 es lo mismo para
+las aristas y aquí se trata igual. Cualquier otro código es un color FIJO de
+LDraw (0 negro, 15 blanco, 4 rojo...): la pupila de un ojo es negra la pinte
+quien la pinte.
+
 Unidades: 1 LDU = 0,4 mm. Un stud son 20 LDU, una placa 8 y un ladrillo 24.
 Ojo con los ejes: en LDraw Y es la vertical y apunta hacia ABAJO.
 """
@@ -213,16 +221,25 @@ class Pieza:
     nombre: str
     palabras: list[str] = field(default_factory=list)
     licencia: str = ""
-    vertices: list[Punto] = field(default_factory=list)
+    #: Los triángulos, agrupados por su código de color YA RESUELTO: "16" es
+    #: el cuerpo pintable y el resto son colores fijos de LDraw. Una pieza
+    #: lisa tiene un solo grupo; los ojos tienen la pupila en el suyo.
+    grupos: dict[str, list[Punto]] = field(default_factory=dict)
     conexiones: list[Conexion] = field(default_factory=list)
+
+    @property
+    def vertices(self) -> list[Punto]:
+        """Todos los vértices, sin distinguir color: lo que miden las cajas."""
+        return [v for grupo in self.grupos.values() for v in grupo]
 
     def caja(self) -> tuple[Punto, Punto]:
         """Esquinas mínima y máxima, en LDU."""
-        if not self.vertices:
+        vertices = self.vertices
+        if not vertices:
             return Punto(0, 0, 0), Punto(0, 0, 0)
-        xs = [v.x for v in self.vertices]
-        ys = [v.y for v in self.vertices]
-        zs = [v.z for v in self.vertices]
+        xs = [v.x for v in vertices]
+        ys = [v.y for v in vertices]
+        zs = [v.z for v in vertices]
         return Punto(min(xs), min(ys), min(zs)), Punto(max(xs), max(ys), max(zs))
 
     def medidas(self) -> tuple[float, float, float]:
@@ -312,7 +329,11 @@ class Biblioteca:
         pieza: Pieza,
         profundidad: int,
         visitados: set[str],
+        color: str = "16",
     ) -> None:
+        # `color` es el color con que ESTE archivo fue referenciado: es lo que
+        # vale un 16 aquí dentro. En la raíz empieza en "16", así que lo que
+        # nadie pinta queda en el grupo pintable.
         # Los ciclos no deberían existir en LDraw, pero un archivo mal formado
         # no debe colgar la herramienta.
         if profundidad > 30:
@@ -351,8 +372,16 @@ class Biblioteca:
                     )
 
                 if self.existe(subarchivo):
+                    # El 16 hereda: el subarchivo se pinta del color con que
+                    # se le referencia, y si esa referencia también dice 16,
+                    # del que ya traíamos. El 24 (color de arista) hereda
+                    # igual; en la práctica no llega a los triángulos.
+                    heredado = (
+                        color if campos[1] in ("16", "24") else campos[1]
+                    )
                     self._recorrer(
-                        subarchivo, completa, pieza, profundidad + 1, visitados
+                        subarchivo, completa, pieza, profundidad + 1,
+                        visitados, heredado,
                     )
 
             elif campos[0] in ("3", "4") and len(campos) >= 11:
@@ -362,15 +391,19 @@ class Biblioteca:
                     transformacion.aplicar(Punto(*numeros[i * 3 : i * 3 + 3]))
                     for i in range(cuantos)
                 ]
+                # El grupo del triángulo: su código, con el 16 (y el 24) ya
+                # resueltos al color del padre.
+                final = color if campos[1] in ("16", "24") else campos[1]
+                grupo = pieza.grupos.setdefault(final, [])
                 # Un cuadrilátero se parte en dos triángulos. Guardarlo con sus
                 # cuatro esquinas bastaba para medir la caja, pero para dibujar
                 # no: los vértices se leen de tres en tres, así que un cuarto
                 # vértice suelto desplazaría todo lo que venga detrás y la
                 # malla saldría hecha trizas.
                 if cuantos == 4:
-                    pieza.vertices += [
+                    grupo += [
                         esquinas[0], esquinas[1], esquinas[2],
                         esquinas[0], esquinas[2], esquinas[3],
                     ]
                 else:
-                    pieza.vertices += esquinas
+                    grupo += esquinas

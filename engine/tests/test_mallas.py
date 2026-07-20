@@ -26,19 +26,54 @@ class ArchivoTests(unittest.TestCase):
         cls.doc = json.loads(_MALLAS.read_text(encoding="utf-8"))
 
     def test_it_is_a_versioned_format(self) -> None:
+        # La versión 2 agrupa los triángulos por código de color. La 1 los
+        # traía en una sola lista y tiraba el color: los ojos del set se
+        # veían blanco sobre blanco.
         self.assertEqual(self.doc["formato"], "blockcad-mallas")
-        self.assertEqual(self.doc["version"], 1)
+        self.assertEqual(self.doc["version"], 2)
 
     def test_the_source_is_credited(self) -> None:
         # La CC BY 4.0 exige que la atribución viaje con la geometría.
         self.assertIn("LDraw", self.doc["origen"])
         self.assertIn("CC BY", self.doc["origen"])
 
-    def test_every_mesh_is_whole_triangles(self) -> None:
-        for nombre, triangulos in self.doc["triangulos"].items():
+    def test_every_group_is_whole_triangles(self) -> None:
+        for nombre, grupos in self.doc["triangulos"].items():
             with self.subTest(pieza=nombre):
-                self.assertEqual(len(triangulos) % 9, 0, "sobran vértices")
-                self.assertGreater(len(triangulos), 0)
+                self.assertIsInstance(grupos, dict)
+                self.assertGreater(len(grupos), 0)
+                for codigo, triangulos in grupos.items():
+                    self.assertEqual(
+                        len(triangulos) % 9, 0, f"sobran vértices en {codigo}"
+                    )
+                    self.assertGreater(len(triangulos), 0)
+
+    def test_the_eyes_have_their_pupils(self) -> None:
+        # El molde 16424 son los ojos del set: cuerpo pintable ("16") y la
+        # pupila en negro fijo ("0"). Con el formato viejo —una sola lista—
+        # esta prueba no puede pasar: no había más que un grupo.
+        grupos = self.doc["triangulos"]["16424"]
+        self.assertIn("16", grupos)
+        self.assertGreater(len(grupos), 1)
+        self.assertIn("0", grupos)
+
+    def test_a_plain_brick_has_only_its_paintable_body(self) -> None:
+        # Un ladrillo liso no trae dibujos: todo él es del color que se elija.
+        self.assertEqual(set(self.doc["triangulos"]["3001"]), {"16"})
+
+    def test_fixed_colors_come_with_their_hex(self) -> None:
+        # Cada código fijo que use alguna malla tiene que decir su hex, o el
+        # visor no sabría pintarlo. El "16" no: no es un color, es «píntame».
+        colores = self.doc["colores_ldraw"]
+        usados = {
+            codigo
+            for grupos in self.doc["triangulos"].values()
+            for codigo in grupos
+        }
+        for codigo in usados - {"16"}:
+            with self.subTest(codigo=codigo):
+                self.assertRegex(colores[codigo], r"^#[0-9A-Fa-f]{6}$")
+        self.assertNotIn("16", colores)
 
     def test_every_mesh_declares_its_extent(self) -> None:
         # Hace falta para reanclarla al girarla, y no es la de la caja.
@@ -73,27 +108,32 @@ class EncajeTests(unittest.TestCase):
 
         fuera = 0
         for pieza in escena["piezas"]:
-            malla = self.triangulos.get(pieza["malla"])
-            self.assertIsNotNone(malla, f"sin malla: {pieza['malla']}")
+            grupos = self.triangulos.get(pieza["malla"])
+            self.assertIsNotNone(grupos, f"sin malla: {pieza['malla']}")
             matriz, origen = pieza["matriz"], pieza["origen"]
             caja = (
                 (pieza["x"], pieza["x"] + pieza["ancho"]),
                 (pieza["y"], pieza["y"] + pieza["fondo"]),
                 (pieza["z"], pieza["z"] + pieza["alto"]),
             )
-            for i in range(0, len(malla), 3):
-                punto = malla[i], malla[i + 1], malla[i + 2]
-                for eje in range(3):
-                    valor = (
-                        sum(matriz[eje][k] * punto[k] for k in range(3))
-                        + origen[eje]
-                    )
-                    bajo, alto = caja[eje]
-                    if not (
-                        bajo - ALTO_STUD - 0.5 <= valor <= alto + ALTO_STUD + 0.5
-                    ):
-                        fuera += 1
-                        break
+            # TODOS los grupos de color: la pupila tiene que caer dentro de
+            # la caja igual que el cuerpo.
+            for malla in grupos.values():
+                for i in range(0, len(malla), 3):
+                    punto = malla[i], malla[i + 1], malla[i + 2]
+                    for eje in range(3):
+                        valor = (
+                            sum(matriz[eje][k] * punto[k] for k in range(3))
+                            + origen[eje]
+                        )
+                        bajo, alto = caja[eje]
+                        if not (
+                            bajo - ALTO_STUD - 0.5
+                            <= valor
+                            <= alto + ALTO_STUD + 0.5
+                        ):
+                            fuera += 1
+                            break
         return fuera
 
     def test_a_piece_without_turning(self) -> None:
@@ -147,21 +187,36 @@ class EncajeTests(unittest.TestCase):
 
 class ServidorTests(unittest.TestCase):
     def test_it_only_sends_what_is_asked(self) -> None:
-        # El archivo son 3,6 MB y 99 piezas; un modelo usa un puñado.
+        # El archivo son 5 MB y 99 piezas; un modelo usa un puñado.
         from blockcad_web.server import mallas_pedidas
 
         recibido = mallas_pedidas(json.dumps(["3001"]))
-        self.assertEqual(list(recibido), ["3001"])
+        self.assertEqual(list(recibido["mallas"]), ["3001"])
+
+    def test_the_colors_travel_with_their_meshes(self) -> None:
+        # Los ojos usan negro fijo: su hex tiene que venir en la respuesta,
+        # o el visor no sabría de qué pintar la pupila.
+        from blockcad_web.server import mallas_pedidas
+
+        recibido = mallas_pedidas(json.dumps(["16424"]))
+        self.assertIn("0", recibido["mallas"]["16424"])
+        self.assertRegex(recibido["colores_ldraw"]["0"], r"^#[0-9A-Fa-f]{6}$")
+        # Y solo los códigos que lo pedido usa, no la tabla entera.
+        usados = {c for g in recibido["mallas"].values() for c in g}
+        self.assertEqual(set(recibido["colores_ldraw"]), usados - {"16"})
 
     def test_an_unknown_mesh_is_just_missing(self) -> None:
         from blockcad_web.server import mallas_pedidas
 
-        self.assertEqual(mallas_pedidas(json.dumps(["no_existe"])), {})
+        recibido = mallas_pedidas(json.dumps(["no_existe"]))
+        self.assertEqual(recibido, {"mallas": {}, "colores_ldraw": {}})
 
     def test_rubbish_does_not_break_it(self) -> None:
         from blockcad_web.server import mallas_pedidas
 
-        self.assertEqual(mallas_pedidas("{no es json"), {})
+        self.assertEqual(
+            mallas_pedidas("{no es json"), {"mallas": {}, "colores_ldraw": {}}
+        )
 
     def test_the_scene_says_which_mesh_to_draw(self) -> None:
         escena = compile_source("ladrillo 2x4 en 0,0,0")

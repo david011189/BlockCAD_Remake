@@ -46,7 +46,7 @@ baldosa 1x2 en 1,1,16 color blanco
 
 @lru_cache(maxsize=1)
 def _archivo_mallas() -> dict:
-    """Las mallas. 3,6 MB, así que se leen una sola vez."""
+    """Las mallas. 5 MB, así que se leen una sola vez."""
     archivo = _DATOS / "mallas_45300.json"
     if not archivo.is_file():
         return {"triangulos": {}, "extension": {}}
@@ -265,20 +265,33 @@ def piezas_para_soltar(texto: str) -> dict:
 
 
 def mallas_pedidas(texto: str) -> dict:
-    """Devuelve solo las mallas que hagan falta.
+    """Devuelve solo las mallas que hagan falta, con sus colores.
 
-    El archivo entero son 3,6 MB y 99 piezas; un modelo usa un puñado. Mandarlo
+    El archivo entero son 5 MB y 99 piezas; un modelo usa un puñado. Mandarlo
     todo en cada compilación sería tirar el ancho de banda por gusto.
+
+    Formato 2: cada malla trae sus triángulos agrupados por código de color
+    —"16" es el cuerpo pintable, el resto son fijos: la pupila de un ojo es
+    negra la pinte quien la pinte—, y `colores_ldraw` dice el hex de cada
+    código fijo que aparezca en lo pedido.
     """
+    vacio = {"mallas": {}, "colores_ldraw": {}}
     try:
         pedidas = json.loads(texto)
     except json.JSONDecodeError:
-        return {}
-    disponibles = _archivo_mallas()["triangulos"]
-    return {
+        return vacio
+    documento = _archivo_mallas()
+    disponibles = documento["triangulos"]
+    mallas = {
         nombre: disponibles[nombre]
         for nombre in pedidas
         if isinstance(nombre, str) and nombre in disponibles
+    }
+    usados = {codigo for grupos in mallas.values() for codigo in grupos}
+    colores = documento.get("colores_ldraw", {})
+    return {
+        "mallas": mallas,
+        "colores_ldraw": {c: colores[c] for c in sorted(usados) if c in colores},
     }
 
 
