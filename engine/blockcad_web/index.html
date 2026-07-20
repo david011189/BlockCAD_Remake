@@ -715,13 +715,22 @@ addEventListener('keydown', (evento) => {
     ArrowUp: [0, -PASO],
     ArrowDown: [0, PASO],
   };
+  // Re Pag y Av Pag acercan y alejan: el zoom del teclado.
+  const zoom = { PageUp: 0.9, PageDown: 1 / 0.9 }[evento.key];
   const giro = giros[evento.key];
-  if (!giro) return;
+  if (!giro && !zoom) return;
   evento.preventDefault();
   const desde = camara.position.clone().sub(controles.target);
   const esfera = new THREE.Spherical().setFromVector3(desde);
-  esfera.theta += giro[0];
-  esfera.phi = Math.min(Math.PI - 0.05, Math.max(0.05, esfera.phi + giro[1]));
+  if (giro) {
+    esfera.theta += giro[0];
+    esfera.phi = Math.min(Math.PI - 0.05, Math.max(0.05, esfera.phi + giro[1]));
+  }
+  if (zoom) {
+    // Acotado como el propio OrbitControls: ni dentro de la pieza ni en
+    // la estratosfera.
+    esfera.radius = Math.min(400, Math.max(0.5, esfera.radius * zoom));
+  }
   desde.setFromSpherical(esfera);
   camara.position.copy(controles.target).add(desde);
   camara.lookAt(controles.target);
@@ -819,7 +828,7 @@ opcionConectar.addEventListener('click', () => {
   );
   fantasma.visible = false;
   modelo.add(fantasma);
-  decir('Mueve el raton y pincha donde conectarla. Flechas: girar la camara. Esc cancela.');
+  decir('Mueve el raton y pincha donde conectarla. Flechas: girar la camara; RePag/AvPag: acercar y alejar. Esc cancela.');
 });
 
 opcionGirar.addEventListener('click', async () => {

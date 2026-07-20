@@ -238,6 +238,14 @@ class InventarioTests(unittest.TestCase):
         antes = html.split("const giros = {")[0]
         self.assertIn("donde === areaCodigo || donde === areaOrden", antes)
 
+    def test_page_keys_zoom_while_placing(self) -> None:
+        # Re Pag acerca, Av Pag aleja, con el radio acotado como el propio
+        # OrbitControls: ni dentro de la pieza ni en la estratosfera.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("PageUp: 0.9", html)
+        self.assertIn("PageDown: 1 / 0.9", html)
+        self.assertIn("esfera.radius = Math.min(400, Math.max(0.5", html)
+
     def test_the_footer_reports_it(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn("datos.agotadas", html)
