@@ -200,6 +200,20 @@ class InventarioTests(unittest.TestCase):
         self.assertIn("no se puede separar una sola", sep)
         self.assertLess(sep.index("fetch('/api/modelo'"), sep.index("aplicar(propuesta)"))
 
+    def test_the_page_has_no_control_characters(self) -> None:
+        """Un retroceso invisible (x08) vivio dentro de un regex del visor.
+
+        Era el resto de un backslash-b comido por una capa del shell: el
+        regex exigia un caracter de control que ningun texto tiene, y
+        desconectar respondia siempre «No he sabido reescribir esa linea».
+        Invisible al leer, letal al ejecutar: lo encontro un usuario y lo
+        cazo la comparacion byte a byte.
+        """
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        raros = {c for c in html if ord(c) < 32 and c not in "
+	"}
+        self.assertEqual(raros, set())
+
     def test_the_footer_reports_it(self) -> None:
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn("datos.agotadas", html)

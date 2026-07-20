@@ -731,7 +731,7 @@ opcionQuitar.addEventListener('click', async () => {
 
   const lineas = areaCodigo.value.split('\n');
   const vieja = lineas[cual.linea - 1];
-  const partes = vieja.match(/^(\s*)(\S+(?:\s+\d+(?:x\d+)?)?)\s+((?:encima|en).*)$/);
+  const partes = vieja.match(/^(\s*)(\S+(?:\s+\d+(?:x\d+)?)?)\s+((?:encima|en).*)$/);
   if (!partes) {
     decir('No he sabido reescribir esa linea.', 'fallo');
     return;
