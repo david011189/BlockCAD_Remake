@@ -1,7 +1,10 @@
 catalogo "wedo"
-modelo "Compuerta de riego"
+modelo "Estacion de riego"
 
 32059 en 9,1,0 color #DDC48E
+32059 en 9,7,0 color #DDC48E
+3666 en 9,1,1 rot 90 color #F57D20
+3666 en 9,3,1 rot 90 color #F57D20
 3710 en 10,5,0 rot 90 color #F4F4F4
 3710 en 10,6,0 rot 90 color #F4F4F4
 28698 en 10,5,1 color #F5F3F0
@@ -10,6 +13,28 @@ modelo "Compuerta de riego"
 3706 en 7.55,5.7,3 rot 90 color #1B1B1B
 21980 en 1.5,4.5,0 rot 90 color #DDDEDC
 19071 en 1.5,4.5,7 color #F5F3F0
+3004 en 0.5,5.5,0 color #F57D20
+3004 en 0.5,5.5,3 color #F57D20
+3004 en 7.5,5.5,0 color #F57D20
+16424 en 2.5,5.5,16 color #F4F4F4
+16424 en 5.5,5.5,16 color #F4F4F4
 3706 en 11.7,1.5,8 color #1B1B1B
-10928 en 11.4,2.3,7.25 color #6C6E68
-3743 en 10.9,1.8,3 rot y 90 color #A5CA18
+3702 en 9,7,1 rot 90 color #F5F3F0
+3701 en 9,7,4 rot 90 color #F5F3F0
+3701 en 13,7,4 rot 90 color #F5F3F0
+3702 en 9,7,7 rot 90 color #F5F3F0
+4162 en 9,7,10 rot 90 color #F57D20
+2780 en 10.6,6.6,7.75 rot 90 color #1B1B1B
+2780 en 12.6,6.6,7.75 rot 90 color #1B1B1B
+10928 en 11.4,2.5,7.25 color #6C6E68
+3743 en 10.9,2,3 rot y 90 color #A5CA18
+35390 en 9.9,2,1 color #F57D20
+35390 en 9.9,2,4 color #F57D20
+35390 en 9.9,2,7 color #F57D20
+35390 en 11.6,2,1 color #F57D20
+35390 en 11.6,2,4 color #F57D20
+39223 en 13,9,1 color #2A9FD8
+39223 en 13,9,4.5 color #2A9FD8
+39223 en 13,9,8 color #2A9FD8
+39223 en 13,9,11.5 color #2A9FD8
+15535 en 13,9,15 color #F5F3F0
