@@ -591,6 +591,7 @@ function anotar(p, cuerpos, aristas, color, opacidad) {
     agarre: p.agarre, agarreEje: p.agarre_eje,
     engrane: p.engrane, cremallera: p.cremallera, conjunto: p.conjunto,
     grupo: p.grupo,
+    giro: p.giro, carrera: p.carrera,
     machoCentro: p.macho_centro, machoEje: p.macho_eje, bocas: p.bocas,
     caja: { x: p.x, y: p.y, z: p.z, ancho: p.ancho, fondo: p.fondo, alto: p.alto },
   });
@@ -2329,6 +2330,18 @@ async function enviar() {
     aplicar('');
     areaOrden.value = '';
     decir('Editor vacío. Puedes recuperarlo con "deshacer".', 'hecho');
+  } else if (orden === 'motor' && resto.join(' ') === 'en este sentido') {
+    marcha = 1;
+    areaOrden.value = '';
+    decir('Motor en marcha. La cadena gira; "parar motor" la detiene.', 'hecho');
+  } else if (orden === 'motor' && resto.join(' ') === 'en otro sentido') {
+    marcha = -1;
+    areaOrden.value = '';
+    decir('Motor en marcha, al reves. "parar motor" lo detiene.', 'hecho');
+  } else if (orden === 'parar' && resto.join(' ') === 'motor') {
+    marcha = 0;
+    areaOrden.value = '';
+    decir('Motor parado. Las piezas se quedan donde el giro las dejo.', 'hecho');
   } else if (soloUna && orden === 'deshacer') {
     deshacer();
     areaOrden.value = '';
@@ -2388,9 +2401,54 @@ function ajustar() {
 }
 addEventListener('resize', ajustar);
 
-function bucle() {
+// --- La marcha: el motor de la escena, animado -------------------------
+//
+// El servidor ya dijo como se mueve cada pieza cuando el motor da una
+// vuelta patron (su giro o su carrera, con su razon). Aqui solo se lleva
+// la cuenta del angulo del motor y se aplica a cada pieza sobre su matriz
+// original. La cremallera corre con tope, para no salirse de los dientes.
+let marcha = 0;          // -1, 0, +1: el sentido del motor
+let anguloMotor = 0;     // radianes acumulados del motor
+let ultimoInstante = null;
+const VELOCIDAD_MOTOR = 3; // rad/s a potencia de demostracion
+const TOPE_CARRERA = 36;   // LDU de recorrido de una cremallera
+
+function animarMarcha(instante) {
+  if (ultimoInstante === null) ultimoInstante = instante;
+  const dt = Math.min(0.1, (instante - ultimoInstante) / 1000);
+  ultimoInstante = instante;
+  if (marcha) anguloMotor += marcha * VELOCIDAD_MOTOR * dt;
+
+  for (const d of dibujadas) {
+    if (!d.giro && !d.carrera) continue;
+    const objetos = [...d.cuerpos, d.aristas];
+    if (!d.matricesBase) {
+      d.matricesBase = objetos.map((o) => o.matrix.clone());
+    }
+    let extra = null;
+    if (d.giro) {
+      const eje = new THREE.Vector3(...d.giro.eje).normalize();
+      const punto = new THREE.Vector3(...d.giro.punto);
+      extra = new THREE.Matrix4().makeTranslation(punto.x, punto.y, punto.z)
+        .multiply(new THREE.Matrix4().makeRotationAxis(eje, anguloMotor * d.giro.razon))
+        .multiply(new THREE.Matrix4().makeTranslation(-punto.x, -punto.y, -punto.z));
+    } else {
+      const eje = new THREE.Vector3(...d.carrera.eje).normalize();
+      const paso = Math.max(-TOPE_CARRERA, Math.min(TOPE_CARRERA,
+        anguloMotor * d.carrera.razon));
+      extra = new THREE.Matrix4().makeTranslation(
+        eje.x * paso, eje.y * paso, eje.z * paso);
+    }
+    objetos.forEach((o, i) => {
+      o.matrix.copy(extra).multiply(d.matricesBase[i]);
+    });
+  }
+}
+
+function bucle(instante) {
   requestAnimationFrame(bucle);
   ajustar();
+  animarMarcha(instante || 0);
   controles.update();
   renderer.render(escena, camara);
 }

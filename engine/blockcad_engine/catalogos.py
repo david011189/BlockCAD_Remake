@@ -207,6 +207,13 @@ def _cremallera(nombre_ldraw: str) -> dict[str, str]:
     return {}
 
 
+def _motor(nombre_ldraw: str) -> dict[str, str]:
+    """Si la pieza es un motor: la fuente de todo giro."""
+    if "Medium Motor" in re.sub(r"\s+", " ", nombre_ldraw):
+        return {"motor": "1"}
+    return {}
+
+
 def _sinfin(nombre_ldraw: str) -> dict[str, str]:
     """Si la pieza es un tornillo sin fin, por su nombre de LDraw.
 
@@ -262,6 +269,7 @@ def _definicion(pieza: dict) -> PartDefinition:
             **_dientes(pieza["nombre_ldraw"]),
             **_sinfin(pieza["nombre_ldraw"]),
             **_cremallera(pieza["nombre_ldraw"]),
+            **_motor(pieza["nombre_ldraw"]),
             **_rueda(pieza["nombre_ldraw"]),
             **({"acoge": _ACOGE[pieza["diseno"]]} if pieza["diseno"] in _ACOGE else {}),
         },

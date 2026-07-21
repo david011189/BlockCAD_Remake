@@ -140,6 +140,7 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
     enganchadas |= con_soporte
 
     conjuntos = _conjuntos(model)
+    cinematica = _cinematica(model)
 
     piezas = []
     for item in model.instances:
@@ -162,6 +163,7 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
                 "molde": item.part_id,
                 "conjunto": conjuntos[item.instance_id],
                 "grupo": item.group or None,
+                **cinematica.get(item.instance_id, {}),
                 **_acogida(item, definition),
                 **_agarre(item, definition),
                 **_machos(item, definition),
@@ -256,6 +258,156 @@ def _agarre(item, definition) -> dict:
             p[2] - item.position.z,
         ],
         "agarre_eje": list(agujeros[0].eje),
+    }
+
+
+def _cinematica(model: BlockModel) -> dict[str, dict]:
+    """Como se mueve cada pieza cuando el motor gira a una vuelta patron.
+
+    El grafo ya lo conocia la fisica; aqui solo se recorre desde el motor:
+
+    - Recta compartida EN CRUZ gira junta (razon 1). Lo redondo resbala,
+      como enseño la prueba en plastico: un eje en agujero redondo no
+      transmite.
+    - Dos ruedas dentadas engranadas: razon -dientes_a/dientes_b.
+    - El sinfin reduce a 1/dientes, en angulo recto.
+    - La rueda muerde a la cremallera: el giro se hace CARRERA, radio
+      primitivo por radian, con el sentido del punto de contacto.
+    - El neumatico gira con su llanta (razon 1).
+
+    Devuelve, por instancia: {"giro": {punto, eje, razon}} para las que
+    giran o {"carrera": {eje, razon}} para las que corren.
+    """
+    from blockcad_engine.model import (
+        _muerden,
+        _muerde_sinfin,
+        _muerde_cremallera,
+        _calzan,
+        _paralelas,
+    )
+
+    piezas = list(model.instances)
+    defs = {p.instance_id: model.catalog.get(p.part_id) for p in piezas}
+    conex = {
+        p.instance_id: list(p.world_connections(defs[p.instance_id]))
+        for p in piezas
+    }
+
+    def cruces(p):
+        return [c for c in conex[p.instance_id] if c.tipo == "agujero_eje"]
+
+    def machos(p):
+        return [c for c in conex[p.instance_id] if c.es_macho]
+
+    movimiento: dict[str, dict] = {}
+    pendientes = []
+    for p in piezas:
+        if defs[p.instance_id].metadata.get("motor"):
+            boca = cruces(p)[0]
+            movimiento[p.instance_id] = {"giro": {
+                "punto": list(boca.punto), "eje": list(boca.eje), "razon": 1.0,
+            }}
+            pendientes.append(p)
+
+    while pendientes:
+        actual = pendientes.pop()
+        mio = movimiento[actual.instance_id].get("giro")
+        if not mio:
+            continue
+        d_act = defs[actual.instance_id]
+        for otra in piezas:
+            if otra.instance_id in movimiento:
+                continue
+            d_otra = defs[otra.instance_id]
+
+            # Recta compartida en cruz: mismo giro. Vale macho-a-cruz en
+            # los dos sentidos (el eje mueve al gusano; el motor al eje).
+            recta = None
+            for a, b in ((actual, otra), (otra, actual)):
+                for mc in machos(a):
+                    for cz in cruces(b):
+                        if mc.misma_recta_que(cz):
+                            recta = cz if b is otra else mc
+                if recta:
+                    break
+            if recta is None and cruces(otra):
+                # El motor no tiene macho: su boca en cruz comparte recta
+                # con el eje que agarra.
+                for ca in cruces(actual):
+                    for cz in cruces(otra):
+                        if ca.misma_recta_que(cz):
+                            recta = cz
+            if recta is not None:
+                movimiento[otra.instance_id] = {"giro": {
+                    "punto": list(recta.punto),
+                    "eje": list(recta.eje),
+                    "razon": mio["razon"],
+                }}
+                pendientes.append(otra)
+                continue
+
+            # Mordida entre ruedas paralelas: razon de dientes, contraria.
+            da = d_act.metadata.get("dientes")
+            db = d_otra.metadata.get("dientes")
+            if da and db and _muerden(actual, d_act, otra, d_otra):
+                eje_b = cruces(otra)[0]
+                movimiento[otra.instance_id] = {"giro": {
+                    "punto": list(eje_b.punto),
+                    "eje": list(eje_b.eje),
+                    "razon": -mio["razon"] * int(da) / int(db),
+                }}
+                pendientes.append(otra)
+                continue
+
+            # El sinfin muerde en angulo recto: una vuelta, un diente.
+            if (
+                d_act.metadata.get("sinfin")
+                and db
+                and _muerde_sinfin(actual, d_act, otra, d_otra)
+            ):
+                eje_b = cruces(otra)[0]
+                movimiento[otra.instance_id] = {"giro": {
+                    "punto": list(eje_b.punto),
+                    "eje": list(eje_b.eje),
+                    "razon": mio["razon"] / int(db),
+                }}
+                pendientes.append(otra)
+                continue
+
+            # La rueda muerde a la cremallera: giro hecho carrera.
+            if (
+                da
+                and d_otra.metadata.get("cremallera")
+                and _muerde_cremallera(actual, d_act, otra, d_otra)
+            ):
+                eje_a = cruces(actual)[0]
+                radio = int(da) * 1.25
+                filas = otra.orientation.filas
+                normal = [filas[i][2] for i in range(3)]
+                # v = eje x r: del eje de la rueda al punto de contacto.
+                v = [
+                    mio["eje"][1] * normal[2] - mio["eje"][2] * normal[1],
+                    mio["eje"][2] * normal[0] - mio["eje"][0] * normal[2],
+                    mio["eje"][0] * normal[1] - mio["eje"][1] * normal[0],
+                ]
+                movimiento[otra.instance_id] = {"carrera": {
+                    "eje": v,
+                    "razon": mio["razon"] * radio,
+                }}
+                continue
+
+            # El neumatico gira con su llanta.
+            if _calzan(actual, d_act, otra, d_otra):
+                movimiento[otra.instance_id] = {"giro": dict(mio)}
+                pendientes.append(otra)
+                continue
+
+    # El motor es la FUENTE: su rotor gira por dentro, pero su carcasa se
+    # queda quieta. Sirvio para arrancar el recorrido y aqui se despide.
+    return {
+        clave: mov
+        for clave, mov in movimiento.items()
+        if not defs[clave].metadata.get("motor")
     }
 
 

@@ -345,6 +345,29 @@ class PaletaTests(unittest.TestCase):
         self.assertIn("pieza.grupo && !esLaElegida(pieza)", html)
         self.assertIn("arrastrable.grupo", html)
 
+    def test_the_scene_carries_the_kinematics(self) -> None:
+        # El giro del motor se propaga por el grafo que ya conocia la
+        # fisica: recta compartida en cruz gira junta (lo redondo
+        # resbala), el sinfin reduce a 1/dientes, la cremallera hace
+        # carrera a radio primitivo por radian. El motor mismo no gira:
+        # es la fuente y su carcasa se queda quieta.
+        escena = compile_source(
+            'catalogo "wedo"\n'
+            '21980 en 1.5,4.5,0 rot 90\n'
+            '3706 en 7.55,5.7,3 rot 90\n'
+            '10928 en 11.5,5.4,2.25 rot 90'
+        )
+        motor, eje, pinon = escena["piezas"]
+        self.assertIsNone(motor.get("giro"))
+        self.assertEqual(eje["giro"]["razon"], 1.0)
+        self.assertEqual(pinon["giro"]["razon"], 1.0)
+        self.assertEqual(pinon["giro"]["eje"], [1.0, 0.0, 0.0])
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("function animarMarcha", html)
+        self.assertIn("makeRotationAxis(eje, anguloMotor * d.giro.razon)", html)
+        self.assertIn("orden === 'motor' && resto.join(' ') === 'en este sentido'", html)
+        self.assertIn("orden === 'parar' && resto.join(' ') === 'motor'", html)
+
     def test_the_rack_magnet_is_tangent(self) -> None:
         # Cada rueda dentada publica su engrane (eje mundial y radio
         # primitivo) y la cremallera su normal con su paso: el visor hace
