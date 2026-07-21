@@ -394,6 +394,55 @@ def _eje_redondo(pieza: PlacedPart, definicion: PartDefinition) -> int | None:
     return None
 
 
+#: Lo que un stud sobresale del techo de su pieza. La caja no lo cuenta
+#: (ver `Dimensions`), pero el plástico existe: para quien no tiene
+#: cavidades, estos 4 LDU son volumen como cualquier otro.
+_ALTO_STUD = 4
+
+#: La recta vertical, ya en forma canónica.
+_VERTICAL = (0.0, 0.0, 1.0)
+
+
+def _clava_studs(
+    a: PlacedPart,
+    def_a: PartDefinition,
+    b: PlacedPart,
+    def_b: PartDefinition,
+) -> bool:
+    """¿Se le clavan a una pieza los studs de la que tiene debajo?
+
+    Que las cajas no cuenten los studs es un trato con letra pequeña: los
+    4 LDU que sobresalen se meten en las cavidades de la pieza de arriba,
+    así que solo vale para quien las tiene. Un ladrillo o una baldosa
+    abrazan el stud con su reverso hueco; un eje, un pin o un engranaje son
+    macizos por debajo, y apoyarlos a la altura exacta del tope es clavarles
+    los studs en el plástico. Lo mismo si la pieza va girada y ofrece un
+    costado: las cavidades están en su base, no en sus paredes.
+
+    La zona prohibida es el stud entero: desde el techo de la pieza de abajo
+    hasta donde llega su punta. Una pieza maciza cuya base caiga dentro de
+    ese tramo, con un stud bajo su planta, está atravesada aunque las cajas
+    ni se rocen.
+    """
+    for arriba, abajo, d_arr, d_ab in ((a, b, def_a, def_b), (b, a, def_b, def_a)):
+        if d_arr.has_bottom_cavities and arriba.orientation.keeps_z_up:
+            continue
+        caja_arr = arriba.bounds(d_arr)
+        caja_ab = abajo.bounds(d_ab)
+        if not caja_ab.max_z <= caja_arr.min_z < caja_ab.max_z + _ALTO_STUD:
+            continue
+        for c in abajo.world_connections(d_ab):
+            if (
+                c.tipo in ("stud", "stud_hueco")
+                and c.punto[2] == caja_ab.max_z
+                and c.eje == _VERTICAL
+                and caja_arr.min_x < c.punto[0] < caja_arr.max_x
+                and caja_arr.min_y < c.punto[1] < caja_arr.max_y
+            ):
+                return True
+    return False
+
+
 def _recta_canonica(eje: tuple[float, ...]) -> tuple[float, float, float]:
     """La misma recta, siempre escrita igual.
 
@@ -716,6 +765,13 @@ class BlockModel:
                 continue
             existing_definition = self.catalog.get(existing.part_id)
             if not candidate_bounds.intersects(existing.bounds(existing_definition)):
+                # Cajas que no se invaden pueden mentir: los studs no cuentan
+                # en la caja, y a una pieza sin cavidades apoyada sobre un
+                # tope con studs se le clavan igual.
+                if _clava_studs(
+                    candidate, definition, existing, existing_definition
+                ):
+                    collisions.append(existing)
                 continue
             # Que dos cajas se solapen es un choque para ladrillos de sistema,
             # que se apoyan y se tocan pero nunca se invaden. Technic es lo

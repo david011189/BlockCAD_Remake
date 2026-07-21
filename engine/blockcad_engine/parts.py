@@ -37,6 +37,11 @@ class PartDefinition:
     category: str = "brick"
     default_color: str = "#D62828"
     has_top_studs: bool = True
+    #: Si su cara de abajo es hueca: los tubos y paredes de un ladrillo
+    #: abrazan los studs de la pieza en que se apoya. Un eje, un pin o un
+    #: engranaje son plástico macizo por debajo, y a esos los studs se les
+    #: clavan: no pueden descansar a la altura exacta del tope.
+    has_bottom_cavities: bool = True
     metadata: dict[str, str] = field(default_factory=dict)
     #: Otros nombres por los que responde. Una pieza real se llama por su
     #: número de molde —3001—, pero nadie quiere escribir eso: el alias

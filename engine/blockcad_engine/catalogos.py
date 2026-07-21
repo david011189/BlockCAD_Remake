@@ -164,6 +164,36 @@ _DIENTES_RE = re.compile(r"Gear (\d+) Tooth")
 _ACOGE = {"28698": "32905@22x:20-60 24505@62y:10-30"}
 
 
+#: Familias cuya base es de sistema: hueca por debajo, con las cavidades que
+#: abrazan los studs de la pieza de abajo. Se reconocen por el nombre de
+#: LDraw porque las conexiones no bastan: una baldosa no declara ninguna y
+#: aun así se asienta sobre studs como cualquier placa. «Slope» y «Bracket»
+#: no traen la palabra Brick/Plate pero heredan el mismo reverso.
+_BASE_DE_SISTEMA = re.compile(
+    r"\b(?:Brick|Plate|Tile|Slope|Bracket|Dish|Plant)\b"
+)
+
+
+def _base_hueca(nombre_ldraw: str, conexiones, alto: float) -> bool:
+    """¿Se traga esta pieza los studs de la pieza en que se apoya?
+
+    La caja de una pieza no cuenta los studs porque se meten en las
+    cavidades de la de arriba, pero ese trato solo vale para quien las
+    tiene. Se decide por dos vías: la familia del nombre (todo el sistema
+    de ladrillos es hueco por debajo) y los tubos del reverso, que LDraw
+    dibuja bajo el techo (stud3/stud4): el hub eléctrico o la cremallera
+    no se llaman Brick y aun así montan sobre studs.
+    """
+    if _BASE_DE_SISTEMA.search(re.sub(r"\s+", " ", nombre_ldraw)):
+        return True
+    return any(
+        c["tipo"] in ("stud", "stud_hueco")
+        and c["punto"][2] < alto
+        and tuple(c.get("eje", (0.0, 0.0, 0.0))) == (0.0, 0.0, 1.0)
+        for c in conexiones
+    )
+
+
 def _rueda(nombre_ldraw: str) -> dict[str, str]:
     """Si la pieza es neumatico o llanta, por su nombre de LDraw.
 
@@ -260,6 +290,9 @@ def _definicion(pieza: dict) -> PartDefinition:
         default_color=_color(pieza.get("colores", [])),
         has_top_studs=any(
             c["tipo"] == "stud" for c in pieza.get("conexiones", [])
+        ),
+        has_bottom_cavities=_base_hueca(
+            pieza["nombre_ldraw"], conexiones, alto
         ),
         metadata={
             "ldraw": pieza["ldraw"],
