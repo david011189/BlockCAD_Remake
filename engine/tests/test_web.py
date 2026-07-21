@@ -272,7 +272,11 @@ class PaletaTests(unittest.TestCase):
         # y barra propia, y recolocado ya medido para no salirse de la
         # pantalla por abajo ni por la derecha.
         html = (_WEB / "index.html").read_text(encoding="utf-8")
-        self.assertIn("max-height:min(60vh, calc(100vh - 16px));overflow-y:auto", html)
+        self.assertIn("max-height:min(60vh, calc(100vh - 16px));overflow-y:scroll", html)
+        # La barra vive SIEMPRE en su canal derecho, con los colores del
+        # editor: el usuario la dibujo asi.
+        self.assertIn(".menu-ctx::-webkit-scrollbar", html)
+        self.assertIn("menuCtx.className = 'menu-ctx'", html)
         self.assertIn("innerHeight - menuCtx.offsetHeight - 8", html)
         self.assertIn("innerWidth - menuCtx.offsetWidth - 8", html)
 

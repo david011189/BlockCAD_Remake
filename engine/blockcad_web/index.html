@@ -183,6 +183,21 @@
   #paleta button:hover { border-color: #3a4560; }
   #paleta button.armada { border-color: #63b3ed; color: #63b3ed; }
   #mano.armada { border-color: #63b3ed; color: #63b3ed; }
+  /* La barra del menu contextual: siempre visible en su canal derecho,
+     con los colores del editor, como pidio el dibujo del usuario. */
+  .menu-ctx { scrollbar-width: thin; scrollbar-color: #3a4152 #0f1116; }
+  .menu-ctx::-webkit-scrollbar { width: 12px; }
+  .menu-ctx::-webkit-scrollbar-track {
+    background: #0f1116;
+    border-radius: 0 8px 8px 0;
+  }
+  .menu-ctx::-webkit-scrollbar-thumb {
+    background: #3a4152;
+    border-radius: 6px;
+    border: 2px solid #0f1116;
+  }
+  .menu-ctx::-webkit-scrollbar-thumb:hover { background: #4a5468; }
+
   /* La camara bloqueada avisa en ROJO: un candado debe verse de lejos. */
   #camara.armada {
     border-color: #ff6b6b;
@@ -1160,11 +1175,12 @@ lienzo.addEventListener('contextmenu', (evento) => evento.preventDefault());
 // El menu del clic derecho: dos verbos sobre la pieza pinchada. Vive en el
 // DOM normal y las opciones EDITAN EL CODIGO, como todo lo demas.
 const menuCtx = document.createElement('div');
+menuCtx.className = 'menu-ctx';
 // El menu crecio con el editor: si no cabe en la pantalla, desplaza con
 // su propia barra en vez de perder opciones por abajo.
 menuCtx.style.cssText = 'position:fixed;z-index:10;display:none;background:#171a21;' +
   'border:1px solid #2a3040;border-radius:8px;padding:4px;min-width:150px;' +
-  'max-height:min(60vh, calc(100vh - 16px));overflow-y:auto;overscroll-behavior:contain;';
+  'max-height:min(60vh, calc(100vh - 16px));overflow-y:scroll;overscroll-behavior:contain;';
 const opcionGirar = document.createElement('button');
 opcionGirar.textContent = 'girar 90°';
 const opcionVoltear = document.createElement('button');
