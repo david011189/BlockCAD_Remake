@@ -525,6 +525,15 @@ class AcogidaTests(unittest.TestCase):
         with self.assertRaises(CollisionError):
             self.modelo.add("32905", GridPosition(138, 100, 49))
 
+    def test_the_stop_forbids_the_high_tunnel(self) -> None:
+        # La pieza real lleva un TOPE: el gusano solo entra en la camara
+        # baja. Girado y entero dentro, pero sobre la recta alta, sigue
+        # siendo choque: ese no es su asiento.
+        with self.assertRaises(CollisionError):
+            self.modelo.add(
+                "32905", GridPosition(138, 107, 89), orientation=self.GIRADO
+            )
+
     def test_the_gear_crowns_the_box(self) -> None:
         # El segundo huesped: el engranaje de 24 entra por la ranura de
         # arriba, ASOMA por ella (la boca del contenedor esta abierta al

@@ -186,22 +186,44 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
 
 
 def _acogida(item, definition) -> dict:
-    """Si la pieza es un contenedor, donde deja el iman a su huesped.
+    """Si la pieza es un contenedor, los ASIENTOS de sus huespedes.
 
-    El centro de acogida es el punto medio de la recta baja de sus bocas:
-    por ahi entrara el eje, y ahi se centra el huesped. Va en coordenadas
-    del mundo, con la pieza ya girada y colocada.
+    Cada huesped tiene el suyo —el tope de la pieza real—: las bocas de
+    su altura declarada, agrupadas por recta, en coordenadas del mundo.
+    El iman no debe ofrecer mas que esto, que es lo que el motor acepta.
     """
     acoge = definition.metadata.get("acoge")
     if not acoge:
         return {}
-    bocas = [c for c in item.world_connections(definition) if c.es_hembra]
-    if not bocas:
-        return {}
-    baja = min(c.punto[2] for c in bocas)
-    linea = [c.punto for c in bocas if c.punto[2] == baja]
-    centro = [round(sum(p[k] for p in linea) / len(linea), 1) for k in range(3)]
-    return {"acoge": acoge.split(), "acoge_centro": centro}
+    entradas = [e.split("@") for e in acoge.split() if "@" in e]
+    mundos = list(item.world_connections(definition))
+    ejes_locales = {"x": (1, 0, 0), "y": (0, 1, 0), "z": (0, 0, 1)}
+    asientos = {}
+    for molde, donde in entradas:
+        altura, eje_local = int(donde[:-1]), ejes_locales[donde[-1]]
+        bocas = [
+            mundo
+            for local, mundo in zip(definition.connections, mundos)
+            if mundo.es_hembra
+            and local.punto[2] == altura
+            and tuple(abs(v) for v in local.eje) == eje_local
+        ]
+        grupos: list[list] = []
+        for c in bocas:
+            for g in grupos:
+                if _misma_recta(g[0].punto, g[0].eje, c.punto, c.eje):
+                    g.append(c)
+                    break
+            else:
+                grupos.append([c])
+        asientos[molde] = [
+            {
+                "centro": [sum(c.punto[k] for c in g) / len(g) for k in range(3)],
+                "eje": list(g[0].eje),
+            }
+            for g in grupos
+        ]
+    return {"acoge": [molde for molde, _ in entradas], "asientos": asientos}
 
 
 def _agarre(item, definition) -> dict:

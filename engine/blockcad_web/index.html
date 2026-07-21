@@ -565,7 +565,7 @@ function anotar(p, cuerpos, aristas, color, opacidad) {
     linea: p.linea, orden, cuerpos, aristas, color, opacidad, nombre: p.nombre,
     suelta: p.suelta,
     rueda: p.rueda,
-    molde: p.molde, acoge: p.acoge, acogeCentro: p.acoge_centro,
+    molde: p.molde, acoge: p.acoge, asientos: p.asientos,
     agarre: p.agarre, agarreEje: p.agarre_eje,
     engrane: p.engrane, cremallera: p.cremallera, conjunto: p.conjunto,
     grupo: p.grupo,
@@ -940,7 +940,8 @@ function sitioParaSoltar(evento) {
   if (moviendo && tocado.object !== suelo) {
     const otra = dibujadas[tocado.object.userData.pieza];
     if (otra && otra.acoge && otra.acoge.includes(moviendo.molde)
-        && moviendo.agarre && moviendo.agarreEje && otra.bocas) {
+        && moviendo.agarre && moviendo.agarreEje
+        && otra.asientos && otra.asientos[moviendo.molde]) {
       // La silueta NO MIENTE: solo se ofrecen bocas donde el huesped
       // ademas CABE — dentro por los costados y por abajo, asomar solo
       // por arriba — que es lo mismo que exigira el motor al soltar. El
@@ -948,7 +949,7 @@ function sitioParaSoltar(evento) {
       // no hay iman, y la solucion es girarlo primero.
       let mejor = null;
       let distancia = Infinity;
-      for (const boca of otra.bocas) {
+      for (const boca of otra.asientos[moviendo.molde]) {
         if (!paralelos(boca.eje, moviendo.agarreEje)) continue;
         const sx = boca.centro[0] - moviendo.agarre[0];
         const sy = boca.centro[1] - moviendo.agarre[1];

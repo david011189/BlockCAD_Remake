@@ -207,8 +207,14 @@ class PaletaTests(unittest.TestCase):
         caja, engranaje = escena["piezas"]
         self.assertEqual(caja["acoge"], ["32905", "24505"])
         self.assertEqual(engranaje["agarre_eje"], [0.0, 1.0, 0.0])
+        # Cada huesped tiene SU asiento (el tope de la pieza real): el
+        # gusano una sola recta baja; el engranaje, las tres de arriba.
+        self.assertEqual(len(caja["asientos"]["32905"]), 1)
+        self.assertEqual(len(caja["asientos"]["24505"]), 3)
+        self.assertEqual(caja["asientos"]["32905"][0]["centro"][2], 62.0)
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn("otra.acoge.includes(moviendo.molde)", html)
+        self.assertIn("otra.asientos[moviendo.molde]", html)
         # Y la silueta no miente: el iman descarta las bocas paralelas
         # donde el huesped no cabe (fuera por un costado o por abajo),
         # que es lo mismo que exigira el motor al soltar.

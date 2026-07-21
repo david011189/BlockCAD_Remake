@@ -153,9 +153,12 @@ _DIENTES_RE = re.compile(r"Gear (\d+) Tooth")
 #: Contenedores: piezas cuyo oficio es alojar a otras en su hueco. La caja
 #: del tornillo sin fin (Technic Gearbox) existe para su pareja completa:
 #: el gusano vive dentro y el engranaje de 24 entra por la ranura de arriba
-#: hasta morderlo en angulo recto. Los huespedes son un hecho de las
-#: piezas, no una preferencia.
-_ACOGE = {"28698": "32905 24505"}
+#: hasta morderlo en angulo recto. Cada huesped tiene SU asiento —la pieza
+#: real lleva un tope, y el gusano solo entra en la camara baja— y se
+#: declara con la altura local de sus bocas y la direccion de su recta:
+#: huesped@altura+eje. A 62 conviven las tres ranuras del engranaje (en y)
+#: y una recta lateral (en x) que no es asiento de nadie.
+_ACOGE = {"28698": "32905@22x 24505@62y"}
 
 
 def _rueda(nombre_ldraw: str) -> dict[str, str]:

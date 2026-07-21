@@ -96,6 +96,9 @@ _LDU_POR_DIENTE = 1.25
 #: porque el sinfin no los cuenta como una rueda: es una rosca.
 _RADIO_SINFIN = 10
 
+#: Para leer los asientos de _ACOGE: la letra dice la recta local.
+_EJES_LOCALES = {"x": (1.0, 0.0, 0.0), "y": (0.0, 1.0, 0.0), "z": (0.0, 0.0, 1.0)}
+
 
 def _muerden(
     a: PlacedPart,
@@ -288,20 +291,38 @@ def _acoge(
     La caja del sinfin es hueca: el gusano vive dentro, alineado con los
     agujeros bajos, y el engranaje de 24 entra por la ranura de arriba. La
     regla es estrecha como sus hermanas: el contenedor declara a QUIENES
-    acoge, el agujero de eje del huesped debe compartir recta con una boca
-    del contenedor, y el huesped debe estar dentro de la caja por los
-    costados y por abajo. Por ARRIBA puede asomar: la boca del contenedor
-    esta abierta al cielo, y el engranaje corona por ella. Atravesar una
-    pared o el suelo sigue siendo choque.
+    acoge y EN QUE asiento —la pieza real lleva un tope, y el gusano solo
+    entra en la camara baja—, el agujero de eje del huesped debe compartir
+    recta con una boca de ese asiento, y el huesped debe estar dentro de
+    la caja por los costados y por abajo. Por ARRIBA puede asomar: la boca
+    del contenedor esta abierta al cielo, y el engranaje corona por ella.
+    Atravesar una pared o el suelo sigue siendo choque.
     """
     for cont, huesped, def_c, def_h in ((a, b, def_a, def_b), (b, a, def_b, def_a)):
-        if huesped.part_id not in def_c.metadata.get("acoge", "").split():
+        asientos = {}
+        for e in def_c.metadata.get("acoge", "").split():
+            partes = e.split("@")
+            if len(partes) == 2:
+                asientos[partes[0]] = partes[1]
+        if huesped.part_id not in asientos:
             continue
+        altura = int(asientos[huesped.part_id][:-1])
+        eje_local = _EJES_LOCALES[asientos[huesped.part_id][-1]]
         ejes = [
             x for x in huesped.world_connections(def_h)
             if x.tipo == "agujero_eje"
         ]
-        bocas = [x for x in cont.world_connections(def_c) if x.es_hembra]
+        # Las bocas del asiento: las hembras a esa altura LOCAL y con esa
+        # direccion LOCAL, que la rotacion del contenedor no cambia.
+        bocas = [
+            mundo
+            for local, mundo in zip(
+                def_c.connections, cont.world_connections(def_c)
+            )
+            if mundo.es_hembra
+            and local.punto[2] == altura
+            and _paralelas(local.eje, eje_local)
+        ]
         if not any(e.misma_recta_que(bc) for e in ejes for bc in bocas):
             continue
         ch, cc = huesped.bounds(def_h), cont.bounds(def_c)
