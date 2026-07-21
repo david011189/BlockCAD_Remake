@@ -209,7 +209,11 @@ class PaletaTests(unittest.TestCase):
         self.assertEqual(engranaje["agarre_eje"], [0.0, 1.0, 0.0])
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn("otra.acoge.includes(moviendo.molde)", html)
-        self.assertIn("bocaCercana(otra.bocas, moviendo.agarreEje)", html)
+        # Y la silueta no miente: el iman descarta las bocas paralelas
+        # donde el huesped no cabe (fuera por un costado o por abajo),
+        # que es lo mismo que exigira el motor al soltar.
+        self.assertIn("sx + moviendo.caja.ancho > otra.caja.x + otra.caja.ancho", html)
+        self.assertIn("if (sz < otra.caja.z) continue;", html)
 
     def test_pieces_declare_their_connected_set(self) -> None:
         # Cada pieza dice a que CONJUNTO pertenece: su componente conectada

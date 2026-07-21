@@ -941,14 +941,31 @@ function sitioParaSoltar(evento) {
     const otra = dibujadas[tocado.object.userData.pieza];
     if (otra && otra.acoge && otra.acoge.includes(moviendo.molde)
         && moviendo.agarre && moviendo.agarreEje && otra.bocas) {
-      const mejor = bocaCercana(otra.bocas, moviendo.agarreEje);
-      if (mejor) {
-        return {
-          x: mejor.centro[0] - moviendo.agarre[0],
-          y: mejor.centro[1] - moviendo.agarre[1],
-          z: mejor.centro[2] - moviendo.agarre[2],
-        };
+      // La silueta NO MIENTE: solo se ofrecen bocas donde el huesped
+      // ademas CABE — dentro por los costados y por abajo, asomar solo
+      // por arriba — que es lo mismo que exigira el motor al soltar. El
+      // gusano sin girar tiene bocas paralelas en las que no cabe: ahi
+      // no hay iman, y la solucion es girarlo primero.
+      let mejor = null;
+      let distancia = Infinity;
+      for (const boca of otra.bocas) {
+        if (!paralelos(boca.eje, moviendo.agarreEje)) continue;
+        const sx = boca.centro[0] - moviendo.agarre[0];
+        const sy = boca.centro[1] - moviendo.agarre[1];
+        const sz = boca.centro[2] - moviendo.agarre[2];
+        if (sx < otra.caja.x
+          || sx + moviendo.caja.ancho > otra.caja.x + otra.caja.ancho) continue;
+        if (sy < otra.caja.y
+          || sy + moviendo.caja.fondo > otra.caja.y + otra.caja.fondo) continue;
+        if (sz < otra.caja.z) continue;
+        const d = Math.hypot(
+          boca.centro[0] - local.x,
+          boca.centro[1] - local.y,
+          boca.centro[2] - local.z,
+        );
+        if (d < distancia) { distancia = d; mejor = { x: sx, y: sy, z: sz }; }
       }
+      if (mejor) return mejor;
     }
   }
 
