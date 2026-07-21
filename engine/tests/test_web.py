@@ -263,6 +263,17 @@ class PaletaTests(unittest.TestCase):
         self.assertIn("mover seleccion (${marcadas.length})", html)
         self.assertIn("la seleccion no las lleva todas", html)
 
+    def test_the_camera_button_locks_the_orbit(self) -> None:
+        # Mover una pieza congela la orbita: raton para la pieza, flechas
+        # para la camara. Y el boton CAMARA la bloquea a voluntad. Toda
+        # reapertura de la orbita pasa por la misma puerta (soltarOrbita),
+        # que respeta el candado.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn('id="camara"', html)
+        self.assertIn("function soltarOrbita()", html)
+        self.assertIn("!camaraBloqueada && !moviendo", html)
+        self.assertNotIn("controles.enabled = true", html)
+
     def test_ctrl_z_undoes_outside_the_text_boxes(self) -> None:
         # Ctrl+Z deshace y Ctrl+Y (o Ctrl+Shift+Z) rehace, por el MISMO
         # historial que las ordenes de la consola. Escribiendo en el

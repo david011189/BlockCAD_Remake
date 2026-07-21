@@ -246,6 +246,7 @@
     <button id="ejemplo">Ejemplo</button>
     <button id="codigo-visible" title="Ocultar o mostrar el panel de codigo, para ver el diseño entero">Codigo</button>
     <button id="mano" title="Con la mano, el clic izquierdo agarra el plano y lo arrastra (tecla H)">✋ Mano</button>
+    <button id="camara" title="Bloquea la camara: el raton deja de orbitar. Las flechas y RePag/AvPag siguen moviendola.">📷 Cámara</button>
     <button id="centrar">Centrar</button>
   </div>
   <input type="file" id="archivo" accept=".blockcad,.json,.txt" hidden>
@@ -834,7 +835,7 @@ function desarmar() {
   armada = null;
   moviendo = null;
   arrastrable = null;
-  controles.enabled = true;
+  soltarOrbita();
   borrarFantasma();
   for (const b of paleta.querySelectorAll('.armada')) b.classList.remove('armada');
 }
@@ -1259,6 +1260,7 @@ opcionQuitar.addEventListener('click', async () => {
 
 function iniciarMovimiento(cual, verbo) {
   desarmar();
+  controles.enabled = false;
   // La silueta: la caja de la pieza, siguiendo al puntero como en la
   // paleta. Conectar confirma con un clic; arrastrar, al soltar el boton.
   moviendo = cual;
@@ -1288,6 +1290,7 @@ function iniciarMovimientoGrupo(piezas, verbo) {
   // studs, y por su esquina se decide el encaje — no por la caja
   // envolvente, que puede empezar en la punta de un eje que asoma.
   const base = piezas.reduce((a, b) => (b.caja.z < a.caja.z ? b : a));
+  controles.enabled = false;
   moviendo = {
     esGrupo: true,
     piezas,
@@ -1705,12 +1708,12 @@ lienzo.addEventListener('pointerup', (evento) => {
       decir('');
     }
     arrastrable = null;
-    controles.enabled = true;
+    soltarOrbita();
     if (!eraArrastre) return;
     return;
   }
   arrastrable = null;
-  controles.enabled = true;
+  soltarOrbita();
 
   if (armada) {
     const sitio = sitioParaSoltar(evento);
@@ -1961,6 +1964,27 @@ document.getElementById('piezas').addEventListener('click', abrirPaleta);
 // mapa. No es un modo nuevo del visor: es decirle a OrbitControls que el
 // boton izquierdo desplace. Pinchar piezas sigue funcionando: un clic
 // quieto no arrastra nada.
+let camaraBloqueada = false;
+const botonCamara = document.getElementById('camara');
+
+// La unica puerta de la orbita: bloqueada por el boton, o quieta mientras
+// una silueta esta en camino — mover la pieza y la camara con el mismo
+// raton era pelearse con uno mismo. Las flechas del teclado y RePag/AvPag
+// siguen moviendo la camara en todo momento.
+function soltarOrbita() {
+  controles.enabled = !camaraBloqueada && !moviendo;
+}
+
+function alternarCamara(bloqueada) {
+  camaraBloqueada = bloqueada === undefined ? !camaraBloqueada : bloqueada;
+  botonCamara.classList.toggle('armada', camaraBloqueada);
+  soltarOrbita();
+  decir(camaraBloqueada
+    ? 'Camara bloqueada: el raton ya no orbita. Flechas y RePag/AvPag la mueven; el boton la suelta.'
+    : 'Camara libre.');
+}
+botonCamara.addEventListener('click', () => alternarCamara());
+
 let manoActiva = false;
 const botonMano = document.getElementById('mano');
 function alternarMano(activa) {
