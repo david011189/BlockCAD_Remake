@@ -253,6 +253,19 @@ class PaletaTests(unittest.TestCase):
         self.assertIn("mover seleccion (${marcadas.length})", html)
         self.assertIn("la seleccion no las lleva todas", html)
 
+    def test_ctrl_z_undoes_outside_the_text_boxes(self) -> None:
+        # Ctrl+Z deshace y Ctrl+Y (o Ctrl+Shift+Z) rehace, por el MISMO
+        # historial que las ordenes de la consola. Escribiendo en el
+        # codigo o en la consola no se toca: alli manda el deshacer del
+        # navegador, que es el de las letras.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("function deshacer()", html)
+        self.assertIn("function rehacer()", html)
+        self.assertIn("evento.ctrlKey || evento.metaKey", html)
+        self.assertIn("tecla === 'z' && !evento.shiftKey", html)
+        self.assertIn("tecla === 'y' || (tecla === 'z' && evento.shiftKey)", html)
+        self.assertIn("donde !== areaCodigo && donde !== areaOrden", html)
+
     def test_grouping_writes_the_grupo_suffix(self) -> None:
         # Agrupar es ESCRIBIR `grupo N` en las lineas marcadas (el
         # lenguaje ya lo sabia decir); desagrupar lo borra. La escena

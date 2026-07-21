@@ -1039,6 +1039,23 @@ addEventListener('keydown', (evento) => {
     if (manoActiva) alternarMano(false);
   }
 
+  if ((evento.ctrlKey || evento.metaKey) && !evento.altKey) {
+    const donde = document.activeElement;
+    if (donde !== areaCodigo && donde !== areaOrden) {
+      const tecla = evento.key.toLowerCase();
+      if (tecla === 'z' && !evento.shiftKey) {
+        evento.preventDefault();
+        deshacer();
+        return;
+      }
+      if (tecla === 'y' || (tecla === 'z' && evento.shiftKey)) {
+        evento.preventDefault();
+        rehacer();
+        return;
+      }
+    }
+  }
+
   // H alterna la mano, como en los editores de mapas. Solo fuera del texto:
   // escribiendo, la h es una letra.
   if (evento.key === 'h' || evento.key === 'H') {
@@ -2027,6 +2044,26 @@ const consolaMensaje = document.getElementById('consola-mensaje');
 const historial = { pasado: [], futuro: [] };
 const TOPE = 100;
 
+function deshacer() {
+  if (!historial.pasado.length) {
+    decir('No hay ninguna orden que deshacer.', 'fallo');
+    return;
+  }
+  historial.futuro.push(areaCodigo.value);
+  aplicar(historial.pasado.pop());
+  decir('Deshecho.', 'hecho');
+}
+
+function rehacer() {
+  if (!historial.futuro.length) {
+    decir('No hay nada que rehacer.', 'fallo');
+    return;
+  }
+  historial.pasado.push(areaCodigo.value);
+  aplicar(historial.futuro.pop());
+  decir('Rehecho.', 'hecho');
+}
+
 function registrar() {
   historial.pasado.push(areaCodigo.value);
   if (historial.pasado.length > TOPE) historial.pasado.shift();
@@ -2174,23 +2211,11 @@ async function enviar() {
     areaOrden.value = '';
     decir('Editor vacío. Puedes recuperarlo con "deshacer".', 'hecho');
   } else if (soloUna && orden === 'deshacer') {
-    if (!historial.pasado.length) {
-      decir('No hay ninguna orden que deshacer.', 'fallo');
-      return;
-    }
-    historial.futuro.push(areaCodigo.value);
-    aplicar(historial.pasado.pop());
+    deshacer();
     areaOrden.value = '';
-    decir('Deshecho.', 'hecho');
   } else if (soloUna && orden === 'rehacer') {
-    if (!historial.futuro.length) {
-      decir('No hay nada que rehacer.', 'fallo');
-      return;
-    }
-    historial.pasado.push(areaCodigo.value);
-    aplicar(historial.futuro.pop());
+    rehacer();
     areaOrden.value = '';
-    decir('Rehecho.', 'hecho');
   } else if (soloUna && orden === 'borrar') {
     borrar((resto[0] || '').toLowerCase());
     areaOrden.value = '';
