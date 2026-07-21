@@ -327,6 +327,12 @@ class PaletaTests(unittest.TestCase):
         self.assertIn("opcionDesagrupar", html)
         self.assertIn("function colorDeGrupo", html)
         self.assertIn("async function escribirGrupo", html)
+        # Al confirmar, la seleccion se suelta: el azul no debe tapar el
+        # color del grupo recien nacido — esa es la señal de que surtio
+        # efecto.
+        agrupado = html.split("async function escribirGrupo")[1].split("opcionAgrupar")[0]
+        self.assertIn("seleccion = null;", agrupado)
+        self.assertIn("marcadas = [];", agrupado)
         self.assertIn("d.grupo ? colorDeGrupo(d.grupo)", html)
         self.assertIn("pieza.grupo && !esLaElegida(pieza)", html)
         self.assertIn("arrastrable.grupo", html)

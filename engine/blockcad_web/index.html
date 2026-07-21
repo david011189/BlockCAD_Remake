@@ -1627,6 +1627,13 @@ async function escribirGrupo(numeros, numero) {
   }
   registrar();
   aplicar(propuesta);
+  // La respuesta visual inmediata: se suelta la seleccion para que el
+  // azul no tape lo que acaba de pasar — el color del grupo recien
+  // nacido, o su ausencia al desagrupar.
+  seleccion = null;
+  marcadas = [];
+  pintarSeleccion();
+  pintarGutter(lineaRota);
   decir(numero
     ? `Agrupadas: ${numeros.length} lineas forman el grupo ${numero}. Un clic lo elige entero.`
     : 'Desagrupadas: cada pieza vuelve a ir por su cuenta.', 'hecho');
