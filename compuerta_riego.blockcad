@@ -1,0 +1,15 @@
+catalogo "wedo"
+modelo "Compuerta de riego"
+
+32059 en 9,1,0 color #DDC48E
+3710 en 10,5,0 rot 90 color #F4F4F4
+3710 en 10,6,0 rot 90 color #F4F4F4
+28698 en 10,5,1 color #F5F3F0
+32905 en 11,5.35,2.125 rot 90 color #9BA19D
+24505 en 10.4,5.5,4.75 color #6C6E68
+3706 en 7.55,5.7,3 rot 90 color #1B1B1B
+21980 en 1.5,4.5,0 rot 90 color #DDDEDC
+19071 en 1.5,4.5,7 color #F5F3F0
+3706 en 11.7,1.5,8 color #1B1B1B
+10928 en 11.4,2.3,7.25 color #6C6E68
+3743 en 10.9,1.8,3 rot y 90 color #A5CA18
