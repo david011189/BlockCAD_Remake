@@ -974,13 +974,27 @@ function sitioParaSoltar(evento) {
     }
   }
 
-  const x = Math.round((local.x - medidas.ancho / 2) / 20) * 20;
-  const y = Math.round((local.y - medidas.fondo / 2) / 20) * 20;
   let z = 0;
   if (tocado.object !== suelo) {
     const encima = dibujadas[tocado.object.userData.pieza];
     if (encima) z = encima.caja.z + encima.caja.alto;
   }
+  if (moviendo && moviendo.esGrupo && moviendo.referencia) {
+    // El grupo aterriza por su pieza base: SU esquina cae en la reticula
+    // de studs y placas, y el resto la sigue rigido. Asi el encaje no lo
+    // decide un eje que asoma — y un grupo desfasado se repara al soltarlo.
+    const r = moviendo.referencia;
+    const refX = r.x + (local.x - medidas.ancho / 2) - moviendo.caja.x;
+    const refY = r.y + (local.y - medidas.fondo / 2) - moviendo.caja.y;
+    const refZ = Math.max(0, r.z + z - moviendo.caja.z);
+    return {
+      x: moviendo.caja.x + Math.round(refX / 20) * 20 - r.x,
+      y: moviendo.caja.y + Math.round(refY / 20) * 20 - r.y,
+      z: moviendo.caja.z + Math.round(refZ / 8) * 8 - r.z,
+    };
+  }
+  const x = Math.round((local.x - medidas.ancho / 2) / 20) * 20;
+  const y = Math.round((local.y - medidas.fondo / 2) / 20) * 20;
   return { x, y, z };
 }
 
@@ -1235,9 +1249,14 @@ function iniciarMovimientoGrupo(piezas, verbo) {
   const minX = Math.min(...piezas.map((p) => p.caja.x));
   const minY = Math.min(...piezas.map((p) => p.caja.y));
   const minZ = Math.min(...piezas.map((p) => p.caja.z));
+  // La pieza BASE del grupo: la mas baja. Es la que se sienta sobre los
+  // studs, y por su esquina se decide el encaje — no por la caja
+  // envolvente, que puede empezar en la punta de un eje que asoma.
+  const base = piezas.reduce((a, b) => (b.caja.z < a.caja.z ? b : a));
   moviendo = {
     esGrupo: true,
     piezas,
+    referencia: { x: base.caja.x, y: base.caja.y, z: base.caja.z },
     caja: {
       x: minX, y: minY, z: minZ,
       ancho: Math.max(...piezas.map((p) => p.caja.x + p.caja.ancho)) - minX,
@@ -1339,6 +1358,12 @@ async function girarGrupo(piezas) {
   }));
   const desX = Math.min(...giradas.map((g) => g.x));
   const desY = Math.min(...giradas.map((g) => g.y));
+  // El ancla del encaje: girada la pieza base, su esquina debe seguir en
+  // la reticula de studs. El ajuste es comun a todas: el giro es rigido.
+  const base = piezas.reduce((a, b) => (b.caja.z < a.caja.z ? b : a));
+  const gBase = giradas.find((g) => g.pieza === base);
+  const ajusteX = Math.round((minX + gBase.x - desX) / 20) * 20 - (minX + gBase.x - desX);
+  const ajusteY = Math.round((minY + gBase.y - desY) / 20) * 20 - (minY + gBase.y - desY);
   const lineas = areaCodigo.value.split('\n');
   const re = /(\sen\s+)(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)/;
   const conGiro = (vieja) => {
@@ -1354,8 +1379,8 @@ async function girarGrupo(piezas) {
     let vieja = lineas[n - 1];
     const donde = vieja.match(re);
     if (!donde) continue; // relacional: que lo resuelva su ancla
-    const nx = (minX + g.x - desX) / 20;
-    const ny = (minY + g.y - desY) / 20;
+    const nx = (minX + g.x - desX + ajusteX) / 20;
+    const ny = (minY + g.y - desY + ajusteY) / 20;
     vieja = vieja.replace(re, `$1${nx},${ny},$4`);
     lineas[n - 1] = conGiro(vieja);
   }

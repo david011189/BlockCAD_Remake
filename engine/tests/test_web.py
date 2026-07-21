@@ -233,6 +233,12 @@ class PaletaTests(unittest.TestCase):
         self.assertIn("async function mudarGrupo", html)
         self.assertIn("async function girarGrupo", html)
         self.assertIn("x: -(p.caja.y - minY + p.caja.fondo)", html)
+        # El encaje del grupo lo decide su pieza BASE: su esquina cae en
+        # la reticula de studs al soltar y al girar, no la caja envolvente
+        # — que puede empezar en la punta de un eje que asoma.
+        self.assertIn("moviendo.esGrupo && moviendo.referencia", html)
+        self.assertIn("referencia: { x: base.caja.x", html)
+        self.assertIn("const ajusteX", html)
 
     def test_shift_click_marks_several_pieces(self) -> None:
         # Shift+clic suma piezas a la seleccion (o las resta); el clic
