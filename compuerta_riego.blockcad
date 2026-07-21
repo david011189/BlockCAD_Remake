@@ -15,7 +15,9 @@ modelo "Estacion de riego"
 19071 en 1.5,4.5,7 color #F5F3F0
 3004 en 0.5,5.5,0 color #F57D20
 3004 en 0.5,5.5,3 color #F57D20
-3004 en 7.5,5.5,0 color #F57D20
+3023 en 7.5,5.5,0 color #F57D20
+3023 en 7.5,5.5,1 color #F57D20
+3069 en 7.5,5.5,2 color #F57D20
 16424 en 2.5,5.5,16 color #F4F4F4
 16424 en 5.5,5.5,16 color #F4F4F4
 3706 en 11.7,1.5,8 color #1B1B1B
