@@ -270,6 +270,9 @@ class PaletaTests(unittest.TestCase):
         # que respeta el candado.
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn('id="camara"', html)
+        # Bloqueada avisa en ROJO: un candado debe verse de lejos.
+        self.assertIn("#camara.armada", html)
+        self.assertIn("border-color: #ff6b6b", html)
         self.assertIn("function soltarOrbita()", html)
         self.assertIn("!camaraBloqueada && !moviendo", html)
         self.assertNotIn("controles.enabled = true", html)
