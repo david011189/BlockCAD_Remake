@@ -273,6 +273,10 @@ class PaletaTests(unittest.TestCase):
         # Bloqueada avisa en ROJO: un candado debe verse de lejos.
         self.assertIn("#camara.armada", html)
         self.assertIn("border-color: #ff6b6b", html)
+        # Y la tecla C la alterna, como la H a la mano: solo fuera del
+        # texto, y nunca con Ctrl — copiar es copiar.
+        self.assertIn("evento.key === 'c' || evento.key === 'C'", html)
+        self.assertIn("!evento.ctrlKey && !evento.metaKey && !evento.altKey", html)
         self.assertIn("function soltarOrbita()", html)
         self.assertIn("!camaraBloqueada && !moviendo", html)
         self.assertNotIn("controles.enabled = true", html)
