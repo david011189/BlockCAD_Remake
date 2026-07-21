@@ -155,10 +155,13 @@ _DIENTES_RE = re.compile(r"Gear (\d+) Tooth")
 #: el gusano vive dentro y el engranaje de 24 entra por la ranura de arriba
 #: hasta morderlo en angulo recto. Cada huesped tiene SU asiento —la pieza
 #: real lleva un tope, y el gusano solo entra en la camara baja— y se
-#: declara con la altura local de sus bocas y la direccion de su recta:
-#: huesped@altura+eje. A 62 conviven las tres ranuras del engranaje (en y)
-#: y una recta lateral (en x) que no es asiento de nadie.
-_ACOGE = {"28698": "32905@22x 24505@62y"}
+#: declara con la altura local de sus bocas, la direccion de su recta y
+#: el ESPACIO del hueco a lo largo de ella: huesped@altura+eje:desde-hasta.
+#: A 62 conviven las tres ranuras del engranaje (en y) y una recta lateral
+#: (en x) que no es asiento de nadie. Los espacios los dice la malla: la
+#: camara baja mide 40 —el largo exacto del gusano: el tope— y la ranura
+#: 20, la holgura justa del engranaje.
+_ACOGE = {"28698": "32905@22x:20-60 24505@62y:10-30"}
 
 
 def _rueda(nombre_ldraw: str) -> dict[str, str]:

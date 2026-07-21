@@ -506,7 +506,7 @@ class AcogidaTests(unittest.TestCase):
         # Girado para alinear su agujero con las bocas bajas, y ENTERO
         # dentro. Queda unido: ni flota ni esta suelto.
         gusano = self.modelo.add(
-            "32905", GridPosition(138, 107, 49), orientation=self.GIRADO
+            "32905", GridPosition(120, 107, 49), orientation=self.GIRADO
         )
         unidas = self.modelo.connected_to(gusano.instance_id)
         self.assertEqual([p.part_id for p in unidas], ["28698"])
@@ -517,13 +517,22 @@ class AcogidaTests(unittest.TestCase):
         # entraria el eje, y no hay acogida que valga.
         with self.assertRaises(CollisionError):
             self.modelo.add(
-                "32905", GridPosition(138, 107, 57), orientation=self.GIRADO
+                "32905", GridPosition(120, 107, 57), orientation=self.GIRADO
             )
 
     def test_crossed_the_worm_does_not_fit(self) -> None:
         # Sin girar, su agujero corre perpendicular a las bocas.
         with self.assertRaises(CollisionError):
-            self.modelo.add("32905", GridPosition(138, 100, 49))
+            self.modelo.add("32905", GridPosition(120, 100, 49))
+
+    def test_the_worm_does_not_bite_the_wall(self) -> None:
+        # Sobre la recta buena pero corrido a la derecha: el gusano
+        # invadiria la pared de la camara, que mide su largo EXACTO. El
+        # hueco lo dice la malla (x local 20..60): una sola posicion.
+        with self.assertRaises(CollisionError):
+            self.modelo.add(
+                "32905", GridPosition(138, 107, 49), orientation=self.GIRADO
+            )
 
     def test_the_stop_forbids_the_high_tunnel(self) -> None:
         # La pieza real lleva un TOPE: el gusano solo entra en la camara
@@ -531,7 +540,7 @@ class AcogidaTests(unittest.TestCase):
         # siendo choque: ese no es su asiento.
         with self.assertRaises(CollisionError):
             self.modelo.add(
-                "32905", GridPosition(138, 107, 89), orientation=self.GIRADO
+                "32905", GridPosition(120, 107, 89), orientation=self.GIRADO
             )
 
     def test_the_gear_crowns_the_box(self) -> None:
@@ -539,7 +548,7 @@ class AcogidaTests(unittest.TestCase):
         # arriba, ASOMA por ella (la boca del contenedor esta abierta al
         # cielo) y muerde al gusano en angulo recto. Queda unido a los dos.
         self.modelo.add(
-            "32905", GridPosition(138, 107, 49), orientation=self.GIRADO
+            "32905", GridPosition(120, 107, 49), orientation=self.GIRADO
         )
         engranaje = self.modelo.add("24505", GridPosition(108, 110, 70))
         unidas = self.modelo.connected_to(engranaje.instance_id)

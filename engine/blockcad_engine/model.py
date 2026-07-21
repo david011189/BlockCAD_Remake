@@ -306,8 +306,11 @@ def _acoge(
                 asientos[partes[0]] = partes[1]
         if huesped.part_id not in asientos:
             continue
-        altura = int(asientos[huesped.part_id][:-1])
-        eje_local = _EJES_LOCALES[asientos[huesped.part_id][-1]]
+        donde, espacio = asientos[huesped.part_id].split(":")
+        altura = int(donde[:-1])
+        letra = donde[-1]
+        eje_local = _EJES_LOCALES[letra]
+        desde, hasta = (int(v) for v in espacio.split("-"))
         ejes = [
             x for x in huesped.world_connections(def_h)
             if x.tipo == "agujero_eje"
@@ -326,13 +329,54 @@ def _acoge(
         if not any(e.misma_recta_que(bc) for e in ejes for bc in bocas):
             continue
         ch, cc = huesped.bounds(def_h), cont.bounds(def_c)
-        if (
+        if not (
             ch.min_x >= cc.min_x and ch.max_x <= cc.max_x
             and ch.min_y >= cc.min_y and ch.max_y <= cc.max_y
             and ch.min_z >= cc.min_z
         ):
+            continue
+        # Y a lo largo de la recta, dentro del HUECO, no de la caja con
+        # paredes: la camara del gusano mide su largo exacto (el tope).
+        limites = _espacio_en_mundo(cont, def_c, letra, desde, hasta)
+        if limites is None:
+            continue
+        eje_mundo, bajo, alto = limites
+        minimos = (ch.min_x, ch.min_y, ch.min_z)
+        maximos = (ch.max_x, ch.max_y, ch.max_z)
+        if minimos[eje_mundo] >= bajo and maximos[eje_mundo] <= alto:
             return True
     return False
+
+
+def _espacio_en_mundo(
+    pieza: PlacedPart,
+    definicion: PartDefinition,
+    letra: str,
+    desde: int,
+    hasta: int,
+) -> tuple[int, int, int] | None:
+    """Un tramo LOCAL de la pieza, llevado al mundo: (eje, desde, hasta).
+
+    El hueco de un contenedor se declara en sus coordenadas de molde; la
+    pieza colocada puede estar girada. El tramo corre por el eje local
+    `letra`; aqui se averigua por que eje del MUNDO corre ya girado, y
+    entre que valores.
+    """
+    j = "xyz".index(letra)
+    filas = pieza.orientation.filas
+    for k in range(3):
+        if filas[k][j]:
+            caja = pieza.bounds(definicion)
+            minimo = (caja.min_x, caja.min_y, caja.min_z)[k]
+            medidas = (
+                definicion.dimensions.width,
+                definicion.dimensions.depth,
+                definicion.dimensions.height,
+            )
+            if filas[k][j] > 0:
+                return (k, minimo + desde, minimo + hasta)
+            return (k, minimo + medidas[j] - hasta, minimo + medidas[j] - desde)
+    return None
 
 
 def _eje_redondo(pieza: PlacedPart, definicion: PartDefinition) -> int | None:

@@ -212,6 +212,10 @@ class PaletaTests(unittest.TestCase):
         self.assertEqual(len(caja["asientos"]["32905"]), 1)
         self.assertEqual(len(caja["asientos"]["24505"]), 3)
         self.assertEqual(caja["asientos"]["32905"][0]["centro"][2], 62.0)
+        # Y cada boca dice su ESPACIO: el hueco real a lo largo de la
+        # recta, en el mundo. La camara del gusano: 40, su largo justo.
+        self.assertEqual(caja["asientos"]["32905"][0]["espacio"], [120, 160])
+        self.assertEqual(caja["asientos"]["24505"][0]["espacio"], [110, 130])
         html = (_WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn("otra.acoge.includes(moviendo.molde)", html)
         self.assertIn("otra.asientos[moviendo.molde]", html)
@@ -228,7 +232,7 @@ class PaletaTests(unittest.TestCase):
         escena = compile_source(
             'catalogo "wedo"\n'
             '28698 en 5,5,5\n'
-            '32905 en 6.9,5.35,6.125 rot 90\n'
+            '32905 en 6,5.35,6.125 rot 90\n'
             'ladrillo 2x4 en 30,30,0'
         )
         caja, gusano, ladrillo = escena["piezas"]

@@ -958,9 +958,28 @@ function sitioParaSoltar(evento) {
       let distancia = Infinity;
       for (const boca of otra.asientos[moviendo.molde]) {
         if (!paralelos(boca.eje, moviendo.agarreEje)) continue;
-        const sx = boca.centro[0] - moviendo.agarre[0];
-        const sy = boca.centro[1] - moviendo.agarre[1];
-        const sz = boca.centro[2] - moviendo.agarre[2];
+        const s = [
+          boca.centro[0] - moviendo.agarre[0],
+          boca.centro[1] - moviendo.agarre[1],
+          boca.centro[2] - moviendo.agarre[2],
+        ];
+        // A lo largo de la recta el agujero DESLIZA: el huesped se mete
+        // en el hueco declarado (la camara del gusano mide su largo
+        // exacto: el tope real). Si el hueco no da, esa boca no vale.
+        if (boca.espacio) {
+          let a = 0;
+          for (let i = 0; i < 3; i++) {
+            if (Math.abs(boca.eje[i]) > Math.abs(boca.eje[a])) a = i;
+          }
+          const medida = [
+            moviendo.caja.ancho, moviendo.caja.fondo, moviendo.caja.alto,
+          ][a];
+          if (medida > boca.espacio[1] - boca.espacio[0]) continue;
+          s[a] = Math.min(
+            Math.max(s[a], boca.espacio[0]), boca.espacio[1] - medida,
+          );
+        }
+        const sx = s[0], sy = s[1], sz = s[2];
         if (sx < otra.caja.x
           || sx + moviendo.caja.ancho > otra.caja.x + otra.caja.ancho) continue;
         if (sy < otra.caja.y

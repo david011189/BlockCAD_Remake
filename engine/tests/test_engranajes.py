@@ -116,7 +116,7 @@ class CremalleraTests(unittest.TestCase):
         self.modelo = BlockModel(catalog=cargar("wedo"))
         self.modelo.add("28698", GridPosition(100, 100, 40))
         self.modelo.add(
-            "32905", GridPosition(138, 107, 49), orientation=Orientation.z(90)
+            "32905", GridPosition(120, 107, 49), orientation=Orientation.z(90)
         )
         self.modelo.add("24505", GridPosition(108, 110, 70))
 

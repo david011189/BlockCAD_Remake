@@ -198,9 +198,16 @@ def _acogida(item, definition) -> dict:
     entradas = [e.split("@") for e in acoge.split() if "@" in e]
     mundos = list(item.world_connections(definition))
     ejes_locales = {"x": (1, 0, 0), "y": (0, 1, 0), "z": (0, 0, 1)}
+    from blockcad_engine.model import _espacio_en_mundo
+
     asientos = {}
-    for molde, donde in entradas:
-        altura, eje_local = int(donde[:-1]), ejes_locales[donde[-1]]
+    for molde, resto in entradas:
+        donde, espacio = resto.split(":")
+        altura, letra = int(donde[:-1]), donde[-1]
+        eje_local = ejes_locales[letra]
+        desde, hasta = (int(v) for v in espacio.split("-"))
+        limites = _espacio_en_mundo(item, definition, letra, desde, hasta)
+        tramo = list(limites[1:]) if limites else None
         bocas = [
             mundo
             for local, mundo in zip(definition.connections, mundos)
@@ -220,6 +227,7 @@ def _acogida(item, definition) -> dict:
             {
                 "centro": [sum(c.punto[k] for c in g) / len(g) for k in range(3)],
                 "eje": list(g[0].eje),
+                "espacio": tramo,
             }
             for g in grupos
         ]
