@@ -267,6 +267,15 @@ class PaletaTests(unittest.TestCase):
         self.assertIn("mover seleccion (${marcadas.length})", html)
         self.assertIn("la seleccion no las lleva todas", html)
 
+    def test_the_context_menu_scrolls_and_stays_on_screen(self) -> None:
+        # El menu del clic derecho crecio con el editor: con tope de alto
+        # y barra propia, y recolocado ya medido para no salirse de la
+        # pantalla por abajo ni por la derecha.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("max-height:min(60vh, calc(100vh - 16px));overflow-y:auto", html)
+        self.assertIn("innerHeight - menuCtx.offsetHeight - 8", html)
+        self.assertIn("innerWidth - menuCtx.offsetWidth - 8", html)
+
     def test_the_camera_button_locks_the_orbit(self) -> None:
         # Mover una pieza congela la orbita: raton para la pieza, flechas
         # para la camara. Y el boton CAMARA la bloquea a voluntad. Toda

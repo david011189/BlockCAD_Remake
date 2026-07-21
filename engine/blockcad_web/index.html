@@ -1160,8 +1160,11 @@ lienzo.addEventListener('contextmenu', (evento) => evento.preventDefault());
 // El menu del clic derecho: dos verbos sobre la pieza pinchada. Vive en el
 // DOM normal y las opciones EDITAN EL CODIGO, como todo lo demas.
 const menuCtx = document.createElement('div');
+// El menu crecio con el editor: si no cabe en la pantalla, desplaza con
+// su propia barra en vez de perder opciones por abajo.
 menuCtx.style.cssText = 'position:fixed;z-index:10;display:none;background:#171a21;' +
-  'border:1px solid #2a3040;border-radius:8px;padding:4px;min-width:150px;';
+  'border:1px solid #2a3040;border-radius:8px;padding:4px;min-width:150px;' +
+  'max-height:min(60vh, calc(100vh - 16px));overflow-y:auto;overscroll-behavior:contain;';
 const opcionGirar = document.createElement('button');
 opcionGirar.textContent = 'girar 90°';
 const opcionVoltear = document.createElement('button');
@@ -1717,6 +1720,12 @@ lienzo.addEventListener('pointerup', (evento) => {
       menuCtx.style.left = evento.clientX + 'px';
       menuCtx.style.top = evento.clientY + 'px';
       menuCtx.style.display = 'block';
+      // Abierto cerca del borde se saldria de la pantalla: se recoloca
+      // ya medido, y si aun asi no cabe, su barra desplaza.
+      menuCtx.style.left = Math.max(0, Math.min(
+        evento.clientX, innerWidth - menuCtx.offsetWidth - 8)) + 'px';
+      menuCtx.style.top = Math.max(0, Math.min(
+        evento.clientY, innerHeight - menuCtx.offsetHeight - 8)) + 'px';
     }
     return;
   }
