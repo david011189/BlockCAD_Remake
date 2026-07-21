@@ -247,6 +247,26 @@ class PaletaTests(unittest.TestCase):
         self.assertIn("mover seleccion (${marcadas.length})", html)
         self.assertIn("la seleccion no las lleva todas", html)
 
+    def test_grouping_writes_the_grupo_suffix(self) -> None:
+        # Agrupar es ESCRIBIR `grupo N` en las lineas marcadas (el
+        # lenguaje ya lo sabia decir); desagrupar lo borra. La escena
+        # publica el grupo, el visor le da contorno de color, un clic lo
+        # elige entero y arrastrarlo lo mueve como una sola pieza.
+        escena = compile_source(
+            'ladrillo 2x4 en 0,0,0 grupo 2\nladrillo 2x2 en 10,10,0'
+        )
+        con, sin = escena["piezas"]
+        self.assertEqual(con["grupo"], 2)
+        self.assertIsNone(sin["grupo"])
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("opcionAgrupar", html)
+        self.assertIn("opcionDesagrupar", html)
+        self.assertIn("function colorDeGrupo", html)
+        self.assertIn("async function escribirGrupo", html)
+        self.assertIn("d.grupo ? colorDeGrupo(d.grupo)", html)
+        self.assertIn("pieza.grupo && !esLaElegida(pieza)", html)
+        self.assertIn("arrastrable.grupo", html)
+
     def test_the_rack_magnet_is_tangent(self) -> None:
         # Cada rueda dentada publica su engrane (eje mundial y radio
         # primitivo) y la cremallera su normal con su paso: el visor hace

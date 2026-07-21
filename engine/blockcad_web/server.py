@@ -161,6 +161,7 @@ def model_to_scene(model: BlockModel, lineas: dict[str, int] | None = None) -> d
                 "rueda": definition.metadata.get("rueda"),
                 "molde": item.part_id,
                 "conjunto": conjuntos[item.instance_id],
+                "grupo": item.group or None,
                 **_acogida(item, definition),
                 **_agarre(item, definition),
                 **_machos(item, definition),

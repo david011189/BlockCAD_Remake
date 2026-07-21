@@ -568,6 +568,7 @@ function anotar(p, cuerpos, aristas, color, opacidad) {
     molde: p.molde, acoge: p.acoge, acogeCentro: p.acoge_centro,
     agarre: p.agarre, agarreEje: p.agarre_eje,
     engrane: p.engrane, cremallera: p.cremallera, conjunto: p.conjunto,
+    grupo: p.grupo,
     machoCentro: p.macho_centro, machoEje: p.macho_eje, bocas: p.bocas,
     caja: { x: p.x, y: p.y, z: p.z, ancho: p.ancho, fondo: p.fondo, alto: p.alto },
   });
@@ -602,6 +603,14 @@ function esMarcada(d) {
   return marcadas.some((m) => d.linea === m.linea && d.orden === m.orden);
 }
 
+// Cada grupo declarado lleva su color de contorno, para verse agrupado
+// sin tener que elegirlo. El azul de la seleccion manda por encima.
+const coloresGrupo = [0xffa94d, 0x69db7c, 0xe599f7, 0xffd43b, 0x63e6be, 0xff8787];
+
+function colorDeGrupo(numero) {
+  return coloresGrupo[(numero - 1) % coloresGrupo.length];
+}
+
 function pintarSeleccion() {
   // La pieza puede haber desaparecido al recompilar. Si ya no la pone nadie,
   // no hay nada elegido.
@@ -612,8 +621,10 @@ function pintarSeleccion() {
 
   for (const d of dibujadas) {
     const elegida = esLaElegida(d) || esMarcada(d);
-    d.aristas.material.color.set(elegida ? 0x63b3ed : d.color);
-    d.aristas.material.opacity = elegida ? 1 : d.opacidad;
+    d.aristas.material.color.set(
+      elegida ? 0x63b3ed : (d.grupo ? colorDeGrupo(d.grupo) : d.color),
+    );
+    d.aristas.material.opacity = elegida || d.grupo ? 1 : d.opacidad;
     // El borde solo se ve por fuera; el relleno dice cuál es sin taparla.
     // Se encienden todos los grupos de color: la pieza es una.
     for (const cuerpo of d.cuerpos) {
@@ -665,14 +676,19 @@ function elegir(pieza) {
 function marcar(pieza) {
   // Shift+clic: la pieza entra en la seleccion, o sale si ya estaba. La
   // ultima marcada pasa a ser la elegida, para que Supr y la consola
-  // sigan hablando de una.
+  // sigan hablando de una. Un grupo declarado entra y sale ENTERO.
   if (pieza.linea == null) return;
+  const piezas = pieza.grupo
+    ? dibujadas.filter((d) => d.grupo === pieza.grupo)
+    : [pieza];
   if (esMarcada(pieza)) {
     marcadas = marcadas.filter(
-      (m) => !(m.linea === pieza.linea && m.orden === pieza.orden),
+      (m) => !piezas.some((d) => d.linea === m.linea && d.orden === m.orden),
     );
   } else {
-    marcadas.push({ linea: pieza.linea, orden: pieza.orden });
+    for (const d of piezas) {
+      if (!esMarcada(d)) marcadas.push({ linea: d.linea, orden: d.orden });
+    }
   }
   seleccion = marcadas.length ? marcadas[marcadas.length - 1] : null;
   pintarSeleccion();
@@ -972,8 +988,14 @@ lienzo.addEventListener('pointermove', (evento) => {
   if (arrastrable && !moviendo && apretado) {
     const recorrido = Math.hypot(evento.clientX - apretado.x, evento.clientY - apretado.y);
     if (recorrido > 5) {
-      iniciarMovimiento(arrastrable, 'Movida');
-      decir('Suelta el boton donde quieras dejarla. Esc cancela.');
+      if (arrastrable.grupo) {
+        const piezas = dibujadas.filter((d) => d.grupo === arrastrable.grupo);
+        iniciarMovimientoGrupo(piezas, 'Movido');
+        decir(`Mueves el grupo ${piezas[0].grupo} entero. Suelta el boton donde quieras dejarlo. Esc cancela.`);
+      } else {
+        iniciarMovimiento(arrastrable, 'Movida');
+        decir('Suelta el boton donde quieras dejarla. Esc cancela.');
+      }
     }
   }
   if ((!armada && !moviendo) || !fantasma) return;
@@ -1063,6 +1085,9 @@ const opcionVoltear = document.createElement('button');
 opcionVoltear.textContent = 'voltear';
 const opcionMoverMarcadas = document.createElement('button');
 const opcionGirarMarcadas = document.createElement('button');
+const opcionAgrupar = document.createElement('button');
+const opcionDesagrupar = document.createElement('button');
+opcionDesagrupar.textContent = 'desagrupar';
 const opcionMoverGrupo = document.createElement('button');
 opcionMoverGrupo.textContent = 'mover grupo';
 const opcionGirarGrupo = document.createElement('button');
@@ -1071,7 +1096,7 @@ const opcionQuitar = document.createElement('button');
 opcionQuitar.textContent = 'desconectar';
 const opcionConectar = document.createElement('button');
 opcionConectar.textContent = 'conectar…';
-for (const b of [opcionGirar, opcionVoltear, opcionConectar, opcionQuitar, opcionMoverGrupo, opcionGirarGrupo, opcionMoverMarcadas, opcionGirarMarcadas]) {
+for (const b of [opcionGirar, opcionVoltear, opcionConectar, opcionQuitar, opcionMoverGrupo, opcionGirarGrupo, opcionMoverMarcadas, opcionGirarMarcadas, opcionAgrupar, opcionDesagrupar]) {
   b.style.cssText = 'display:block;width:100%;text-align:left;margin:2px 0;';
   menuCtx.append(b);
 }
@@ -1456,10 +1481,77 @@ opcionGirarMarcadas.addEventListener('click', () => {
   girarGrupo(piezas);
 });
 
+// El bloque que gobiernan "mover grupo" y "girar grupo": el grupo
+// DECLARADO si la pieza tiene uno; si no, su conjunto conectado.
+function bloqueDe(pieza) {
+  return pieza.grupo
+    ? dibujadas.filter((d) => d.grupo === pieza.grupo)
+    : dibujadas.filter((d) => d.conjunto === pieza.conjunto);
+}
+
+async function escribirGrupo(numeros, numero) {
+  // Agrupar y desagrupar ESCRIBEN: ponen o quitan el `grupo N` de cada
+  // linea, validando una sola vez. El lenguaje ya conocia el sufijo.
+  const lineas = areaCodigo.value.split('\n');
+  for (const n of numeros) {
+    const limpia = lineas[n - 1].replace(/\s+grupo\s+\d+/, '');
+    lineas[n - 1] = numero ? `${limpia} grupo ${numero}` : limpia;
+  }
+  const propuesta = lineas.join('\n');
+  let datos;
+  try {
+    const respuesta = await fetch('/api/modelo', { method: 'POST', body: propuesta });
+    datos = await respuesta.json();
+  } catch (error) {
+    decir('No se pudo hablar con el servidor: ' + error.message, 'fallo');
+    return;
+  }
+  if (!datos.ok) {
+    decir('No he podido reescribir esas lineas: ' + datos.mensaje, 'fallo');
+    return;
+  }
+  registrar();
+  aplicar(propuesta);
+  decir(numero
+    ? `Agrupadas: ${numeros.length} lineas forman el grupo ${numero}. Un clic lo elige entero.`
+    : 'Desagrupadas: cada pieza vuelve a ir por su cuenta.', 'hecho');
+}
+
+opcionAgrupar.addEventListener('click', () => {
+  if (!escenaAlDia()) return cerrarMenu();
+  const piezas = dibujadas.filter(esMarcada);
+  cerrarMenu();
+  if (piezas.length < 2) return;
+  const numeros = [...new Set(piezas.map((p) => p.linea))];
+  if (numeros.some((n) => n == null)) {
+    decir('Alguna pieza no viene del codigo: no puedo agruparla.', 'fallo');
+    return;
+  }
+  for (const n of numeros) {
+    if (piezas.filter((p) => p.linea === n).length
+        < dibujadas.filter((d) => d.linea === n).length) {
+      decir(`La linea ${n} pone mas piezas de las marcadas (un repetir): agrupar la linea las lleva a todas. Marca todas o edita el codigo.`, 'fallo');
+      return;
+    }
+  }
+  const numero = Math.max(0, ...dibujadas.map((d) => d.grupo || 0)) + 1;
+  escribirGrupo(numeros, numero);
+});
+
+opcionDesagrupar.addEventListener('click', () => {
+  if (!piezaDelMenu || !piezaDelMenu.grupo) return cerrarMenu();
+  if (!escenaAlDia()) return cerrarMenu();
+  const numeros = [...new Set(
+    dibujadas.filter((d) => d.grupo === piezaDelMenu.grupo).map((d) => d.linea),
+  )];
+  cerrarMenu();
+  escribirGrupo(numeros, 0);
+});
+
 opcionMoverGrupo.addEventListener('click', () => {
   if (!piezaDelMenu) return cerrarMenu();
   if (!escenaAlDia()) return cerrarMenu();
-  const grupo = dibujadas.filter((d) => d.conjunto === piezaDelMenu.conjunto);
+  const grupo = bloqueDe(piezaDelMenu);
   cerrarMenu();
   iniciarMovimientoGrupo(grupo, 'Movido');
   decir(`Mueves ${grupo.length} piezas unidas. Suelta con un clic; Esc cancela.`);
@@ -1467,7 +1559,7 @@ opcionMoverGrupo.addEventListener('click', () => {
 
 opcionGirarGrupo.addEventListener('click', () => {
   if (!piezaDelMenu) return cerrarMenu();
-  const grupo = dibujadas.filter((d) => d.conjunto === piezaDelMenu.conjunto);
+  const grupo = bloqueDe(piezaDelMenu);
   cerrarMenu();
   girarGrupo(grupo);
 });
@@ -1489,6 +1581,11 @@ lienzo.addEventListener('pointerdown', (evento) => {
   rayo.setFromCamera(puntero, camara);
   const tocada = rayo.intersectObjects(dibujadas.flatMap((d) => d.cuerpos), false)[0];
   const cual = tocada ? dibujadas[tocada.object.userData.pieza] : null;
+  if (cual && cual.grupo && esMarcada(cual) && cual.linea != null) {
+    arrastrable = cual;
+    controles.enabled = false;
+    return;
+  }
   if (cual && esLaElegida(cual) && cual.suelta && cual.linea != null) {
     arrastrable = cual;
     controles.enabled = false;
@@ -1518,6 +1615,9 @@ lienzo.addEventListener('pointerup', (evento) => {
       opcionGirarMarcadas.style.display = varias ? '' : 'none';
       opcionMoverMarcadas.textContent = `mover seleccion (${marcadas.length})`;
       opcionGirarMarcadas.textContent = `girar seleccion (${marcadas.length})`;
+      opcionAgrupar.style.display = varias && !cual.grupo ? '' : 'none';
+      opcionAgrupar.textContent = `agrupar (${marcadas.length})`;
+      opcionDesagrupar.style.display = cual.grupo ? '' : 'none';
       menuCtx.style.left = evento.clientX + 'px';
       menuCtx.style.top = evento.clientY + 'px';
       menuCtx.style.display = 'block';
@@ -1583,6 +1683,18 @@ lienzo.addEventListener('pointerup', (evento) => {
 
   if (evento.shiftKey && pieza) {
     marcar(pieza);
+    return;
+  }
+  if (pieza && pieza.grupo && !esLaElegida(pieza)) {
+    // Un grupo declarado es "una pieza": el clic lo elige entero.
+    seleccion = { linea: pieza.linea, orden: pieza.orden };
+    marcadas = dibujadas
+      .filter((d) => d.grupo === pieza.grupo)
+      .map((d) => ({ linea: d.linea, orden: d.orden }));
+    pintarSeleccion();
+    pintarGutter(lineaRota);
+    verLinea(pieza.linea);
+    decir(`Grupo ${pieza.grupo}: ${marcadas.length} piezas. Arrastralo para moverlo; clic derecho: girar grupo o desagrupar.`);
     return;
   }
   elegir(pieza && esLaElegida(pieza) ? null : pieza);
