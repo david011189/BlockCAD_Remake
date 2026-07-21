@@ -267,6 +267,14 @@ class PaletaTests(unittest.TestCase):
         self.assertIn("mover seleccion (${marcadas.length})", html)
         self.assertIn("la seleccion no las lleva todas", html)
 
+    def test_only_one_context_menu_at_a_time(self) -> None:
+        # El clic derecho sobre el menu de piezas (o las barras del visor)
+        # no debe abrir ADEMAS el menu del navegador: dos menus a la vez
+        # es uno de mas. En los cuadros de texto el nativo se respeta.
+        html = (_WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("if (menuCtx.contains(evento.target)", html)
+        self.assertIn("evento.target.id === 'barra-x'", html)
+
     def test_the_context_menu_scrolls_and_stays_on_screen(self) -> None:
         # El menu del clic derecho crecio con el editor: con tope de alto
         # y barra propia, y recolocado ya medido para no salirse de la

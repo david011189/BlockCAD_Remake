@@ -1172,6 +1172,18 @@ let apretado = null;
 
 lienzo.addEventListener('contextmenu', (evento) => evento.preventDefault());
 
+// El menu del navegador tampoco debe salir SOBRE el menu de piezas ni en
+// las barras del visor: el clic derecho en una opcion o en su barra abria
+// los dos menus a la vez. En los cuadros de texto no se toca: alli el
+// menu nativo es el de copiar y pegar.
+addEventListener('contextmenu', (evento) => {
+  if (menuCtx.contains(evento.target)
+      || evento.target.id === 'barra-x'
+      || evento.target.id === 'barra-y') {
+    evento.preventDefault();
+  }
+});
+
 // El menu del clic derecho: dos verbos sobre la pieza pinchada. Vive en el
 // DOM normal y las opciones EDITAN EL CODIGO, como todo lo demas.
 const menuCtx = document.createElement('div');
